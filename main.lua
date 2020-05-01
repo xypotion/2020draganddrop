@@ -12,6 +12,7 @@
 --ooh, maybe even click/tap to skip the animation? probably not hard to do. and/or player can configure to be instantaneous
 
 require "eventSetQueue"
+require "pathfinding"
 
 function love.load()
 	math.randomseed(os.time())
@@ -63,6 +64,15 @@ function love.load()
 	mouseDownAtX, mouseDownAtY = 0, 0 --not sure if necessary
 	mouseStillDown = false
 	mouseHasntMovedFar = false
+	
+	
+	
+	
+	local map = mapAllPathsFrom(grid, {y = 1, x = 1})
+	
+	
+	
+	
 end
 
 function love.update(dt)
