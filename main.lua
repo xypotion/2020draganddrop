@@ -66,9 +66,11 @@ function love.load()
 	mouseHasntMovedFar = false
 	
 	
-	
-	
-	local map = mapAllPathsFrom(grid, {y = 1, x = 1})
+	--debuggy
+	currentCell = {y = 1, x = 1}
+	map = mapAllPathsFrom(grid, currentCell)
+	gameMode = "map"
+	hoveredCell = nil
 	
 	
 	
@@ -127,24 +129,60 @@ function love.draw()
 		end
 	end
 	
-	--things in grid
-	for y=1, 3 do
-		for x=1, 3 do
-			if grid[y][x].contents then
-				love.graphics.setColor(grid[y][x].contents.color)
-				love.graphics.circle("fill", (x-0.5)*cellSize + gridOffsetX, (y-0.5)*cellSize + gridOffsetY, cellSize*0.45)--, cellSize*0.45)
+	white()
+	
+	if gameMode == "map" then
+		--"hero"
+		love.graphics.circle("fill", (currentCell.x-0.5)*cellSize + gridOffsetX, (currentCell.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+		
+		--obstacles
+		for y, row in pairs(map) do
+			for x, c in pairs(row) do
+				if c.obstacle then
+					setColor(0,0,0)
+					love.graphics.circle("fill", (x-0.5)*cellSize + gridOffsetX, (y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+				end
 			end
 		end
-	end
+		
+		white()
+		
+		--path to currently selected destination
+		if hoveredCell then
+			love.graphics.circle("line", (hoveredCell.x-0.5)*cellSize + gridOffsetX, (hoveredCell.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+			
+			local pc = map[hoveredCell.y][hoveredCell.x].parentCell
+			
+			while pc do
+				-- print(pc.y, pc.x)
+				love.graphics.circle("line", (pc.x-0.5)*cellSize + gridOffsetX, (pc.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+				
+				pc = map[pc.y][pc.x].parentCell
+				-- tablePrint(pc)
+				-- if pc then print("true") end
+			end
+			
+		end
+	else
+		--things in grid
+		for y=1, 3 do
+			for x=1, 3 do
+				if grid[y][x].contents then
+					love.graphics.setColor(grid[y][x].contents.color)
+					love.graphics.circle("fill", (x-0.5)*cellSize + gridOffsetX, (y-0.5)*cellSize + gridOffsetY, cellSize*0.45)--, cellSize*0.45)
+				end
+			end
+		end
 	
-	--grabbedThing
-	if grabbedThing then
-		local mx, my = love.mouse.getPosition()
-		-- local mCellX, mCellY = math.floor(mx/cellSize),math.floor(my/cellSize)
-		setColor(grabbedThing.item.fadeColor)
-		love.graphics.circle("fill", mx - grabbedThing.relMouseX + cellSize/2, my - grabbedThing.relMouseY + cellSize/2, cellSize*0.45)--, cellSize*0.45)
+		--grabbedThing
+		if grabbedThing then
+			local mx, my = love.mouse.getPosition()
+			-- local mCellX, mCellY = math.floor(mx/cellSize),math.floor(my/cellSize)
+			setColor(grabbedThing.item.fadeColor)
+			love.graphics.circle("fill", mx - grabbedThing.relMouseX + cellSize/2, my - grabbedThing.relMouseY + cellSize/2, cellSize*0.45)--, cellSize*0.45)
+		end
 	end
-	
+		
 	white()
 end
 
@@ -198,9 +236,16 @@ function love.mousemoved(x,y)
 	local mCellX, mCellY = math.floor((x-gridOffsetX+cellSize)/cellSize), math.floor((y-gridOffsetY+cellSize)/cellSize)
 	-- print(mCellX, mCellY)
 	
+	hoveredCell = nil
+	
 	for y=1, 3 do
 		for x=1, 3 do
-			grid[y][x].mouseOver = y == mCellY and x == mCellX --so, true if these match, otherwise false
+			if y == mCellY and x == mCellX then
+				grid[y][x].mouseOver = true
+				hoveredCell = {y = y, x = x}
+			else
+				grid[y][x].mouseOver = false
+			end
 		end
 	end
 end

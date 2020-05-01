@@ -7,7 +7,7 @@ function mapAllPathsFrom(grid, start)
 	map[start.y][start.x].shortestDistanceFromStart = 0
 	
 	--DEBUG
-	map[2][1].obstacle = true
+	-- map[2][1].obstacle = true
 	map[2][2].obstacle = true
 	-- map[2][3].obstacle = true
 		
@@ -17,7 +17,7 @@ function mapAllPathsFrom(grid, start)
 	
 	--...and loop! until you run out of places to visit
 	while(current) do --and failsafe < 1000) do
-		print("loop iteration "..failsafe)
+		-- print("loop iteration "..failsafe)
 		-- failsafe = failsafe + 1
 		
 		uvn = findNextsUnvisitedNeighbors(map, current)
@@ -45,7 +45,7 @@ function interpretGrid(grid)
 		for j, x in ipairs(y) do
 			copy[k][j] = {				
 				shortestDistanceFromStart = 999,
-				parentCell = {},
+				parentCell = nil,--{},
 				visited = false,
 				
 				obstacle = false
