@@ -27,7 +27,7 @@ function mapAllPathsFrom(grid, start)
 		--mark current as visited
 		map[current.y][current.x].visited = true
 		
-		current = findUnvisitedCellWithShortestDistanceToCurrent(map, uvn, current)
+		current = findUnvisitedCellWithShortestDistanceToCurrent(map)
 	end
 		
 	tablePrint(map)
@@ -57,7 +57,7 @@ function interpretGrid(grid)
 end
 
 --
-function findUnvisitedCellWithShortestDistanceToCurrent(g, uvn, current)
+function findUnvisitedCellWithShortestDistanceToCurrent(g)
 	local next = nil
 	local shortestDistance = 999
 	
