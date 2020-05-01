@@ -1,5 +1,5 @@
 function mapAllPathsFrom(grid, start)
-	-- local failsafe = 0
+	local failsafe = 0
 		
 	local map = interpretGrid(grid)
 		
@@ -16,9 +16,9 @@ function mapAllPathsFrom(grid, start)
 	local uvn = nil
 	
 	--...and loop! until you run out of places to visit
-	while(current) do --and failsafe < 1000) do
+	while(current and failsafe < 1000) do
 		-- print("loop iteration "..failsafe)
-		-- failsafe = failsafe + 1
+		failsafe = failsafe + 1
 		
 		uvn = findNextsUnvisitedNeighbors(map, current)
 			
@@ -61,14 +61,15 @@ function findUnvisitedCellWithShortestDistanceToCurrent(g, uvn, current)
 	local next = nil
 	local shortestDistance = 999
 	
-	--check all neighbors, keeping only the one that's shortest
-	for k, neighborCoords in pairs(uvn) do
-		local gn = g[neighborCoords.y][neighborCoords.x]
-		if gn.shortestDistanceFromStart + 1 < shortestDistance then
-			next = neighborCoords
-			shortestDistance = gn.shortestDistanceFromStart
+	--check all cells, keeping only the one that's unvisited and nearest start
+	for y, row in pairs(g) do
+		for x, cell in pairs(row) do
+			if not cell.visited and cell.shortestDistanceFromStart + 1 < shortestDistance then
+				next = {y = y, x = x}
+				shortestDistance = cell.shortestDistanceFromStart
+			end
 		end
-	end
+	end	
 	
 	return next
 end
