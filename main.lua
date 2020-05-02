@@ -17,6 +17,7 @@ require "pathfinding"
 function love.load()
 	math.randomseed(os.time())
 	
+	-- make the GRID
 	grid = {}
 	for y=1, 3 do
 		grid[y] = {}
@@ -34,23 +35,44 @@ function love.load()
 	
 	initEventQueueSystem()
 
+
+	--ADD CONTENTS to the grid + track in things table
 	things = {}
-	for y=1, 3 do
-		for x=1, 3 do
+	-- for y=1, 3 do
+	-- 	for x=1, 3 do
+	for y, row in ipairs(grid) do
+		for x, cell in ipairs(row) do
 			local r, g, b = math.random(), math.random(), math.random()
-			local t = {
-				color = {r, g, b, 1},
-				fadeColor = {r, g, b, 0.5},
-				message = "my darkness is this strong: "..(1/(r+g+b))
-			}
+			local t = {class = "clear"}
 			
-			if math.random() < 0.25 then t = nil end
+			--generate some random obstacles
+			if math.random() < 0.25 then 
+				t = {
+					class = "obstacle",
+					color = {r, g, b, 1},
+					fadeColor = {r, g, b, 0.5},
+					message = "my darkness is this strong: "..(1/(r+g+b))
+				}
+			end
 			
+			--add t to things list...
 			table.insert(things, t)
 			
-			grid[y][x].contents = t
+			--...but more importantly, add to grid
+			cell.contents = t
 		end
 	end
+	
+	grid[1][1].contents = {
+		class = "hero",
+		color = {1,1,1,1},
+		fadeColor = {1,1,1,0.5},
+		message = "hero?"
+	}
+	
+	-- tablePrint(grid)
+	
+
 
 	-- grid[1][3].contents = thing1
 	-- grid[2][1].contents = thing2
@@ -66,13 +88,16 @@ function love.load()
 	mouseHasntMovedFar = false
 	
 	
+	
+	-- failSafe = 0
+	
 	--debuggy
-	currentCell = {y = 1, x = 1}
-	map = mapAllPathsFrom(grid, currentCell)
+	-- currentCell = {y = 1, x = 1}
+	grid = mapAllPathsFromHero(grid)--, currentCell)
 	gameMode = "map"
 	hoveredCell = nil
-	
-	
+		
+	tablePrint(grid)
 	
 	
 end
@@ -133,33 +158,40 @@ function love.draw()
 	
 	if gameMode == "map" then
 		--"hero"
-		love.graphics.circle("fill", (currentCell.x-0.5)*cellSize + gridOffsetX, (currentCell.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+		-- love.graphics.circle("fill", (currentCell.x-0.5)*cellSize + gridOffsetX, (currentCell.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
 		
 		--obstacles
-		for y, row in pairs(map) do
+		for y, row in pairs(grid) do
 			for x, c in pairs(row) do
-				if c.obstacle then
+				-- if c.obstacle then
 					setColor(0,0,0)
-					love.graphics.circle("fill", (x-0.5)*cellSize + gridOffsetX, (y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
-				end
+					-- love.graphics.circle("fill", (x-0.5)*cellSize + gridOffsetX, (y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+					if c.contents and c.contents.class ~= "clear" then
+						drawCellContents(c.contents, (y-0.5)*cellSize + gridOffsetY, (x-0.5)*cellSize + gridOffsetX)
+					end
+				-- end
 			end
 		end
 		
 		white()
 		
-		--path to currently selected destination
+		--path to currently hovered destination
 		if hoveredCell then
-			love.graphics.circle("line", (hoveredCell.x-0.5)*cellSize + gridOffsetX, (hoveredCell.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+			-- love.graphics.circle("line", (hoveredCell.x-0.5)*cellSize + gridOffsetX, (hoveredCell.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
 			
-			local pc = map[hoveredCell.y][hoveredCell.x].parentCell
-			
-			while pc do
-				-- print(pc.y, pc.x)
-				love.graphics.circle("line", (pc.x-0.5)*cellSize + gridOffsetX, (pc.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
-				
-				pc = map[pc.y][pc.x].parentCell
-				-- tablePrint(pc)
-				-- if pc then print("true") end
+			-- local pc = grid[hoveredCell.y][hoveredCell.x].pat
+			--
+			-- while pc do
+			-- 	-- print(pc.y, pc.x)
+			-- 	love.graphics.circle("line", (pc.x-0.5)*cellSize + gridOffsetX, (pc.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+			--
+			-- 	pc = grid[pc.y][pc.x].parentCell
+			-- 	-- tablePrint(pc)
+			-- 	-- if pc then print("true") end
+			-- end
+
+			for i, step in pairs(grid[hoveredCell.y][hoveredCell.x].pathFromHero) do
+				love.graphics.circle("line", (step.x-0.5)*cellSize + gridOffsetX, (step.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
 			end
 			
 		end
@@ -184,6 +216,43 @@ function love.draw()
 	end
 		
 	white()
+end
+
+
+-----------------------------------------------------------------------------------------------------------
+
+function drawStage()
+end
+
+function drawCellContents(obj, screenY, screenX)
+	-- print(screenY, screenX)
+	setColor(obj.color)
+	love.graphics.circle("fill", screenX, screenY, cellSize*0.45)
+end
+
+-----------------------------------------------------------------------------------------------------------
+
+
+--called for queueing move events after input is given
+function moveThingAtYX(y, x, dy, dx)
+	local ty, tx = y + dy, x + dx
+	
+	local moveFrames = {
+		{pose = "idle", yOffset = dy * -15, xOffset = dx * -15},
+		{pose = "idle", yOffset = dy * -10, xOffset = dx * -10},
+		{pose = "idle", yOffset = dy * -5, xOffset = dx * -5},
+		{pose = "idle", yOffset = 0, xOffset = 0},
+	}	
+
+	--queue pose and cell ops
+	queueSet({
+		-- cellOpEvent(ty, tx, hero),
+		-- cellOpEvent(y, x, clear()),
+		cellSwapEvent(grid, y, x, ty, tx), --i hope this works...
+		spriteMoveEvent(grid, ty, tx, moveFrames)
+	})
+	
+	processNow()
 end
 
 
@@ -295,6 +364,10 @@ function love.keypressed(key)
 			queue(cellSwapEvent(grid, math.random(3), math.random(3), math.random(3), math.random(3)))
 		end
 	end
+	
+	if key == "d" then
+		moveThingAtYX(1, 1, 0, 1)
+	end
 end
 
 --not sure if this is really that helpful...
@@ -384,8 +457,12 @@ function pop(q)
 	return item
 end
 
-function push(q, item)
-	table.insert(q, item)
+function push(q, item, place)
+	if place then
+		table.insert(q, place, item)
+	else
+		table.insert(q, item)
+	end
 end
 
 --an old debug-helper function i made in 2014 :)

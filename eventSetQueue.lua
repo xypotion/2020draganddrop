@@ -4,6 +4,7 @@
 -- what else? there must be more to it...
 
 require "events/cellOp"
+require "events/spriteMove"
 
 function initEventQueueSystem()
 	eventSetQueue = {}

@@ -1,55 +1,132 @@
-function mapAllPathsFrom(grid, start)
+function mapAllPathsFromHero(grid)--, start)
 	local failsafe = 0
 		
 	local map = interpretGrid(grid)
+	-- local map = grid --TODO this should not be necessary
 		
 	--set start point in the grid
-	map[start.y][start.x].shortestDistanceFromStart = 0
+	-- map[start.y][start.x].shortestDistanceFromStart = 0
 	
 	--DEBUG
 	-- map[2][1].obstacle = true
-	map[2][2].obstacle = true
+	-- map[2][2].obstacle = true
 	-- map[2][3].obstacle = true
 		
 	--prime...
-	local current = start
+	local currentLocation = findHeroLocationInGrid(grid)--start
+	map[currentLocation.y][currentLocation.x].shortestDistanceFromStart = 0
 	local uvn = nil
 	
-	--...and loop! until you run out of places to visit
-	while(current and failsafe < 1000) do
-		-- print("loop iteration "..failsafe)
+	--...and loop, dijkstra-style! until you run out of places to visit
+	while(currentLocation and failsafe < 100) do
+		
+		print("loop iteration "..failsafe)
 		failsafe = failsafe + 1
 		
-		uvn = findNextsUnvisitedNeighbors(map, current)
-			
-		updateDistancesAndParentCell(uvn, map, current)
+		uvn = findNextsUnvisitedNeighbors(map, currentLocation)
+		-- tablePrint(uvn)
+		
+		-- print("updateDistancesAndParentCell")
+		updateDistancesAndParentCell(uvn, map, currentLocation)
 	
 		--mark current as visited
-		map[current.y][current.x].visited = true
+		map[currentLocation.y][currentLocation.x].visited = true
 		
-		current = findUnvisitedCellWithShortestDistanceToCurrent(map)
+		currentLocation = findUnvisitedCellWithShortestDistanceToCurrent(map)
 	end
 		
-	tablePrint(map)
+	-- tablePrint(map)
 	
-	return map
+	return transferPathMapToGrid(map, grid)
+end
+
+function transferPathMapToGrid(m, g)
+	--zip map into grid
+	--or, zip "reverse paths into grid"
+	for y, row in ipairs(m) do
+		for x, cell in ipairs(row) do
+			--get path TO this cell. push(path, step, 1) should put the last step at the beginning of the list, which is what we want
+			local path = {{y = y, x = x}}
+			
+			--prime with map's matching cell
+			local pc = cell.parentCell
+			
+			-- tablePrint(cell)
+			
+			--and loop until there's no more parentCell
+			while pc do --and failSafe < 100 do
+				-- print("adding a path ", y, x)
+				
+				--unless
+				if m[pc.y][pc.x].parentCell then
+					--push a step in the path
+					push(path, pc)--, 1) TODO just for now
+				end
+				
+				--get next
+				pc = m[pc.y][pc.x].parentCell
+				
+				-- failSafe = failSafe + 1
+			end
+			
+			
+			--deposit path in grid
+			g[y][x].pathFromHero = path
+			
+			--also contents!
+			-- g[y][x].contents = cell.contents
+			
+			--DEBUG
+			-- if cell.obstacle then
+			-- 	g[y][x].contents = things[1]
+			-- -- else
+			-- 	-- grid[y][x].contents = things[2]
+			-- end
+		end
+	end
+	
+	return g
+end
+
+function findHeroLocationInGrid(g)
+	local heroLocation = nil
+	
+	-- tablePrint(g)
+	
+	for y, row in ipairs(g) do
+		for x, cell in ipairs(row) do
+			-- print(y,x)
+			-- tablePrint(cell)
+			if cell.contents.class == "hero" then
+				heroLocation = {y = y, x = x}
+			end
+		end
+	end
+	
+	return heroLocation
 end
 
 --make a copy of grid, noting obstacles
 --for now, nothing is an obstacle. hopefully won't be too hard TODO later
-function interpretGrid(grid)
+function interpretGrid(g)
 	local copy = {}
 	
-	for k, y in ipairs(grid) do
-		copy[k] = {}
-		for j, x in ipairs(y) do
-			copy[k][j] = {				
+	for y, row in ipairs(g) do
+		copy[y] = {}
+		for x, cell in ipairs(row) do				
+			copy[y][x] = {				
 				shortestDistanceFromStart = 999,
-				parentCell = nil,--{},
+				parentCell = nil,
 				visited = false,
 				
 				obstacle = false
 			}
+			
+			--shouldn't be necessary... TODO
+			if cell.contents.class == "obstacle" then
+				copy[y][x].obstacle = true
+			end
+			
 		end
 	end
 	
@@ -64,6 +141,9 @@ function findUnvisitedCellWithShortestDistanceToCurrent(g)
 	--check all cells, keeping only the one that's unvisited and nearest start
 	for y, row in pairs(g) do
 		for x, cell in pairs(row) do
+			-- print("findUnvisitedCellWithShortestDistanceToCurrent ", y, x)
+			-- tablePrint(cell)
+			
 			if not cell.visited and cell.shortestDistanceFromStart + 1 < shortestDistance then
 				next = {y = y, x = x}
 				shortestDistance = cell.shortestDistanceFromStart
@@ -88,6 +168,7 @@ function findNextsUnvisitedNeighbors(g, current)
 	return uvn
 end
 
+--TODO actually look at cell contents
 function getCellIfValid(g, y, x)
 	local c = nil
 	
@@ -100,13 +181,14 @@ end
 
 function updateDistancesAndParentCell(neighbors, g, current)
 	--loop through neighbors, updating each corresponding g member's shortestDistanceFromStart AND parent cell if there's a shorter one now
-	for k, n in pairs(neighbors) do
-		print(k)
-		tablePrint(n)
+	for i, n in pairs(neighbors) do
+		-- print(k)
+		-- tablePrint(n)
 		
 		local dist = g[current.y][current.x].shortestDistanceFromStart + 1
 		
 		if dist < g[n.y][n.x].shortestDistanceFromStart then
+			-- print("ping!")
 			g[n.y][n.x].parentCell = current
 			g[n.y][n.x].shortestDistanceFromStart = dist
 		end
