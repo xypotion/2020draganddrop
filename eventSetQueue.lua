@@ -4,6 +4,7 @@
 -- what else? there must be more to it...
 
 require "events/cellOp"
+require "events/gridOps"
 require "events/spriteMove"
 
 function initEventQueueSystem()
@@ -47,7 +48,10 @@ function eventProcessing(dt)
 			currentEvents = pop(eventSetQueue)
 		end
 		
+		if empty(currentEvents) then print("no current events") end
+		
 		for k, e in pairs(currentEvents) do
+		-- for k, e in pairs(currentEvents) do --TODO figure out why this breaks it. it should work BETTER, but it doesn't.
 			--if not already finished, process this event 
 			if not e.finished then
 				-- print("processing "..e.class)

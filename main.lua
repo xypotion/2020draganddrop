@@ -42,18 +42,20 @@ function love.load()
 	-- 	for x=1, 3 do
 	for y, row in ipairs(grid) do
 		for x, cell in ipairs(row) do
-			local r, g, b = math.random(), math.random(), math.random()
+			-- local r, g, b = math.random(), math.random(), math.random()
 			local t = {class = "clear"}
 			
-			--generate some random obstacles
-			if math.random() < 0.25 then 
-				t = {
-					class = "obstacle",
-					color = {r, g, b, 1},
-					fadeColor = {r, g, b, 0.5},
-					message = "my darkness is this strong: "..(1/(r+g+b))
-				}
-			end
+			-- --generate some random obstacles
+			-- if math.random() < 0.25 then
+			-- 	t = {
+			-- 		class = "obstacle",
+			-- 		color = {r, g, b, 1},
+			-- 		fadeColor = {r, g, b, 0.5},
+			-- 		message = "my darkness is this strong: "..(1/(r+g+b)),
+			-- 		yOffset = 0,
+			-- 		xOffset = 0
+			-- 	}
+			-- end
 			
 			--add t to things list...
 			table.insert(things, t)
@@ -67,8 +69,15 @@ function love.load()
 		class = "hero",
 		color = {1,1,1,1},
 		fadeColor = {1,1,1,0.5},
-		message = "hero?"
+		message = "hero?",
+		yOffset = 0,
+		xOffset = 0
 	}
+	
+	-- clearObstacles(grid)
+	-- addObstacles(grid)
+	
+	queue(gridOpEvent(grid, "add obstacles", {threshold = 0.2}))
 	
 	-- tablePrint(grid)
 	
@@ -227,7 +236,7 @@ end
 function drawCellContents(obj, screenY, screenX)
 	-- print(screenY, screenX)
 	setColor(obj.color)
-	love.graphics.circle("fill", screenX, screenY, cellSize*0.45)
+	love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.45)
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -237,12 +246,21 @@ end
 function moveThingAtYX(y, x, dy, dx)
 	local ty, tx = y + dy, x + dx
 	
+	-- local fourth = cellSize / 4
+	local max = 2
+	
 	local moveFrames = {
-		{pose = "idle", yOffset = dy * -15, xOffset = dx * -15},
-		{pose = "idle", yOffset = dy * -10, xOffset = dx * -10},
-		{pose = "idle", yOffset = dy * -5, xOffset = dx * -5},
-		{pose = "idle", yOffset = 0, xOffset = 0},
+		-- {pose = "idle", yOffset = dy * -(3 * fourth), xOffset = dx * -(3 * fourth)},
+		-- {pose = "idle", yOffset = dy * -(2 * fourth), xOffset = dx * -(2 * fourth)},
+		-- {pose = "idle", yOffset = dy * -(1 * fourth), xOffset = dx * -(1 * fourth)},
+		-- {pose = "idle", yOffset = 0, xOffset = 0},
 	}	
+	
+	for k = max - 1, 0, -1 do
+		push(moveFrames, {pose = "idle", yOffset = dy * -(cellSize * k / max), xOffset = dx * -(cellSize * k / max)})
+	end
+	
+	tablePrint(moveFrames)
 
 	--queue pose and cell ops
 	queueSet({
@@ -282,22 +300,48 @@ function love.mousereleased(mx, my, button)
 	-- local mCellX, mCellY = math.floor(mx/cellSize),math.floor(my/cellSize)
 	local mCellX, mCellY = math.floor((mx-gridOffsetX+cellSize)/cellSize), math.floor((my-gridOffsetY+cellSize)/cellSize)
 	
-	if grabbedThing and grabbedThing.item then
+	if gameMode == "map" then
+		-- print("a")
 		if cellExistsAt(mCellX, mCellY) then
-			queue(cellSwapEvent(grid, mCellY, mCellX, grabbedThing.originY, grabbedThing.originX))
-		end
+			-- print("b")
 		
-		grabbedThing = nil
-		processNow()		
+			-- local c = grid[mCellY][mCellX].contents
+			if grid[mCellY][mCellX].pathFromHero then
+				print("c")
+			
+				local starty = findHeroLocationInGrid(grid)
+				for i, step in ipairs(grid[mCellY][mCellX].pathFromHero) do
+					print("d")
+			
+					moveThingAtYX(starty.y, starty.x, step.y - starty.y, step.x - starty.x)
+					
+					starty = step
+				end
+				
+				queue(gridOpEvent(grid, "clear obstacles"))
+				queue(gridOpEvent(grid, "add obstacles", {threshold = 0.2}))
+				
+				queue(gridOpEvent(grid, "remap"))
+			end
+		end
+	else
+		if grabbedThing and grabbedThing.item then
+			if cellExistsAt(mCellX, mCellY) then
+				queue(cellSwapEvent(grid, mCellY, mCellX, grabbedThing.originY, grabbedThing.originX))
+			end
+		
+			grabbedThing = nil
+			processNow()		
+		end
+	
+		-- grabbedThing = nil
+		-- mouseDownAtX, mouseDownAtY = 0, 0 --i really feel like there should be a more efficient way to do this...
+		mouseDownTimer = 0
+		mouseStillDown = false
+		mouseHasntMovedFar = false
+	
+		processNow()
 	end
-	
-	-- grabbedThing = nil
-	-- mouseDownAtX, mouseDownAtY = 0, 0 --i really feel like there should be a more efficient way to do this...
-	mouseDownTimer = 0
-	mouseStillDown = false
-	mouseHasntMovedFar = false
-	
-	processNow()
 end
 
 function love.mousemoved(x,y)
@@ -366,7 +410,7 @@ function love.keypressed(key)
 	end
 	
 	if key == "d" then
-		moveThingAtYX(1, 1, 0, 1)
+		tablePrint(findHeroLocationInGrid(grid))
 	end
 end
 
@@ -445,6 +489,7 @@ function peek(q)
 	return q[1]
 end
 
+--why the hell is this so complicated? TODO
 function pop(q)
 	local item = q[1]
 	
@@ -457,12 +502,13 @@ function pop(q)
 	return item
 end
 
-function push(q, item, place)
-	if place then
-		table.insert(q, place, item)
-	else
-		table.insert(q, item)
-	end
+function push(q, item)
+	table.insert(q, item)
+end
+
+--basically just inserting at the other end from push()
+function reversePush(q, item)
+	table.insert(q, 1, item)
 end
 
 --an old debug-helper function i made in 2014 :)

@@ -60,7 +60,8 @@ function transferPathMapToGrid(m, g)
 				--unless
 				if m[pc.y][pc.x].parentCell then
 					--push a step in the path
-					push(path, pc)--, 1) TODO just for now
+					-- push(path, pc)
+					reversePush(path, pc)
 				end
 				
 				--get next
