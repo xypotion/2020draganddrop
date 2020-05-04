@@ -26,6 +26,7 @@ end
 
 -----------------------------------------------------------------------------------------------------------
 
+--TODO clean up. i'm not quite ready to yet...
 function eventProcessing(dt)
 	eventFrame = eventFrame + dt
 	

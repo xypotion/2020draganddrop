@@ -1,7 +1,7 @@
-function cellOpEvent(g, y, x, payload)
+function cellOpEvent(grid, y, x, payload)
 	local e = {
 		class = "cellOp",
-		grid = g,
+		grid = grid,
 		y = y,
 		x = x,
 		payload = payload
@@ -11,8 +11,6 @@ function cellOpEvent(g, y, x, payload)
 end
 
 function process_cellOpEvent(e)
-	-- tablePrint(e)
-	-- cellAt(e.y, e.x).contents = e.payload
 	e.grid[e.y][e.x].contents = e.payload
 		
 	e.finished = true
@@ -20,11 +18,11 @@ end
 
 -----------------------------------------------------------------------------------------------------------
 
---swap the contents of cells 1 and 2 in grid g
-function cellSwapEvent(g, y1, x1, y2, x2)
+--swap the CONTENTS of cells 1 and 2 in grid g
+function cellSwapEvent(grid, y1, x1, y2, x2)
 	local e = {
 		class = "cellSwap",
-		grid = g,
+		grid = grid,
 		y1 = y1, 
 		x1 = x1, 
 		y2 = y2,

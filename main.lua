@@ -35,30 +35,14 @@ function love.load()
 	
 	initEventQueueSystem()
 
-
 	--ADD CONTENTS to the grid + track in things table
-	things = {}
-	-- for y=1, 3 do
-	-- 	for x=1, 3 do
+	-- things = {}
 	for y, row in ipairs(grid) do
 		for x, cell in ipairs(row) do
-			-- local r, g, b = math.random(), math.random(), math.random()
 			local t = {class = "clear"}
 			
-			-- --generate some random obstacles
-			-- if math.random() < 0.25 then
-			-- 	t = {
-			-- 		class = "obstacle",
-			-- 		color = {r, g, b, 1},
-			-- 		fadeColor = {r, g, b, 0.5},
-			-- 		message = "my darkness is this strong: "..(1/(r+g+b)),
-			-- 		yOffset = 0,
-			-- 		xOffset = 0
-			-- 	}
-			-- end
-			
 			--add t to things list...
-			table.insert(things, t)
+			-- table.insert(things, t)
 			
 			--...but more importantly, add to grid
 			cell.contents = t
@@ -73,18 +57,8 @@ function love.load()
 		yOffset = 0,
 		xOffset = 0
 	}
-	
-	-- clearObstacles(grid)
-	-- addObstacles(grid)
-	
+		
 	queue(gridOpEvent(grid, "add obstacles", {threshold = 0.2}))
-	
-	-- tablePrint(grid)
-	
-
-
-	-- grid[1][3].contents = thing1
-	-- grid[2][1].contents = thing2
 	
 	grabbedThing = nil
 	
@@ -96,23 +70,16 @@ function love.load()
 	mouseStillDown = false
 	mouseHasntMovedFar = false
 	
-	
-	
-	-- failSafe = 0
-	
 	--debuggy
-	-- currentCell = {y = 1, x = 1}
-	grid = mapAllPathsFromHero(grid)--, currentCell)
-	gameMode = "map"
+	grid = mapAllPathsFromHero(grid) --TODO might rather make this "mapAllPathsFrom", then provide coordinates. also maybe a mode?
+	--also TODO shouldn't there be a way to not make this return things
+	gameMode = "map" --TODO shouldn't be necessary! remove & simplify
 	hoveredCell = nil
 		
-	tablePrint(grid)
-	
-	
+	-- tablePrint(grid)
 end
 
 function love.update(dt)
-	
 	eventProcessing(dt)
 	
 	--still maybe doing a long press?
@@ -146,12 +113,9 @@ function love.update(dt)
 	end
 end
 
-function love.draw()
-	-- setColor(.2,.2,.2)
-	
+function love.draw()	
 	--grid cells
 	for y=1, 3 do
-		-- love.graphics.line(x*cellSize, y*cellSize,x*cellSize, y*cellSize)
 		for x=1, 3 do
 			local cell = grid[y][x]
 			if cell.mouseOver then
@@ -186,19 +150,6 @@ function love.draw()
 		
 		--path to currently hovered destination
 		if hoveredCell then
-			-- love.graphics.circle("line", (hoveredCell.x-0.5)*cellSize + gridOffsetX, (hoveredCell.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
-			
-			-- local pc = grid[hoveredCell.y][hoveredCell.x].pat
-			--
-			-- while pc do
-			-- 	-- print(pc.y, pc.x)
-			-- 	love.graphics.circle("line", (pc.x-0.5)*cellSize + gridOffsetX, (pc.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
-			--
-			-- 	pc = grid[pc.y][pc.x].parentCell
-			-- 	-- tablePrint(pc)
-			-- 	-- if pc then print("true") end
-			-- end
-
 			for i, step in pairs(grid[hoveredCell.y][hoveredCell.x].pathFromHero) do
 				love.graphics.circle("line", (step.x-0.5)*cellSize + gridOffsetX, (step.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
 			end
@@ -210,7 +161,7 @@ function love.draw()
 			for x=1, 3 do
 				if grid[y][x].contents then
 					love.graphics.setColor(grid[y][x].contents.color)
-					love.graphics.circle("fill", (x-0.5)*cellSize + gridOffsetX, (y-0.5)*cellSize + gridOffsetY, cellSize*0.45)--, cellSize*0.45)
+					love.graphics.circle("fill", (x-0.5)*cellSize + gridOffsetX, (y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
 				end
 			end
 		end
@@ -218,9 +169,8 @@ function love.draw()
 		--grabbedThing
 		if grabbedThing then
 			local mx, my = love.mouse.getPosition()
-			-- local mCellX, mCellY = math.floor(mx/cellSize),math.floor(my/cellSize)
 			setColor(grabbedThing.item.fadeColor)
-			love.graphics.circle("fill", mx - grabbedThing.relMouseX + cellSize/2, my - grabbedThing.relMouseY + cellSize/2, cellSize*0.45)--, cellSize*0.45)
+			love.graphics.circle("fill", mx - grabbedThing.relMouseX + cellSize/2, my - grabbedThing.relMouseY + cellSize/2, cellSize*0.45)
 		end
 	end
 		
@@ -234,7 +184,6 @@ function drawStage()
 end
 
 function drawCellContents(obj, screenY, screenX)
-	-- print(screenY, screenX)
 	setColor(obj.color)
 	love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.45)
 end
@@ -246,27 +195,16 @@ end
 function moveThingAtYX(y, x, dy, dx)
 	local ty, tx = y + dy, x + dx
 	
-	-- local fourth = cellSize / 4
+	--max = the number of movement frames
 	local max = 2
-	
-	local moveFrames = {
-		-- {pose = "idle", yOffset = dy * -(3 * fourth), xOffset = dx * -(3 * fourth)},
-		-- {pose = "idle", yOffset = dy * -(2 * fourth), xOffset = dx * -(2 * fourth)},
-		-- {pose = "idle", yOffset = dy * -(1 * fourth), xOffset = dx * -(1 * fourth)},
-		-- {pose = "idle", yOffset = 0, xOffset = 0},
-	}	
 	
 	for k = max - 1, 0, -1 do
 		push(moveFrames, {pose = "idle", yOffset = dy * -(cellSize * k / max), xOffset = dx * -(cellSize * k / max)})
 	end
 	
-	tablePrint(moveFrames)
-
 	--queue pose and cell ops
 	queueSet({
-		-- cellOpEvent(ty, tx, hero),
-		-- cellOpEvent(y, x, clear()),
-		cellSwapEvent(grid, y, x, ty, tx), --i hope this works...
+		cellSwapEvent(grid, y, x, ty, tx), --eventually this won't work, but ok for now
 		spriteMoveEvent(grid, ty, tx, moveFrames)
 	})
 	
@@ -278,7 +216,6 @@ end
 
 
 function love.mousepressed(mx, my, button)
-	-- local mCellX, mCellY = math.floor(mx/cellSize),math.floor(my/cellSize)
 	local mCellX, mCellY = math.floor((mx-gridOffsetX+cellSize)/cellSize), math.floor((my-gridOffsetY+cellSize)/cellSize)
 	mouseDownAtX, mouseDownAtY = mx, my
 	
@@ -297,30 +234,26 @@ function love.mousepressed(mx, my, button)
 end
 
 function love.mousereleased(mx, my, button)
-	-- local mCellX, mCellY = math.floor(mx/cellSize),math.floor(my/cellSize)
 	local mCellX, mCellY = math.floor((mx-gridOffsetX+cellSize)/cellSize), math.floor((my-gridOffsetY+cellSize)/cellSize)
 	
 	if gameMode == "map" then
-		-- print("a")
 		if cellExistsAt(mCellX, mCellY) then
-			-- print("b")
-		
-			-- local c = grid[mCellY][mCellX].contents
+			
+			--is this somewhere that can be walked to?
 			if grid[mCellY][mCellX].pathFromHero then
-				print("c")
-			
+				--TODO make this more readable
 				local starty = findHeroLocationInGrid(grid)
-				for i, step in ipairs(grid[mCellY][mCellX].pathFromHero) do
-					print("d")
-			
+				for i, step in ipairs(grid[mCellY][mCellX].pathFromHero) do			
 					moveThingAtYX(starty.y, starty.x, step.y - starty.y, step.x - starty.x)
 					
 					starty = step
 				end
 				
+				--debug. just clear obstacles and then add some
 				queue(gridOpEvent(grid, "clear obstacles"))
 				queue(gridOpEvent(grid, "add obstacles", {threshold = 0.2}))
 				
+				--then once done walking, remap the paths
 				queue(gridOpEvent(grid, "remap"))
 			end
 		end
@@ -345,10 +278,10 @@ function love.mousereleased(mx, my, button)
 end
 
 function love.mousemoved(x,y)
-	-- print(math.floor(x/cellSize),math.floor(y/cellSize))
 	local mCellX, mCellY = math.floor((x-gridOffsetX+cellSize)/cellSize), math.floor((y-gridOffsetY+cellSize)/cellSize)
-	-- print(mCellX, mCellY)
-	
+
+	--are we now hovering over a grid cell?
+	--note that this will not really be a thing when the game is for touchscreens...
 	hoveredCell = nil
 	
 	for y=1, 3 do
@@ -364,7 +297,6 @@ function love.mousemoved(x,y)
 end
 
 function longPressEventAt(mx, my)
-	-- print(mx, my)
 	local t = getTopThingAtPos(mx, my)
 	
 	print(t.message)
@@ -375,27 +307,25 @@ function longPressEventAt(mx, my)
 	t.message = "my darkness is this strong: "..(1/(r+g+b))
 end
 
+--TODO maybe change this to just take cell coords
 function getTopThingAtPos(mx, my)
 	-- for thing in pairs(clickableThings) do
+	--	...
 	-- end
 	--wait, of course it's not gonna be this easy. hmmm
-	--...i still feel like this is th better way, though. TODO some system that puts all drawable things in a list like this. i guess? unless it's 100% not necessary
+	--...i still feel like this is the better way, though. TODO some system that puts all drawable things in a list like this. i guess? unless it's 100% not necessary
 	
-	-- if my >= cellSize and my <= cellSize * 4 and mx >= cellSize and mx <= cellSize * 4 then
+	--TODO yeah, this can definitely be abstracted, since other things use this
 	if my >= gridOffsetY and my <= cellSize * 3 + gridOffsetY and mx >= gridOffsetX and mx <= cellSize * 3 + gridOffsetX then		
-		-- cy, cx = math.floor(my / cellSize), math.floor(mx / cellSize)
 		local cx, cy = math.floor((mx-gridOffsetX+cellSize)/cellSize), math.floor((my-gridOffsetY+cellSize)/cellSize)
 		
 		if grid[cy] and grid[cy][cx] and grid[cy][cx].contents then
-			-- local r, g, b = math.random(), math.random(), math.random()
--- 			grid[cy][cx].contents.color = {r, g, b, 1}
--- 			grid[cy][cx].contents.fadeColor = {r, g, b, 0.5}
-			
 			return grid[cy][cx].contents
 		end
 	end
 end
 
+--basically all debug functions! :P
 function love.keypressed(key)
 	if key == "escape" then love.event.quit() end
 	
@@ -423,21 +353,21 @@ function cellExistsAt(x, y)
 	end
 end
 
--- function itemAt(x, y)
+--TODO decide you need this or not. not sure if it's necessary when you can just do grid[y][x]
+--copied from HDBS:
+-- function cellAt(y, x)
+-- 	-- if stage.field[y] then
+-- 	-- 	return stage.field[y][x]
 -- 	if grid[y] and grid[y][x] and grid[y][x].contents then
--- 		return grid[y][x].contents
+-- 		return grid[y][x]
 -- 	else
 -- 		return nil
 -- 	end
 -- end
 
---copied from HDBS:
---i'm honestly a little freaked out that you can use this to SET cell attributes, but i guess that's what "pass by reference" is all about. ok! i guess!!
--- function xcellAt(y, x)
--- 	-- if stage.field[y] then
--- 	-- 	return stage.field[y][x]
+-- function itemAt(x, y)
 -- 	if grid[y] and grid[y][x] and grid[y][x].contents then
--- 		return grid[y][x]
+-- 		return grid[y][x].contents
 -- 	else
 -- 		return nil
 -- 	end
@@ -502,6 +432,7 @@ function pop(q)
 	return item
 end
 
+--TODO maybe find better names for these two functions...
 function push(q, item)
 	table.insert(q, item)
 end

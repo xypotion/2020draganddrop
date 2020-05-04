@@ -1,3 +1,5 @@
+--the intention is for these "grid ops" to be self explanatory
+
 function gridOpEvent(g, command, params)
 	local e = {
 		class = "gridOp",
