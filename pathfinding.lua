@@ -1,5 +1,5 @@
 function mapAllPathsFromHero(grid)--, start)
-	local failsafe = 0
+	-- local failsafe = 0
 		
 	local map = interpretGrid(grid)
 	-- local map = grid --TODO this should not be necessary
@@ -10,10 +10,9 @@ function mapAllPathsFromHero(grid)--, start)
 	local uvn = nil
 	
 	--...and loop, dijkstra-style! until you run out of places to visit
-	while(currentLocation and failsafe < 100) do
-		
-		print("loop iteration "..failsafe)
-		failsafe = failsafe + 1
+	while(currentLocation) do-- and failsafe < 100) do
+		-- print("loop iteration "..failsafe)
+		-- failsafe = failsafe + 1
 		
 		uvn = findNextsUnvisitedNeighbors(map, currentLocation)
 		

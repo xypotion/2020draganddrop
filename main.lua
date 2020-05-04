@@ -58,7 +58,9 @@ function love.load()
 		xOffset = 0
 	}
 		
+	--this is not elegant (you're mapping twice at boot), but it's debug junk anyway. doesn't matter
 	queue(gridOpEvent(grid, "add obstacles", {threshold = 0.2}))
+	queue(gridOpEvent(grid, "remap"))
 	
 	grabbedThing = nil
 	
@@ -197,6 +199,7 @@ function moveThingAtYX(y, x, dy, dx)
 	
 	--max = the number of movement frames
 	local max = 2
+	local moveFrames = {}
 	
 	for k = max - 1, 0, -1 do
 		push(moveFrames, {pose = "idle", yOffset = dy * -(cellSize * k / max), xOffset = dx * -(cellSize * k / max)})
