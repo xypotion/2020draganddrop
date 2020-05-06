@@ -32,30 +32,32 @@ function transferPathMapToGrid(m, g)
 	--or, zip "reverse paths into grid"
 	for y, row in ipairs(m) do
 		for x, cell in ipairs(row) do
-			--get path TO this cell. push(path, step, 1) should put the last step at the beginning of the list, which is what we want
-			local path = {{y = y, x = x}}
-			
-			--prime with map's matching cell
-			local pc = cell.parentCell
-			
-			
-			--and loop until there's no more parentCell
-			while pc do --and failSafe < 100 do
-				
-				--push this parent cell to the beginning of the list, unless we have found the end
-				if m[pc.y][pc.x].parentCell then
-					--push a step in the path
-					reversePush(path, pc)
+			if cell.parentCell then
+				--get path TO this cell. push(path, step, 1) should put the last step at the beginning of the list, which is what we want
+				local path = {{y = y, x = x}}
+
+				--prime with map's matching cell
+				local pc = cell.parentCell
+
+				--and loop until there's no more parentCell
+				while pc do --and failSafe < 100 do
+					--push this parent cell to the beginning of the list, unless we have found the end
+					if m[pc.y][pc.x].parentCell then
+						--add a step in the path
+						reversePush(path, pc)
+					end
+
+					--get next
+					pc = m[pc.y][pc.x].parentCell
+
+					-- failSafe = failSafe + 1
 				end
 				
-				--get next
-				pc = m[pc.y][pc.x].parentCell
-				
-				-- failSafe = failSafe + 1
+				--deposit path in grid
+				g[y][x].pathFromHero = path
+			else
+				g[y][x].pathFromHero = {}
 			end
-			
-			--deposit path in grid
-			g[y][x].pathFromHero = path
 		end
 	end
 	

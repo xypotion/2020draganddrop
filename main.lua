@@ -17,6 +17,13 @@ require "pathfinding"
 function love.load()
 	math.randomseed(os.time())
 	
+	love.window.setTitle("<3")
+	
+	cellSize = 72
+	love.window.setMode(cellSize * 5, cellSize * 9)
+
+	gridOffsetX, gridOffsetY = cellSize, cellSize
+	
 	-- make the GRID
 	grid = {}
 	for y=1, 3 do
@@ -30,8 +37,6 @@ function love.load()
 			}
 		end
 	end
-
-	gridOffsetX, gridOffsetY = 144, 144
 	
 	initEventQueueSystem()
 
@@ -63,8 +68,6 @@ function love.load()
 	queue(gridOpEvent(grid, "remap"))
 	
 	grabbedThing = nil
-	
-	cellSize = 72
 	
 	longPressTime = 0.5
 	mouseDownTimer = 0
@@ -344,6 +347,10 @@ function love.keypressed(key)
 	
 	if key == "d" then
 		tablePrint(findHeroLocationInGrid(grid))
+	end
+	
+	if key == "g" then
+		tablePrint(grid)
 	end
 end
 
