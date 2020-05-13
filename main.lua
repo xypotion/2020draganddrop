@@ -79,11 +79,14 @@ function love.load()
 	--also TODO shouldn't there be a way to not make this return things
 	gameMode = "map" --TODO shouldn't be necessary! remove & simplify
 	hoveredCell = nil
+	
+	
+	tablePrint(allCellsInGrid(grid))
 		
 	
 	--pretending i know how the hero object will be structured
 	initHERO()
-	tablePrint(HERO)
+	-- tablePrint(HERO)
 	
 end
 
@@ -385,6 +388,22 @@ end
 -- 		return nil
 -- 	end
 -- end
+
+--for use when you need to read all the cells in a 2D array and don't want to do the nested 'for' loops. kinda dumb, but worth a try.
+--GOOD for tallying stat bonuses or checking for the presence of a single thing
+--NOT good for geometric things like pathing, finding syncs, targeting actions, etc
+--MIGHT work for times you need to change the contents/properties of all grid cells, but not sure. still avoid geometric contexts, of course.
+function allCellsInGrid(g)
+	local cells = {}
+	
+	for y, row in ipairs(g) do
+		for x, cell in ipairs(row) do
+			push(cells, {y = y, x = x, cell = cell})
+		end
+	end
+	
+	return cells
+end
 
 
 -----------------------------------------------------------------------------------------------------------

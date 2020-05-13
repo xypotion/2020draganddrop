@@ -63,7 +63,11 @@ function initHERO()
 	--starting card/skill/gear/etc inventories
 	HERO.cards = {}
 	HERO.skill = {}
-	HERO.gear = {}
+	HERO.gear = {
+		newGear(1),
+		newGear(2),
+		newGear(3),
+	}
 	HERO.keyItems = {}
 	HERO.stories = {}
 	HERO.recipes = {}
@@ -73,14 +77,19 @@ function initHERO()
 	
 	
 	--put stuff in grids
+	-- HERO.bodies[1][2][2].contents = 
 	
 	
 	--put grids, etc in hero grid
-	HERO.heroGrid[2][2] = {"heart", 1}
-	HERO.heroGrid[2][1] = {"mind", 1}
-	HERO.heroGrid[2][3] = {"body", 1}
-	HERO.heroGrid[1][2] = {"invocation", 1}
-	HERO.heroGrid[3][2] = {"pet", 1}
+	HERO.heroGrid[2][2].contents = {type = "heart", id = 1}
+	HERO.heroGrid[2][1].contents = {type = "mind", id = 1}
+	HERO.heroGrid[2][3].contents = {type = "body", id = 1}
+	HERO.heroGrid[1][2].contents = {type = "invocation", id = 1}
+	HERO.heroGrid[3][2].contents = {type = "pet", id = 1}
+	
+	HERO.activeHeart = 1
+	HERO.activeMind = 1
+	HERO.activeBody = 1
 	
 	
 	--and actually get ready to do stuff
@@ -107,11 +116,26 @@ function newPet()
 	return {}
 end
 
+function newGear(id)
+	return {id = id}
+end
+
 
 ---------------------------------------------------------------------------------------------------
 
 
 --will be called often; accounts for everything! racial skills, gear, grid bonuses, etc
 function calculateHEROStats()
+	--use HERO.baseStats to initialize
+	
+	
+	--factor in affinity levels
+	
+	
+	--factor in current all bonuses from equipped, active grids in hero grid
+	
+	
+	--factor in stat bonuses from current body's gear
+	
 end
 
