@@ -1,18 +1,17 @@
---it works! now, what would happen in a BE grid? imagine using a QUEUE to line up events
---1. thing is grabbed and the mouse is released. make sure (1) it can be moved, (2) its destination is valid; (3) check the same two things for the other item if it's a swap
---2. IF dest is empty, just drop it in; no animation (actuation);
-	-- ELSE it's swapping with something, so actuate both items swapping with each other
---3. actually place the item in the grid cell; swap if necessary; this should maybe be done before the actuation
---4. re-calculate stats/whatever. probably no animation here, but do update display. actuate if you want to be fancy, but make it quick
---5. re-calculate all syncs IF THERE WAS A CHANGE TO THEM. probably check this ahead of time. 
---		if there wasn't, then account for them again (multipliers, whatever) silently
---		if there was, then wipe them now and show base stats/whatever. actuate if you want to be fancy...
---6. if syncs have to be demonstrated, quickly animate each line being drawn, then update sync display
---all of this should happen fairly quickly. don't make player wait around while sync lines are being redrawn... like a second or two at most
---ooh, maybe even click/tap to skip the animation? probably not hard to do. and/or player can configure to be instantaneous
+--[[
+things that would be good to do next
+- multiple grids; nav on top, drag & drop on bottom
+- "inventory" or "drawer" of items to drag into/between grids. maybe can drag obstacles from bottom to top? :)
+- obs-tacular pathing, like different ways of pathing near/around/over different types of things
+- canvases + click input
+- build & test this shit on android
+  - ugh, and start building a quicksave framework with auto-serialize or recursive table-zipping... but also check forums to see if there's a better way. :/
+]]
+
 
 require "eventSetQueue"
 require "pathfinding"
+require "hero"
 
 function love.load()
 	math.randomseed(os.time())
@@ -81,7 +80,11 @@ function love.load()
 	gameMode = "map" --TODO shouldn't be necessary! remove & simplify
 	hoveredCell = nil
 		
-	-- tablePrint(grid)
+	
+	--pretending i know how the hero object will be structured
+	initHERO()
+	tablePrint(HERO)
+	
 end
 
 function love.update(dt)
@@ -385,6 +388,29 @@ end
 
 
 -----------------------------------------------------------------------------------------------------------
+
+function new3x3Grid(cellPrimer)
+	return newGrid(3, 3, cellPrimer)
+end
+
+function newGrid(height, width, cellPrimer)
+	-- if not height then height, width = 3, 3 end
+	cellPrimer = cellPrimer or {}
+		
+	local g = {}
+	
+	for y = 1, height do
+		g[y] = {}
+		for x = 1, width do
+			g[y][x] = {}
+			for k, v in pairs(cellPrimer) do
+				g[y][x][k] = v
+			end
+		end
+	end
+	
+	return g
+end
 
 
 function white()
