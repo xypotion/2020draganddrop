@@ -11,7 +11,7 @@ function initEventQueueSystem()
 	eventSetQueue = {}
 	
 	eventFrame = 0
-	eventFrameLength = 0.05
+	eventFrameLength = 0.0125
 	
 	currentEvents = {}
 end

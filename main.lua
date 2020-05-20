@@ -27,7 +27,7 @@ function love.load()
 	GRIDS = {}
 	GRIDS.debug = initDebugGrid()
 	-- GRIDS.debug.offsetX, GRIDS.debug.offsetY = cellSize, cellSize
-	GRIDS.debug.offsetX, GRIDS.debug.offsetY = cellSize, cellSize
+	GRIDS.debug.offsetX, GRIDS.debug.offsetY = 0, 0 --cellSize, cellSize
 
 	-- tablePrint(allCellsInGrid(GRIDS.debug))
 		
@@ -63,9 +63,11 @@ end
 function initDebugGrid()
 	local grid = {}
 	
-	for y=1, 3 do
+	local debugGridSize = 5
+	
+	for y=1, debugGridSize do
 		grid[y] = {}
-		for x=1, 3 do
+		for x=1, debugGridSize do
 			local r, g, b = math.random(), math.random(), math.random()
 			grid[y][x] = {
 				mouseOver = false,
@@ -137,17 +139,19 @@ end
 
 function love.draw()	
 	--grid cells
-	for y=1, 3 do
-		for x=1, 3 do
-			local cell = GRIDS.debug[y][x]
-			if cell.mouseOver then
-				setColor(cell.bgHoverColor)
-			else
-				setColor(cell.bgColor)
-			end
-			love.graphics.rectangle("fill", (x-1)*cellSize+1+GRIDS.debug.offsetX, (y-1)*cellSize+1+GRIDS.debug.offsetY, cellSize-2, cellSize-2)
+	-- for y=1, 3 do
+	-- 	for x=1, 3 do
+	for k, v in ipairs(allCellsInGrid(GRIDS.debug)) do
+			-- local cell = GRIDS.debug[y][x]
+			-- tablePrint(cell)
+		if v.cell.mouseOver then
+			setColor(v.cell.bgHoverColor)
+		else
+			setColor(v.cell.bgColor)
 		end
+		love.graphics.rectangle("fill", (v.x-1)*cellSize+1+GRIDS.debug.offsetX, (v.y-1)*cellSize+1+GRIDS.debug.offsetY, cellSize-2, cellSize-2)
 	end
+	-- end
 	
 	white()
 	
@@ -220,7 +224,7 @@ function moveThingAtYX(y, x, dy, dx)
 	local ty, tx = y + dy, x + dx
 	
 	--max = the number of movement frames
-	local max = 2
+	local max = 4
 	local moveFrames = {}
 	
 	for k = max - 1, 0, -1 do
@@ -302,22 +306,24 @@ function love.mousereleased(mx, my, button)
 	-- end
 end
 
-function love.mousemoved(x,y)
-	local mCellX, mCellY = math.floor((x-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((y-GRIDS.debug.offsetY+cellSize)/cellSize)
+function love.mousemoved(mx,my)
+	local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
 
 	--are we now hovering over a grid cell?
 	--note that this will not really be a thing when the game is for touchscreens...
 	hoveredCell = nil
 	
-	for y=1, 3 do
-		for x=1, 3 do
-			if y == mCellY and x == mCellX then
-				GRIDS.debug[y][x].mouseOver = true
-				hoveredCell = {y = y, x = x}
+	-- for y=1, 3 do
+	-- 	for x=1, 3 do
+	for k, v in ipairs(allCellsInGrid(GRIDS.debug)) do
+			if v.y == mCellY and v.x == mCellX then
+				-- GRIDS.debug[y][x].mouseOver = true
+				v.cell.mouseOver = true
+				hoveredCell = {y = mCellY, x = mCellX} --wait, why is this needed?
 			else
-				GRIDS.debug[y][x].mouseOver = false
+				v.cell.mouseOver = false
 			end
-		end
+		-- end
 	end
 end
 
@@ -341,7 +347,7 @@ function getTopThingAtPos(mx, my)
 	--...i still feel like this is the better way, though. TODO some system that puts all drawable things in a list like this. i guess? unless it's 100% not necessary
 	
 	--TODO yeah, this can definitely be abstracted, since other things use this
-	if my >= GRIDS.debug.offsetY and my <= cellSize * 3 + GRIDS.debug.offsetY and mx >= GRIDS.debug.offsetX and mx <= cellSize * 3 + GRIDS.debug.offsetX then		
+	if my >= GRIDS.debug.offsetY and my <= cellSize * 5 + GRIDS.debug.offsetY and mx >= GRIDS.debug.offsetX and mx <= cellSize * 5 + GRIDS.debug.offsetX then		
 		local cx, cy = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
 		
 		if GRIDS.debug[cy] and GRIDS.debug[cy][cx] and GRIDS.debug[cy][cx].contents then
