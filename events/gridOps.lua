@@ -17,7 +17,7 @@ function process_gridOpEvent(e)
 	elseif e.command == "clear obstacles" then
 		for y, row in ipairs(e.g) do
 			for x, cell in ipairs(row) do
-				if cell.contents.class == "obstacle" then
+				if cell.contents.class ~= "hero" then
 					cell.contents = {class = "clear"}
 				end
 			end
@@ -30,7 +30,7 @@ function process_gridOpEvent(e)
 					local r, g, b = math.random(), math.random(), math.random()
 		
 					t = {
-						class = "obstacle",
+						class = e.params.type,
 						color = {r, g, b, 1},
 						fadeColor = {r, g, b, 0.5},
 						message = "my darkness is this strong: "..(1/(r+g+b)),

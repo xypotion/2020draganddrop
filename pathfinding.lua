@@ -99,7 +99,9 @@ function interpretGrid(g)
 			}
 			
 			--shouldn't be necessary... TODO
-			if cell.contents.class == "obstacle" then
+			if cell.contents.class == "block" 
+			or cell.contents.class == "danger" 
+			or cell.contents.class == "npc" then
 				copy[y][x].obstacle = true
 			end
 		end

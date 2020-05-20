@@ -32,7 +32,10 @@ function love.load()
 	-- tablePrint(allCellsInGrid(GRIDS.debug))
 		
 	--this is not elegant (you're mapping twice at boot), but it's debug junk anyway. doesn't matter
-	queue(gridOpEvent(GRIDS.debug, "add obstacles", {threshold = 0.2}))
+	queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
+	queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
+	queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
+	queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1}))
 	queue(gridOpEvent(GRIDS.debug, "remap"))
 	
 	grabbedThing = nil
@@ -49,6 +52,10 @@ function love.load()
 	--also TODO shouldn't there be a way to not make this return things
 	gameMode = "debug" --TODO shouldn't be necessary! remove & simplify
 	hoveredCell = nil
+	
+	softOscillator = 1
+	oscillatorCounter = 0
+	TAU = math.pi * 2
 	
 	
 	-- tablePrint(GRIDS)
@@ -104,6 +111,9 @@ function initDebugGrid()
 end
 
 function love.update(dt)
+	oscillatorCounter = oscillatorCounter + dt * 5 % TAU
+	softOscillator = 0.25 + math.sin(oscillatorCounter) * 0.0625
+	
 	eventProcessing(dt)
 	
 	--still maybe doing a long press?
@@ -212,7 +222,18 @@ end
 
 function drawCellContents(obj, screenY, screenX)
 	setColor(obj.color)
-	love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.45)
+	
+	if obj.class == "block" then
+		love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.5, 6)
+	elseif obj.class == "danger" then
+		love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize * 0.4, 4)
+	elseif obj.class == "npc" then
+		love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.35)
+	elseif obj.class == "item" then
+		love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.15)
+	elseif obj.class == "hero" then
+		love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize * softOscillator)
+	end
 	-- love.graphics.polygon("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.45)
 end
 
@@ -280,7 +301,10 @@ function love.mousereleased(mx, my, button)
 				
 				--debug. just clear obstacles and then add some
 				queue(gridOpEvent(GRIDS.debug, "clear obstacles"))
-				queue(gridOpEvent(GRIDS.debug, "add obstacles", {threshold = 0.2}))
+				queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
+				queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
+				queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
+				queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1}))
 				
 				--then once done walking, remap the paths
 				queue(gridOpEvent(GRIDS.debug, "remap"))
