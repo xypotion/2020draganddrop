@@ -20,11 +20,49 @@ function love.load()
 	
 	cellSize = 72
 	love.window.setMode(cellSize * 5, cellSize * 9)
-
-	gridOffsetX, gridOffsetY = cellSize, cellSize
 	
-	-- make the GRID
-	grid = {}
+	initEventQueueSystem()
+	
+	-- make the GRIDS
+	GRIDS = {}
+	GRIDS.debug = initDebugGrid()
+	-- GRIDS.debug.offsetX, GRIDS.debug.offsetY = cellSize, cellSize
+	GRIDS.debug.offsetX, GRIDS.debug.offsetY = cellSize, cellSize
+
+	-- tablePrint(allCellsInGrid(GRIDS.debug))
+		
+	--this is not elegant (you're mapping twice at boot), but it's debug junk anyway. doesn't matter
+	queue(gridOpEvent(GRIDS.debug, "add obstacles", {threshold = 0.2}))
+	queue(gridOpEvent(GRIDS.debug, "remap"))
+	
+	grabbedThing = nil
+	
+	longPressTime = 0.5
+	mouseDownTimer = 0
+	mouseDownAtX, mouseDownAtY = 0, 0 --not sure if necessary
+	mouseStillDown = false
+	mouseHasntMovedFar = false
+	
+	--debuggy
+	GRIDS.debug = mapAllPathsFromHero(GRIDS.debug) --TODO might rather make this "mapAllPathsFrom", then provide coordinates. also maybe a mode?
+	
+	--also TODO shouldn't there be a way to not make this return things
+	gameMode = "debug" --TODO shouldn't be necessary! remove & simplify
+	hoveredCell = nil
+	
+	
+	-- tablePrint(GRIDS)
+		
+	
+	--pretending i know how the hero object will be structured
+	initHERO()
+	-- tablePrint(HERO)
+	
+end
+
+function initDebugGrid()
+	local grid = {}
+	
 	for y=1, 3 do
 		grid[y] = {}
 		for x=1, 3 do
@@ -36,8 +74,6 @@ function love.load()
 			}
 		end
 	end
-	
-	initEventQueueSystem()
 
 	--ADD CONTENTS to the grid + track in things table
 	-- things = {}
@@ -61,33 +97,8 @@ function love.load()
 		yOffset = 0,
 		xOffset = 0
 	}
-		
-	--this is not elegant (you're mapping twice at boot), but it's debug junk anyway. doesn't matter
-	queue(gridOpEvent(grid, "add obstacles", {threshold = 0.2}))
-	queue(gridOpEvent(grid, "remap"))
 	
-	grabbedThing = nil
-	
-	longPressTime = 0.5
-	mouseDownTimer = 0
-	mouseDownAtX, mouseDownAtY = 0, 0 --not sure if necessary
-	mouseStillDown = false
-	mouseHasntMovedFar = false
-	
-	--debuggy
-	grid = mapAllPathsFromHero(grid) --TODO might rather make this "mapAllPathsFrom", then provide coordinates. also maybe a mode?
-	--also TODO shouldn't there be a way to not make this return things
-	gameMode = "map" --TODO shouldn't be necessary! remove & simplify
-	hoveredCell = nil
-	
-	
-	tablePrint(allCellsInGrid(grid))
-		
-	
-	--pretending i know how the hero object will be structured
-	initHERO()
-	-- tablePrint(HERO)
-	
+	return grid
 end
 
 function love.update(dt)
@@ -128,30 +139,30 @@ function love.draw()
 	--grid cells
 	for y=1, 3 do
 		for x=1, 3 do
-			local cell = grid[y][x]
+			local cell = GRIDS.debug[y][x]
 			if cell.mouseOver then
 				setColor(cell.bgHoverColor)
 			else
 				setColor(cell.bgColor)
 			end
-			love.graphics.rectangle("fill", (x-1)*cellSize+1+gridOffsetX, (y-1)*cellSize+1+gridOffsetY, cellSize-2, cellSize-2)
+			love.graphics.rectangle("fill", (x-1)*cellSize+1+GRIDS.debug.offsetX, (y-1)*cellSize+1+GRIDS.debug.offsetY, cellSize-2, cellSize-2)
 		end
 	end
 	
 	white()
 	
-	if gameMode == "map" then
+	-- if gameMode == "map" then
 		--"hero"
-		-- love.graphics.circle("fill", (currentCell.x-0.5)*cellSize + gridOffsetX, (currentCell.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+		-- love.graphics.circle("fill", (currentCell.x-0.5)*cellSize + GRIDS.debug.offsetX, (currentCell.y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
 		
 		--obstacles
-		for y, row in pairs(grid) do
-			for x, c in pairs(row) do
+		for y, row in ipairs(GRIDS.debug) do
+			for x, c in ipairs(row) do
 				-- if c.obstacle then
 					setColor(0,0,0)
-					-- love.graphics.circle("fill", (x-0.5)*cellSize + gridOffsetX, (y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+					-- love.graphics.circle("fill", (x-0.5)*cellSize + GRIDS.debug.offsetX, (y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
 					if c.contents and c.contents.class ~= "clear" then
-						drawCellContents(c.contents, (y-0.5)*cellSize + gridOffsetY, (x-0.5)*cellSize + gridOffsetX)
+						drawCellContents(c.contents, (y-0.5)*cellSize + GRIDS.debug.offsetY, (x-0.5)*cellSize + GRIDS.debug.offsetX)
 					end
 				-- end
 			end
@@ -161,29 +172,30 @@ function love.draw()
 		
 		--path to currently hovered destination
 		if hoveredCell then
-			for i, step in pairs(grid[hoveredCell.y][hoveredCell.x].pathFromHero) do
-				love.graphics.circle("line", (step.x-0.5)*cellSize + gridOffsetX, (step.y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
+			for i, step in pairs(GRIDS.debug[hoveredCell.y][hoveredCell.x].pathFromHero) do
+				love.graphics.circle("line", (step.x-0.5)*cellSize + GRIDS.debug.offsetX, (step.y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
 			end
 			
 		end
-	else
-		--things in grid
-		for y=1, 3 do
-			for x=1, 3 do
-				if grid[y][x].contents then
-					love.graphics.setColor(grid[y][x].contents.color)
-					love.graphics.circle("fill", (x-0.5)*cellSize + gridOffsetX, (y-0.5)*cellSize + gridOffsetY, cellSize*0.45)
-				end
-			end
-		end
-	
-		--grabbedThing
-		if grabbedThing then
-			local mx, my = love.mouse.getPosition()
-			setColor(grabbedThing.item.fadeColor)
-			love.graphics.circle("fill", mx - grabbedThing.relMouseX + cellSize/2, my - grabbedThing.relMouseY + cellSize/2, cellSize*0.45)
-		end
-	end
+	-- else
+		--things in grid		--
+		-- for y=1, 3 do
+		-- 	for x=1, 3 do
+		-- 		if GRIDS.debug[y][x].contents and GRIDS.debug[y][x].contents.color then
+		-- 			love.graphics.setColor(GRIDS.debug[y][x].contents.color)
+		-- 			love.graphics.circle("fill", (x-0.5)*cellSize + GRIDS.debug.offsetX, (y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
+		-- 		end
+		-- 	end
+		-- end
+		--
+		-- --grabbedThing
+		-- if grabbedThing then
+		-- 	local mx, my = love.mouse.getPosition()
+		-- 	-- tablePrint(grabbedThing)
+		-- 	setColor(grabbedThing.item.fadeColor)
+		-- 	love.graphics.circle("fill", mx - grabbedThing.relMouseX + cellSize/2, my - grabbedThing.relMouseY + cellSize/2, cellSize*0.45)
+		-- end
+	-- end
 		
 	white()
 end
@@ -197,6 +209,7 @@ end
 function drawCellContents(obj, screenY, screenX)
 	setColor(obj.color)
 	love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.45)
+	-- love.graphics.polygon("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.45)
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -216,8 +229,8 @@ function moveThingAtYX(y, x, dy, dx)
 	
 	--queue pose and cell ops
 	queueSet({
-		cellSwapEvent(grid, y, x, ty, tx), --eventually this won't work, but ok for now
-		spriteMoveEvent(grid, ty, tx, moveFrames)
+		cellSwapEvent(GRIDS.debug, y, x, ty, tx), --eventually this won't work, but ok for now
+		spriteMoveEvent(GRIDS.debug, ty, tx, moveFrames)
 	})
 	
 	processNow()
@@ -228,15 +241,15 @@ end
 
 
 function love.mousepressed(mx, my, button)
-	local mCellX, mCellY = math.floor((mx-gridOffsetX+cellSize)/cellSize), math.floor((my-gridOffsetY+cellSize)/cellSize)
+	local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
 	mouseDownAtX, mouseDownAtY = mx, my
 	
-	--if we're clicking in the grid and there's an item there, "grab" it
-	if grid[mCellY] and grid[mCellY][mCellX] and grid[mCellY][mCellX].contents then
+	--if we're clicking in the grid and there's an item there, "grab" it... TODO this sucks. clean it up
+	if GRIDS.debug[mCellY] and GRIDS.debug[mCellY][mCellX] and GRIDS.debug[mCellY][mCellX].contents and GRIDS.debug[mCellY][mCellX].contents.class ~= "clear" then
 		grabbedThing = {
-			item = grid[mCellY][mCellX].contents,
-			relMouseY = my - cellSize * (mCellY - 1) - gridOffsetY, --to prevent the graphic from jumping to a weird place near the cursor when grabbed
-			relMouseX = mx - cellSize * (mCellX - 1) - gridOffsetX,
+			item = GRIDS.debug[mCellY][mCellX].contents,
+			relMouseY = my - cellSize * (mCellY - 1) - GRIDS.debug.offsetY, --to prevent the graphic from jumping to a weird place near the cursor when grabbed
+			relMouseX = mx - cellSize * (mCellX - 1) - GRIDS.debug.offsetX,
 			originY = mCellY,
 			originX = mCellX
 		}
@@ -246,51 +259,51 @@ function love.mousepressed(mx, my, button)
 end
 
 function love.mousereleased(mx, my, button)
-	local mCellX, mCellY = math.floor((mx-gridOffsetX+cellSize)/cellSize), math.floor((my-gridOffsetY+cellSize)/cellSize)
+	local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
 	
-	if gameMode == "map" then
+	-- if gameMode == "map" then
 		if cellExistsAt(mCellX, mCellY) then
 			
 			--is this somewhere that can be walked to?
-			if grid[mCellY][mCellX].pathFromHero then
+			if GRIDS.debug[mCellY][mCellX].pathFromHero then
 				--TODO make this more readable
-				local starty = findHeroLocationInGrid(grid)
-				for i, step in ipairs(grid[mCellY][mCellX].pathFromHero) do			
+				local starty = findHeroLocationInGrid(GRIDS.debug)
+				for i, step in ipairs(GRIDS.debug[mCellY][mCellX].pathFromHero) do			
 					moveThingAtYX(starty.y, starty.x, step.y - starty.y, step.x - starty.x)
 					
 					starty = step
 				end
 				
 				--debug. just clear obstacles and then add some
-				queue(gridOpEvent(grid, "clear obstacles"))
-				queue(gridOpEvent(grid, "add obstacles", {threshold = 0.2}))
+				queue(gridOpEvent(GRIDS.debug, "clear obstacles"))
+				queue(gridOpEvent(GRIDS.debug, "add obstacles", {threshold = 0.2}))
 				
 				--then once done walking, remap the paths
-				queue(gridOpEvent(grid, "remap"))
+				queue(gridOpEvent(GRIDS.debug, "remap"))
 			end
 		end
-	else
-		if grabbedThing and grabbedThing.item then
-			if cellExistsAt(mCellX, mCellY) then
-				queue(cellSwapEvent(grid, mCellY, mCellX, grabbedThing.originY, grabbedThing.originX))
-			end
-		
-			grabbedThing = nil
-			processNow()		
-		end
-	
-		-- grabbedThing = nil
-		-- mouseDownAtX, mouseDownAtY = 0, 0 --i really feel like there should be a more efficient way to do this...
-		mouseDownTimer = 0
-		mouseStillDown = false
-		mouseHasntMovedFar = false
-	
-		processNow()
-	end
+	-- else
+	-- 	if grabbedThing and grabbedThing.item then
+	-- 		if cellExistsAt(mCellX, mCellY) then
+	-- 			queue(cellSwapEvent(GRIDS.debug, mCellY, mCellX, grabbedThing.originY, grabbedThing.originX))
+	-- 		end
+	--
+	-- 		grabbedThing = nil
+	-- 		processNow()
+	-- 	end
+	--
+	-- 	-- grabbedThing = nil
+	-- 	-- mouseDownAtX, mouseDownAtY = 0, 0 --i really feel like there should be a more efficient way to do this...
+	-- 	mouseDownTimer = 0
+	-- 	mouseStillDown = false
+	-- 	mouseHasntMovedFar = false
+	--
+	-- 	processNow()
+	-- end
 end
 
 function love.mousemoved(x,y)
-	local mCellX, mCellY = math.floor((x-gridOffsetX+cellSize)/cellSize), math.floor((y-gridOffsetY+cellSize)/cellSize)
+	local mCellX, mCellY = math.floor((x-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((y-GRIDS.debug.offsetY+cellSize)/cellSize)
 
 	--are we now hovering over a grid cell?
 	--note that this will not really be a thing when the game is for touchscreens...
@@ -299,10 +312,10 @@ function love.mousemoved(x,y)
 	for y=1, 3 do
 		for x=1, 3 do
 			if y == mCellY and x == mCellX then
-				grid[y][x].mouseOver = true
+				GRIDS.debug[y][x].mouseOver = true
 				hoveredCell = {y = y, x = x}
 			else
-				grid[y][x].mouseOver = false
+				GRIDS.debug[y][x].mouseOver = false
 			end
 		end
 	end
@@ -328,11 +341,11 @@ function getTopThingAtPos(mx, my)
 	--...i still feel like this is the better way, though. TODO some system that puts all drawable things in a list like this. i guess? unless it's 100% not necessary
 	
 	--TODO yeah, this can definitely be abstracted, since other things use this
-	if my >= gridOffsetY and my <= cellSize * 3 + gridOffsetY and mx >= gridOffsetX and mx <= cellSize * 3 + gridOffsetX then		
-		local cx, cy = math.floor((mx-gridOffsetX+cellSize)/cellSize), math.floor((my-gridOffsetY+cellSize)/cellSize)
+	if my >= GRIDS.debug.offsetY and my <= cellSize * 3 + GRIDS.debug.offsetY and mx >= GRIDS.debug.offsetX and mx <= cellSize * 3 + GRIDS.debug.offsetX then		
+		local cx, cy = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
 		
-		if grid[cy] and grid[cy][cx] and grid[cy][cx].contents then
-			return grid[cy][cx].contents
+		if GRIDS.debug[cy] and GRIDS.debug[cy][cx] and GRIDS.debug[cy][cx].contents then
+			return GRIDS.debug[cy][cx].contents
 		end
 	end
 end
@@ -347,22 +360,22 @@ function love.keypressed(key)
 	
 	if key == "s" then
 		for i = 1, 27 do
-			queue(cellSwapEvent(grid, math.random(3), math.random(3), math.random(3), math.random(3)))
+			queue(cellSwapEvent(GRIDS.debug, math.random(3), math.random(3), math.random(3), math.random(3)))
 		end
 	end
 	
 	if key == "d" then
-		tablePrint(findHeroLocationInGrid(grid))
+		tablePrint(findHeroLocationInGrid(GRIDS.debug))
 	end
 	
 	if key == "g" then
-		tablePrint(grid)
+		tablePrint(GRIDS)
 	end
 end
 
 --not sure if this is really that helpful...
 function cellExistsAt(x, y)
-	if grid[y] and grid[y][x] then
+	if GRIDS.debug[y] and GRIDS.debug[y][x] then
 		return true
 	else
 		return false

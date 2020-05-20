@@ -13,7 +13,7 @@ end
 
 function process_gridOpEvent(e)
 	if e.command == "remap" then
-		grid = mapAllPathsFromHero(grid)
+		GRIDS.debug = mapAllPathsFromHero(GRIDS.debug) --this is definitely wrong
 	elseif e.command == "clear obstacles" then
 		for y, row in ipairs(e.g) do
 			for x, cell in ipairs(row) do
@@ -43,7 +43,7 @@ function process_gridOpEvent(e)
 			end
 		end
 	else
-		print("THERE'S NO SUCH GRID OP AS "..e.class..", LOL")
+		print("THERE'S NO SUCH GRID OP AS "..e.command..", LOL")
 	end
 	
 	e.finished = true
