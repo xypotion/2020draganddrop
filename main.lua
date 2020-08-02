@@ -1,4 +1,6 @@
 --[[
+sort of hilarious that this doesn't do dragging and dropping anymore, and it never related to matching :P
+
 things that would be good to do next
 - multiple grids; nav on top, drag & drop on bottom
 - "inventory" or "drawer" of items to drag into/between grids. maybe can drag obstacles from bottom to top? :)
@@ -37,6 +39,15 @@ function love.load()
 	queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
 	queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1}))
 	queue(gridOpEvent(GRIDS.debug, "remap"))
+	
+	
+	--"GRIDS" is so debuggy. i don't really understand why i chose to do it that way...
+	--...so now with a *semblance* of actual game design:
+	world = {}
+	world.islands = {}
+	world.islands[1] = {}
+	world.islands[1].
+	
 	
 	grabbedThing = nil
 	
