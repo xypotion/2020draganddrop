@@ -43,8 +43,26 @@ function love.load()
   queue(gridOpEvent(GRIDS.debug, "remap"))
 
 
+  --init island and CIA + NIA ("current " and "next island area")
   currentIsland = initIsland()
---  CIA =
+  CIA = currentIsland[currentIsland.areaNumbersReference[1].y][currentIsland.areaNumbersReference[1].x]
+  NIA = nil
+  
+  tablePrint(CIA)
+  
+  queue(gridOpEvent(CIA, "add obstacles", {type = "item", threshold = 0.1}))
+  queue(gridOpEvent(CIA, "remap"))
+  
+  CIA[3][3].contents = {
+    class = "hero",
+    color = {1,1,1,1},
+    fadeColor = {1,1,1,0.5},
+    message = "hero?",
+    yOffset = 0,
+    xOffset = 0
+  }
+  
+  CIA = mapAllPathsFromHero(CIA)
 
 
 --  grabbedThing = nil
@@ -161,7 +179,8 @@ function love.draw()
   --grid cells
   -- for y=1, 3 do
   -- 	for x=1, 3 do
-  for k, v in ipairs(allCellsInGrid(GRIDS.debug)) do
+  -- for k, v in ipairs(allCellsInGrid(GRIDS.debug)) do
+  for k, v in ipairs(allCellsInGrid(CIA)) do
     -- local cell = GRIDS.debug[y][x]
     -- tablePrint(cell)
     if v.cell.mouseOver then
@@ -169,7 +188,8 @@ function love.draw()
     else
       setColor(v.cell.bgColor)
     end
-    love.graphics.rectangle("fill", (v.x-1)*cellSize+1+GRIDS.debug.offsetX, (v.y-1)*cellSize+1+GRIDS.debug.offsetY, cellSize-2, cellSize-2)
+    -- love.graphics.rectangle("fill", (v.x-1)*cellSize+1+GRIDS.debug.offsetX, (v.y-1)*cellSize+1+GRIDS.debug.offsetY, cellSize-2, cellSize-2)
+    love.graphics.rectangle("fill", (v.x-1)*cellSize+1+CIA.offsetX, (v.y-1)*cellSize+1+CIA.offsetY, cellSize-2, cellSize-2)
   end
   -- end
 
@@ -180,13 +200,15 @@ function love.draw()
   -- love.graphics.circle("fill", (currentCell.x-0.5)*cellSize + GRIDS.debug.offsetX, (currentCell.y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
 
   --obstacles
-  for y, row in ipairs(GRIDS.debug) do
+  -- for y, row in ipairs(GRIDS.debug) do
+  for y, row in ipairs(CIA) do
     for x, c in ipairs(row) do
       -- if c.obstacle then
       setColor(0,0,0)
       -- love.graphics.circle("fill", (x-0.5)*cellSize + GRIDS.debug.offsetX, (y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
       if c.contents and c.contents.class ~= "clear" then
-        drawCellContents(c.contents, (y-0.5)*cellSize + GRIDS.debug.offsetY, (x-0.5)*cellSize + GRIDS.debug.offsetX)
+        -- drawCellContents(c.contents, (y-0.5)*cellSize + GRIDS.debug.offsetY, (x-0.5)*cellSize + GRIDS.debug.offsetX)
+        drawCellContents(c.contents, (y-0.5)*cellSize + CIA.offsetY, (x-0.5)*cellSize + CIA.offsetX)
       end
       -- end
     end
@@ -196,8 +218,10 @@ function love.draw()
 
   --path to currently hovered destination
   if hoveredCell then
-    for i, step in pairs(GRIDS.debug[hoveredCell.y][hoveredCell.x].pathFromHero) do
-      love.graphics.circle("line", (step.x-0.5)*cellSize + GRIDS.debug.offsetX, (step.y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
+    -- for i, step in pairs(GRIDS.debug[hoveredCell.y][hoveredCell.x].pathFromHero) do
+    for i, step in pairs(CIA[hoveredCell.y][hoveredCell.x].pathFromHero) do
+      -- love.graphics.circle("line", (step.x-0.5)*cellSize + GRIDS.debug.offsetX, (step.y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
+      love.graphics.circle("line", (step.x-0.5)*cellSize + CIA.offsetX, (step.y-0.5)*cellSize + CIA.offsetY, cellSize*0.45)
     end
 
   end
@@ -267,9 +291,15 @@ function moveThingAtYX(y, x, dy, dx)
   end
 
   --queue pose and cell ops
+  -- queueSet({
+  --     cellSwapEvent(GRIDS.debug, y, x, ty, tx), --eventually this won't work, but ok for now
+  --     spriteMoveEvent(GRIDS.debug, ty, tx, moveFrames)
+  --   })
+
+  --queue pose and cell ops
   queueSet({
-      cellSwapEvent(GRIDS.debug, y, x, ty, tx), --eventually this won't work, but ok for now
-      spriteMoveEvent(GRIDS.debug, ty, tx, moveFrames)
+      cellSwapEvent(CIA, y, x, ty, tx), --eventually this won't work, but ok for now
+      spriteMoveEvent(CIA, ty, tx, moveFrames)
     })
 
   processNow()
@@ -280,15 +310,20 @@ end
 
 
 function love.mousepressed(mx, my, button)
-  local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
+  -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
+  local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
   mouseDownAtX, mouseDownAtY = mx, my
 
   --if we're clicking in the grid and there's an item there, "grab" it... TODO this sucks. clean it up
-  if GRIDS.debug[mCellY] and GRIDS.debug[mCellY][mCellX] and GRIDS.debug[mCellY][mCellX].contents and GRIDS.debug[mCellY][mCellX].contents.class ~= "clear" then
+  -- if GRIDS.debug[mCellY] and GRIDS.debug[mCellY][mCellX] and GRIDS.debug[mCellY][mCellX].contents and GRIDS.debug[mCellY][mCellX].contents.class ~= "clear" then
+  if GRIDS.debug[mCellY] and CIA[mCellY][mCellX] and CIA[mCellY][mCellX].contents and CIA[mCellY][mCellX].contents.class ~= "clear" then
     grabbedThing = {
-      item = GRIDS.debug[mCellY][mCellX].contents,
-      relMouseY = my - cellSize * (mCellY - 1) - GRIDS.debug.offsetY, --to prevent the graphic from jumping to a weird place near the cursor when grabbed
-      relMouseX = mx - cellSize * (mCellX - 1) - GRIDS.debug.offsetX,
+      -- item = GRIDS.debug[mCellY][mCellX].contents,
+      item = CIA[mCellY][mCellX].contents,
+      -- relMouseY = my - cellSize * (mCellY - 1) - GRIDS.debug.offsetY, --to prevent the graphic from jumping to a weird place near the cursor when grabbed
+      -- relMouseX = mx - cellSize * (mCellX - 1) - GRIDS.debug.offsetX,
+      relMouseY = my - cellSize * (mCellY - 1) - CIA.offsetY, --to prevent the graphic from jumping to a weird place near the cursor when grabbed
+      relMouseX = mx - cellSize * (mCellX - 1) - CIA.offsetX,
       originY = mCellY,
       originX = mCellX
     }
@@ -298,16 +333,20 @@ function love.mousepressed(mx, my, button)
 end
 
 function love.mousereleased(mx, my, button)
-  local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
+  -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
+  local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
 
   -- if gameMode == "map" then
   if cellExistsAt(mCellX, mCellY) then
 
     --is this somewhere that can be walked to?
-    if GRIDS.debug[mCellY][mCellX].pathFromHero then
+    -- if GRIDS.debug[mCellY][mCellX].pathFromHero then
+    if CIA[mCellY][mCellX].pathFromHero then  
       --TODO make this more readable
-      local starty = findHeroLocationInGrid(GRIDS.debug)
-      for i, step in ipairs(GRIDS.debug[mCellY][mCellX].pathFromHero) do			
+      -- local starty = findHeroLocationInGrid(GRIDS.debug)
+      -- for i, step in ipairs(GRIDS.debug[mCellY][mCellX].pathFromHero) do
+        local starty = findHeroLocationInGrid(CIA)
+        for i, step in ipairs(CIA[mCellY][mCellX].pathFromHero) do			
         moveThingAtYX(starty.y, starty.x, step.y - starty.y, step.x - starty.x)
 
         starty = step
@@ -321,7 +360,8 @@ function love.mousereleased(mx, my, button)
       queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1}))
 
       --then once done walking, remap the paths
-      queue(gridOpEvent(GRIDS.debug, "remap"))
+      -- queue(gridOpEvent(GRIDS.debug, "remap"))
+      queue(gridOpEvent(CIA, "remap"))
     end
   end
   -- else
@@ -345,7 +385,8 @@ function love.mousereleased(mx, my, button)
 end
 
 function love.mousemoved(mx,my)
-  local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
+  -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
+  local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
 
   --are we now hovering over a grid cell?
   --note that this will not really be a thing when the game is for touchscreens...
@@ -353,7 +394,8 @@ function love.mousemoved(mx,my)
 
   -- for y=1, 3 do
   -- 	for x=1, 3 do
-  for k, v in ipairs(allCellsInGrid(GRIDS.debug)) do
+  -- for k, v in ipairs(allCellsInGrid(GRIDS.debug)) do
+  for k, v in ipairs(allCellsInGrid(CIA)) do
     if v.y == mCellY and v.x == mCellX then
       -- GRIDS.debug[y][x].mouseOver = true
       v.cell.mouseOver = true
@@ -385,11 +427,18 @@ function getTopThingAtPos(mx, my)
   --...i still feel like this is the better way, though. TODO some system that puts all drawable things in a list like this. i guess? unless it's 100% not necessary
 
   --TODO yeah, this can definitely be abstracted, since other things use this
-  if my >= GRIDS.debug.offsetY and my <= cellSize * 5 + GRIDS.debug.offsetY and mx >= GRIDS.debug.offsetX and mx <= cellSize * 5 + GRIDS.debug.offsetX then		
-    local cx, cy = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
+  -- if my >= GRIDS.debug.offsetY and my <= cellSize * 5 + GRIDS.debug.offsetY and mx >= GRIDS.debug.offsetX and mx <= cellSize * 5 + GRIDS.debug.offsetX then
+  --   local cx, cy = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
+  --
+  --   if GRIDS.debug[cy] and GRIDS.debug[cy][cx] and GRIDS.debug[cy][cx].contents then
+  --     return GRIDS.debug[cy][cx].contents
+  --   end
+  -- end
+  if my >= CIA.offsetY and my <= cellSize * 5 + CIA.offsetY and mx >= CIA.offsetX and mx <= cellSize * 5 + CIA.offsetX then		
+    local cx, cy = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
 
-    if GRIDS.debug[cy] and GRIDS.debug[cy][cx] and GRIDS.debug[cy][cx].contents then
-      return GRIDS.debug[cy][cx].contents
+    if CIA[cy] and CIA[cy][cx] and CIA[cy][cx].contents then
+      return CIA[cy][cx].contents
     end
   end
 end
@@ -404,22 +453,26 @@ function love.keypressed(key)
 
   if key == "s" then
     for i = 1, 27 do
-      queue(cellSwapEvent(GRIDS.debug, math.random(3), math.random(3), math.random(3), math.random(3)))
+      -- queue(cellSwapEvent(GRIDS.debug, math.random(3), math.random(3), math.random(3), math.random(3)))
+      queue(cellSwapEvent(CIA, math.random(3), math.random(3), math.random(3), math.random(3)))
     end
   end
 
   if key == "d" then
-    tablePrint(findHeroLocationInGrid(GRIDS.debug))
+    -- tablePrint(findHeroLocationInGrid(GRIDS.debug))
+    tablePrint(findHeroLocationInGrid(CIA))
   end
 
-  if key == "g" then
-    tablePrint(GRIDS)
+  if key == "i" then
+    -- tablePrint(GRIDS)
+    tablePrint(island)
   end
 end
 
 --not sure if this is really that helpful...
 function cellExistsAt(x, y)
-  if GRIDS.debug[y] and GRIDS.debug[y][x] then
+  -- if GRIDS.debug[y] and GRIDS.debug[y][x] then
+  if CIA[y] and CIA[y][x] then
     return true
   else
     return false
