@@ -18,7 +18,6 @@ require "helpers"
 require "island"
 
 function love.load()
-<<<<<<< HEAD
   math.randomseed(os.time())
 
   love.window.setTitle("<3")
@@ -74,69 +73,6 @@ function love.load()
   --pretending i know how the hero object will be structured
   initHERO()
   -- tablePrint(HERO)
-
-=======
-	math.randomseed(os.time())
-	
-	love.window.setTitle("<3")
-	
-	cellSize = 72
-	love.window.setMode(cellSize * 5, cellSize * 9)
-	
-	initEventQueueSystem()
-	
-	-- make the GRIDS
-	GRIDS = {}
-	GRIDS.debug = initDebugGrid()
-	-- GRIDS.debug.offsetX, GRIDS.debug.offsetY = cellSize, cellSize
-	GRIDS.debug.offsetX, GRIDS.debug.offsetY = 0, 0 --cellSize, cellSize
-
-	-- tablePrint(allCellsInGrid(GRIDS.debug))
-		
-	--this is not elegant (you're mapping twice at boot), but it's debug junk anyway. doesn't matter
-	queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
-	queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
-	queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
-	queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1}))
-	queue(gridOpEvent(GRIDS.debug, "remap"))
-	
-	
-	--"GRIDS" is so debuggy. i don't really understand why i chose to do it that way...
-	--...so now with a *semblance* of actual game design:
-	world = {}
-	world.islands = {}
-	world.islands[1] = {}
-	world.islands[1].
-	
-	
-	grabbedThing = nil
-	
-	longPressTime = 0.5
-	mouseDownTimer = 0
-	mouseDownAtX, mouseDownAtY = 0, 0 --not sure if necessary
-	mouseStillDown = false
-	mouseHasntMovedFar = false
-	
-	--debuggy
-	GRIDS.debug = mapAllPathsFromHero(GRIDS.debug) --TODO might rather make this "mapAllPathsFrom", then provide coordinates. also maybe a mode?
-	
-	--also TODO shouldn't there be a way to not make this return things
-	gameMode = "debug" --TODO shouldn't be necessary! remove & simplify
-	hoveredCell = nil
-	
-	softOscillator = 1
-	oscillatorCounter = 0
-	TAU = math.pi * 2
-	
-	
-	-- tablePrint(GRIDS)
-		
-	
-	--pretending i know how the hero object will be structured
-	initHERO()
-	-- tablePrint(HERO)
-	
->>>>>>> 7f6e4534f21c03dd2d710610962881ee63a27a50
 end
 
 function initDebugGrid()
