@@ -24,8 +24,7 @@ function process_gridOpEvent(e)
 				end
 			end
 		end
-    
-	elseif e.command == "add obstacles" then
+	elseif e.command == "add obstacles" then --debug junk
 		--generate some random obstacles
 		for y, row in ipairs(e.g) do
 			for x, cell in ipairs(row) do
