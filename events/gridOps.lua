@@ -13,7 +13,9 @@ end
 
 function process_gridOpEvent(e)
 	if e.command == "remap" then
-		GRIDS.debug = mapAllPathsFromHero(GRIDS.debug) --this is definitely wrong
+--		GRIDS.debug = mapAllPathsFromHero(GRIDS.debug) --this is definitely wrong
+		e.g = mapAllPathsFromHero(e.g) --...ok, but it's weird that this works. sigh.
+    
 	elseif e.command == "clear obstacles" then
 		for y, row in ipairs(e.g) do
 			for x, cell in ipairs(row) do
@@ -22,6 +24,7 @@ function process_gridOpEvent(e)
 				end
 			end
 		end
+    
 	elseif e.command == "add obstacles" then
 		--generate some random obstacles
 		for y, row in ipairs(e.g) do
