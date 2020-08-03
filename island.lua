@@ -35,7 +35,7 @@ function initIslandArea()
 
   local size = 5
 
-  --build out the grid itself & initialize cells 
+  --build out the grid itself & initialize cells
   for y=1, size do
     grid[y] = {}
     for x=1, size do
@@ -51,8 +51,9 @@ function initIslandArea()
   --ADD CONTENTS to the grid
   for y, row in ipairs(grid) do
     for x, cell in ipairs(row) do
-			--explanation: if row or column 1 or 5, add block; otherwise clear
-			if y % 4 == 1 or x % 4 == 1 then
+      --add basic borders. explanation: if row or column 1 or 5, add block; otherwise clear
+      -- if y % 4 == 1 or x % 4 == 1 then
+			if y % 4 == 1 and x ~= 3 or x % 4 == 1 and y ~= 3 then --same but allows for basic connecting roads. this is DEBUG obviously
 				local r, g, b = math.random(), math.random(), math.random()
 				
 	      cell.contents = {

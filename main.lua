@@ -279,7 +279,7 @@ function moveThingAtYX(y, x, dy, dx)
   local ty, tx = y + dy, x + dx
 
   --max = the number of movement frames
-  local max = 4
+  local max = 6
   local moveFrames = {}
 
   for k = max - 1, 0, -1 do
@@ -332,6 +332,7 @@ function love.mousepressed(mx, my, button)
   end
 end
 
+--TODO prevent input from doing anything when an animation (event) is in progress!
 function love.mousereleased(mx, my, button)
   -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
   local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
