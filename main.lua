@@ -22,8 +22,13 @@ function love.load()
 
   love.window.setTitle("<3")
 
-  cellSize = 72
-  love.window.setMode(cellSize * 5, cellSize * 9)
+  cellSize, overworldZoom = 18, 4
+  
+	overworldCanvas = love.graphics.newCanvas(cellSize * 5, cellSize * 5)
+  overworldCanvas:setFilter("nearest")
+  
+  love.window.setMode(cellSize * overworldZoom * 5, cellSize * overworldZoom * 9)
+
 
   initEventQueueSystem()
 
@@ -39,7 +44,7 @@ function love.load()
   -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
   -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
   -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
-  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1})) --TODO document these in grid Ops before deleting. lol
+  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1})) --TODO document these in gridOps before deleting. lol
   -- queue(gridOpEvent(GRIDS.debug, "remap"))
 
 
@@ -175,7 +180,12 @@ function love.update(dt)
   end
 end
 
-function love.draw()	
+function love.draw()
+  
+  
+  love.graphics.setCanvas(overworldCanvas)  
+  love.graphics.clear(0,0,0,1)
+  
   --grid cells
   -- for y=1, 3 do
   -- 	for x=1, 3 do
@@ -246,6 +256,10 @@ function love.draw()
   -- end
 
   white()
+  
+	--draw gameCanvas
+	love.graphics.setCanvas()
+	love.graphics.draw(overworldCanvas, 0, 0, 0, overworldZoom, overworldZoom)
 end
 
 
@@ -311,7 +325,9 @@ end
 
 function love.mousepressed(mx, my, button)
   -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
-  local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
+  -- local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
+  local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
+  
   mouseDownAtX, mouseDownAtY = mx, my
 
   --if we're clicking in the grid and there's an item there, "grab" it... TODO this sucks. clean it up
@@ -335,8 +351,9 @@ end
 --TODO prevent input from doing anything when an animation (event) is in progress!
 function love.mousereleased(mx, my, button)
   -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
-  local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
-
+  -- local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
+  local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
+  
   -- if gameMode == "map" then
   if cellExistsAt(mCellX, mCellY) then
 
@@ -385,9 +402,17 @@ function love.mousereleased(mx, my, button)
   -- end
 end
 
+function convertMouseCoordsToOverworldCoords(mx, my)
+  local x = math.floor((mx-CIA.offsetX+cellSize*overworldZoom)/cellSize/overworldZoom)
+  local y = math.floor((my-CIA.offsetY+cellSize*overworldZoom)/cellSize/overworldZoom)
+  
+  return x, y
+end
+
 function love.mousemoved(mx,my)
   -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
-  local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
+  -- local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
+  local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
 
   --are we now hovering over a grid cell?
   --note that this will not really be a thing when the game is for touchscreens...

@@ -23,7 +23,8 @@ function initIsland()
 	
 	addOuterIslandBorder(island)
 	
-	tablePrint(island.areaNumbersReference)
+  print("area 1 is...")
+  tablePrint(island.areaNumbersReference[1])
 
   return island
 end
