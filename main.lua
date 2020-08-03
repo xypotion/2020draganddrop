@@ -28,19 +28,19 @@ function love.load()
   initEventQueueSystem()
 
   -- make the GRIDS
-  GRIDS = {}
-  GRIDS.debug = initDebugGrid()
+  -- GRIDS = {}
+  -- GRIDS.debug = initDebugGrid()
   -- GRIDS.debug.offsetX, GRIDS.debug.offsetY = cellSize, cellSize
-  GRIDS.debug.offsetX, GRIDS.debug.offsetY = 0, 0 --cellSize, cellSize
+  -- GRIDS.debug.offsetX, GRIDS.debug.offsetY = 0, 0 --cellSize, cellSize
 
   -- tablePrint(allCellsInGrid(GRIDS.debug))
 
   --this is not elegant (you're mapping twice at boot), but it's debug junk anyway. doesn't matter
-  queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
-  queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
-  queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
-  queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1}))
-  queue(gridOpEvent(GRIDS.debug, "remap"))
+  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
+  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
+  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
+  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1})) --TODO document these in grid Ops before deleting. lol
+  -- queue(gridOpEvent(GRIDS.debug, "remap"))
 
 
   --init island and CIA + NIA ("current " and "next island area")
@@ -48,7 +48,7 @@ function love.load()
   CIA = currentIsland[currentIsland.areaNumbersReference[1].y][currentIsland.areaNumbersReference[1].x]
   NIA = nil
   
-  tablePrint(CIA)
+  -- tablePrint(CIA)
   
   queue(gridOpEvent(CIA, "add obstacles", {type = "item", threshold = 0.1}))
   queue(gridOpEvent(CIA, "remap"))
@@ -74,7 +74,7 @@ function love.load()
   mouseHasntMovedFar = false
 
   --debuggy
-  GRIDS.debug = mapAllPathsFromHero(GRIDS.debug) --TODO might rather make this "mapAllPathsFrom", then provide coordinates. also maybe a mode?
+  -- GRIDS.debug = mapAllPathsFromHero(GRIDS.debug) --TODO might rather make this "mapAllPathsFrom", then provide coordinates. also maybe a mode?
 
   --also TODO shouldn't there be a way to not make this return things
   gameMode = "debug" --TODO shouldn't be necessary! remove & simplify
@@ -258,7 +258,7 @@ function drawCellContents(obj, screenY, screenX)
   setColor(obj.color)
 
   if obj.class == "block" then
-    love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.5, 6)
+    love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.5, 8)
   elseif obj.class == "danger" then
     love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize * 0.4, 4)
   elseif obj.class == "npc" then
@@ -316,7 +316,7 @@ function love.mousepressed(mx, my, button)
 
   --if we're clicking in the grid and there's an item there, "grab" it... TODO this sucks. clean it up
   -- if GRIDS.debug[mCellY] and GRIDS.debug[mCellY][mCellX] and GRIDS.debug[mCellY][mCellX].contents and GRIDS.debug[mCellY][mCellX].contents.class ~= "clear" then
-  if GRIDS.debug[mCellY] and CIA[mCellY][mCellX] and CIA[mCellY][mCellX].contents and CIA[mCellY][mCellX].contents.class ~= "clear" then
+  if CIA[mCellY] and CIA[mCellY][mCellX] and CIA[mCellY][mCellX].contents and CIA[mCellY][mCellX].contents.class ~= "clear" then
     grabbedThing = {
       -- item = GRIDS.debug[mCellY][mCellX].contents,
       item = CIA[mCellY][mCellX].contents,
@@ -353,11 +353,11 @@ function love.mousereleased(mx, my, button)
       end
 
       --debug. just clear obstacles and then add some
-      queue(gridOpEvent(GRIDS.debug, "clear obstacles"))
-      queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
-      queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
-      queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
-      queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1}))
+      -- queue(gridOpEvent(GRIDS.debug, "clear obstacles"))
+      -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
+      -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
+      -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
+      -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1}))
 
       --then once done walking, remap the paths
       -- queue(gridOpEvent(GRIDS.debug, "remap"))
@@ -513,30 +513,4 @@ function allCellsInGrid(g)
   end
 
   return cells
-end
-
-
------------------------------------------------------------------------------------------------------------
-
-function new3x3Grid(cellPrimer)
-  return newGrid(3, 3, cellPrimer)
-end
-
-function newGrid(height, width, cellPrimer)
-  -- if not height then height, width = 3, 3 end
-  cellPrimer = cellPrimer or {}
-
-  local g = {}
-
-  for y = 1, height do
-    g[y] = {}
-    for x = 1, width do
-      g[y][x] = {}
-      for k, v in pairs(cellPrimer) do
-        g[y][x][k] = v
-      end
-    end
-  end
-
-  return g
 end

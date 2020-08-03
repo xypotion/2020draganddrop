@@ -21,14 +21,6 @@ function shuffle(arr)
   return new
 end
 
--- function clear()
--- 	return {class = "clear"}
--- end
---
--- function empty()
--- 	return {contents = clear()}
--- end
-
 function empty(t)
   local e = true
   for k, v in pairs(t) do
@@ -91,3 +83,58 @@ function rollRound(num)
     return math.floor(num)
   end
 end
+
+--obviously never pass anything to this that's got looping references
+--will not clone deeper than 16 levels (TODO test this)
+function deepClone(original, safety)
+  if safety then
+    if safety > 16 then
+      print("clone is too deep! returning nil")
+      return nil
+    end
+  else
+    safety = 0
+  end
+    
+  local clone = {}
+  
+  for k, v in pairs(original) do
+    if type (v) == "table" then
+      clone[k] = deepClone(v, safety + 1)
+    else
+      clone[k] = v
+    end
+  end
+  
+  return clone
+end
+
+-----------------------------------------------------------------------------------------------------------
+
+function new3x3Grid(cellPrimer)
+  return newGrid(3, 3, cellPrimer)
+end
+
+function newGrid(height, width, cellPrimer)
+  -- if not height then height, width = 3, 3 end
+  cellPrimer = cellPrimer or {}
+
+  local g = {}
+
+  for y = 1, height do
+    g[y] = {}
+    for x = 1, width do
+      g[y][x] = deepClone(cellPrimer)
+    end
+  end
+
+  return g
+end
+
+-- function clear()
+-- 	return {class = "clear"}
+-- end
+--
+-- function empty()
+-- 	return {contents = clear()}
+-- end
