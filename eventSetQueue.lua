@@ -52,25 +52,16 @@ function eventProcessing(dt)
 		
 		if empty(currentEvents) then print("no current events") end
 		
-		for k, e in pairs(currentEvents) do
-		-- for k, e in pairs(currentEvents) do --TODO figure out why this breaks it. it should work BETTER, but it doesn't.
+		for k, e in pairs(currentEvents) do --any way of making this work with ipairs()? TODO
 			--if not already finished, process this event 
 			if not e.finished then
         -- print("processing "..e.class) --DEBUG but useful
 			
-				-- if e.class == "function" then --i kind of want to avoid doing this again
-				-- 	-- print("...calling "..e.func)
-				-- 	_G[e.func](e.arg1)
-				-- 	e.finished = true?
-				-- else
-					_G["process_"..e.class.."Event"](e)
-				-- end
+				_G["process_"..e.class.."Event"](e)
 				
 				if e.finished then
           -- print(e.class, "finished!!!") --DEBUG useful
 					currentEvents[k] = nil
-					-- print("something")
-					-- numFinished = numFinished + 1
 				end
 			end
 		end

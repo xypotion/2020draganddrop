@@ -1,4 +1,4 @@
-function cellOpEvent(grid, y, x, payload)
+function cellOpEvent(grid, y, x, payload) --TODO rename? this is vague. actually everything here is vague...
 	local e = {
 		class = "cellOp",
 		grid = grid,
@@ -56,8 +56,6 @@ function areaTransferEvent(sg, sy, sx, dg, dy, dx) --source and destination: gri
 end
 
 function process_areaTransferEvent(e)
-  -- tablePrint(e, 2)
-  
   e.destGrid[e.destY][e.destX].contents = e.sourceGrid[e.sourceY][e.sourceX].contents
   e.sourceGrid[e.sourceY][e.sourceX].contents = {class = "clear"} 
   --you COULD make this event swappy, but it'll basically only be used for hero movement, so maybe doesn't matter

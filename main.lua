@@ -8,7 +8,14 @@ things that would be good to do next
 - canvases + click input
 - build & test this shit on android
   - ugh, and start building a quicksave framework with auto-serialize or recursive table-zipping... but also check forums to see if there's a better way. :/
-- TODO idea: make a "luaMod" or "highMod" or even %% operator that shifts the modulo window up by 1, so we don't have to fuck around with off-by-1 mod ops
+
+TODO 
+- idea: make a "luaMod" or "highMod" or even %% operator that shifts the modulo window up by 1, so we don't have to fuck around with off-by-1 mod ops
+- add: clicking on hero immediately after arriving in a new area will walk them back to the previous area
+
+BUGS... FIXME
+- hovered tile stays hovered after you leave area, and it still looks that way when you return
+- why do all grass tiles in every area look the same? that seems wrong. same for the border blocks. huh.
 ]]
 
 
@@ -33,16 +40,7 @@ function love.load()
   
   love.window.setMode(cellSize * overworldZoom * AREASIZE, cellSize * overworldZoom * (AREASIZE * 2 - 1))
 
-
   initEventQueueSystem()
-
-  -- make the GRIDS
-  -- GRIDS = {}
-  -- GRIDS.debug = initDebugGrid()
-  -- GRIDS.debug.offsetX, GRIDS.debug.offsetY = cellSize, cellSize
-  -- GRIDS.debug.offsetX, GRIDS.debug.offsetY = 0, 0 --cellSize, cellSize
-
-  -- tablePrint(allCellsInGrid(GRIDS.debug))
 
   --this is not elegant (you're mapping twice at boot), but it's debug junk anyway. doesn't matter
   -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
@@ -51,13 +49,9 @@ function love.load()
   -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1})) --TODO document these in gridOps before deleting. lol
   -- queue(gridOpEvent(GRIDS.debug, "remap"))
 
-
-  --init island and CIA + PIA ("current " and "previous island area")
+  --init island and CIA "current island area"
   currentIsland = initIsland()
   CIA = currentIsland[currentIsland.areaNumbersReference[1].y][currentIsland.areaNumbersReference[1].x]
-  PIA = nil
-  
-  -- tablePrint(CIA)
   
   queue(gridOpEvent(CIA, "add obstacles", {type = "item", threshold = 0.1}))
   queue(gridOpEvent(CIA, "remap"))
@@ -71,8 +65,7 @@ function love.load()
     xOffset = 0
   }
   
-  CIA = mapAllPathsFromHero(CIA)
-
+  CIA = mapAllPathsFromHero(CIA) --TODO might rather make this just "mapAllPathsFrom", then provide coordinates. also maybe a mode?
 
 --  grabbedThing = nil
 
@@ -82,9 +75,6 @@ function love.load()
   mouseStillDown = false
   mouseHasntMovedFar = false
 
-  --debuggy
-  -- GRIDS.debug = mapAllPathsFromHero(GRIDS.debug) --TODO might rather make this "mapAllPathsFrom", then provide coordinates. also maybe a mode?
-
   --also TODO shouldn't there be a way to not make this return things
   gameMode = "debug" --TODO shouldn't be necessary! remove & simplify
   hoveredCell = nil
@@ -92,10 +82,6 @@ function love.load()
   softOscillator = 1
   oscillatorCounter = 0
   TAU = math.pi * 2
-
-
-  -- tablePrint(GRIDS)
-
 
   --pretending i know how the hero object will be structured
   initHERO()
@@ -190,24 +176,14 @@ function love.draw()
   love.graphics.setCanvas(overworldCanvas)  
   love.graphics.clear(0,0,0,1)
   
-  --grid cells
-  -- for y=1, 3 do
-  -- 	for x=1, 3 do
-  -- for k, v in ipairs(allCellsInGrid(GRIDS.debug)) do
   for k, v in ipairs(allCellsInGrid(CIA)) do
-    -- local cell = GRIDS.debug[y][x]
-    -- tablePrint(cell)
     if v.cell.mouseOver then
       setColor(v.cell.bgHoverColor)
     else
       setColor(v.cell.bgColor)
     end
-    -- love.graphics.rectangle("fill", (v.x-1)*cellSize+1+GRIDS.debug.offsetX, (v.y-1)*cellSize+1+GRIDS.debug.offsetY, cellSize-2, cellSize-2)
-    -- love.graphics.rectangle("fill", (v.x-1)*cellSize+1+CIA.offsetX, (v.y-1)*cellSize+1+CIA.offsetY, cellSize-2, cellSize-2)
     love.graphics.rectangle("fill", (v.x-1)*cellSize+CIA.offsetX, (v.y-1)*cellSize+CIA.offsetY, cellSize, cellSize)
-  end
-  -- end
-  
+  end  
   
   --this is just a copy of the above... abstract that shit TODO
   if PIA then
@@ -224,22 +200,12 @@ function love.draw()
 
   white()
 
-  -- if gameMode == "map" then
-  --"hero"
-  -- love.graphics.circle("fill", (currentCell.x-0.5)*cellSize + GRIDS.debug.offsetX, (currentCell.y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
-
-  --obstacles
-  -- for y, row in ipairs(GRIDS.debug) do
+  --draw cell contents
   for y, row in ipairs(CIA) do
     for x, c in ipairs(row) do
-      -- if c.obstacle then
-      setColor(0,0,0)
-      -- love.graphics.circle("fill", (x-0.5)*cellSize + GRIDS.debug.offsetX, (y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
       if c.contents and c.contents.class ~= "clear" then
-        -- drawCellContents(c.contents, (y-0.5)*cellSize + GRIDS.debug.offsetY, (x-0.5)*cellSize + GRIDS.debug.offsetX)
         drawCellContents(c.contents, (y-0.5)*cellSize + CIA.offsetY, (x-0.5)*cellSize + CIA.offsetX)
       end
-      -- end
     end
   end
 
@@ -247,29 +213,22 @@ function love.draw()
   if PIA then  
     for y, row in ipairs(PIA) do
       for x, c in ipairs(row) do
-        -- if c.obstacle then
-        setColor(0,0,0)
-        -- love.graphics.circle("fill", (x-0.5)*cellSize + GRIDS.debug.offsetX, (y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
         if c.contents and c.contents.class ~= "clear" then
-          -- drawCellContents(c.contents, (y-0.5)*cellSize + GRIDS.debug.offsetY, (x-0.5)*cellSize + GRIDS.debug.offsetX)
           drawCellContents(c.contents, (y-0.5)*cellSize + PIA.offsetY, (x-0.5)*cellSize + PIA.offsetX)
         end
-        -- end
       end
     end
   end
 
   white()
 
-  --path to currently hovered destination
+  --draw path to currently hovered destination
   if hoveredCell and CIA[hoveredCell.y][hoveredCell.x].pathFromHero then --TODO this second condition was not always necessary. investigate
-    -- for i, step in pairs(GRIDS.debug[hoveredCell.y][hoveredCell.x].pathFromHero) do
     for i, step in pairs(CIA[hoveredCell.y][hoveredCell.x].pathFromHero) do
-      -- love.graphics.circle("line", (step.x-0.5)*cellSize + GRIDS.debug.offsetX, (step.y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
       love.graphics.circle("line", (step.x-0.5)*cellSize + CIA.offsetX, (step.y-0.5)*cellSize + CIA.offsetY, cellSize*0.45)
     end
-
   end
+  
   -- else
   --things in grid		--
   -- for y=1, 3 do
@@ -293,6 +252,7 @@ function love.draw()
   white()
   
 	--draw gameCanvas
+  --TODO move ALL of this to drawOverworld :) ...better yet, in draw.lua, or even drawOverworld.lua
 	love.graphics.setCanvas()
 	love.graphics.draw(overworldCanvas, 0, 0, 0, overworldZoom, overworldZoom)
 end
@@ -340,14 +300,6 @@ function moveThingAtYX(y, x, dy, dx, max)
       })
   end
   
-  -- tablePrint(moveFrames)
-
-  --queue pose and cell ops
-  -- queueSet({
-  --     cellSwapEvent(GRIDS.debug, y, x, ty, tx), --eventually this won't work, but ok for now
-  --     spriteMoveEvent(GRIDS.debug, ty, tx, moveFrames)
-  --   })
-
   --queue pose and cell ops
   queueSet({
       cellSwapEvent(CIA, y, x, ty, tx), --eventually swapping won't work, but ok for now. DEBUG
@@ -359,11 +311,11 @@ end
 
 --similar to above...
 --queue an areaMove event after building up its moveFrames
-function moveAreaByDYDX(area, dy, dx, max)
-  max = max or 10 --the number of frames this movement should last
-  
-  -- local moveFrames... wait. why am i doing this here, again? 
-end
+-- function moveAreaByDYDX(area, dy, dx, max)
+--   max = max or 10 --the number of frames this movement should last
+--
+--   -- local moveFrames... wait. why am i doing this here, again?
+-- end
 
 
 -----------------------------------------------------------------------------------------------------------
@@ -396,19 +348,14 @@ end
 
 --TODO prevent input from doing anything when an animation (event) is in progress!
 function love.mousereleased(mx, my, button)
-  -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
-  -- local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
   local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
   
   -- if gameMode == "map" then
   if cellExistsAt(mCellX, mCellY) then
 
     --is this somewhere that can be walked to?
-    -- if GRIDS.debug[mCellY][mCellX].pathFromHero then
     if CIA[mCellY][mCellX].pathFromHero then  
       --TODO make this more readable, including renaming "starty" 9_9
-      -- local starty = findHeroLocationInGrid(GRIDS.debug)
-      -- for i, step in ipairs(GRIDS.debug[mCellY][mCellX].pathFromHero) do
       local starty = findHeroLocationInGrid(CIA)
           
       --queue up move/swap events from step to step along path
@@ -417,9 +364,6 @@ function love.mousereleased(mx, my, button)
 
         starty = step
       end
-
-
-
 
       --TODO is the hero going to an edge from somewhere else? then move the stage!            
       --also determine PIA NOW. or is it more like PIA?
@@ -430,30 +374,17 @@ function love.mousereleased(mx, my, button)
       
       --which way are we going?
       if mCellY == 1 and starty.y ~= 1 then
-        -- print("screen up")
         dy = -1
       elseif mCellY == 5 and starty.y ~= 5 then
-        -- print("screen down")
         dy = 1
       elseif mCellX == 1 and starty.x ~= 1 then
-        -- print("screen left")
         dx = -1
       elseif mCellX == 5 and starty.x ~= 5 then
-        -- print("screen right")
         dx = 1
       end
       
-      -- moveAreaByDYDX() --NOPE AGAIN. make the frames in areaMoveEvent() & queue 2 at once (for CIA and PIA). i think it's the only way.
-      
       --so are we switching areas?
       if (dy ~= 0 or dx ~= 0) then
-        -- PIA = CIA
-        -- PIA.offsetY = 0
-        -- PIA.offsetX = 0
-        
-        -- CIA = currentIsland[ciaCoords.y][(ciaCoords.x) % ISLANDSIZE + 1]
-        -- CIA = currentIsland[ciaCoords.y][(ciaCoords.x - 2) % ISLANDSIZE + 1]
-        -- -1 0 1 ... % 2 = 1, 0, 1
         --confusing math, but this should find the next area over per dy and dx
         local nextArea = currentIsland[(ciaCoords.y + dy - 1) % ISLANDSIZE + 1][(ciaCoords.x + dx - 1) % ISLANDSIZE + 1]
                 
@@ -463,23 +394,13 @@ function love.mousereleased(mx, my, button)
           areaMoveEvent(nextArea, dy, dx), --by the time this processes, nextArea will be CIA (because of the primer)
           areaMoveEvent(CIA, dy, dx), --by the time this processes, CIA will be PIA
           areaTransferEvent(CIA, mCellY, mCellX, nextArea, (mCellY + dy - 1) % AREASIZE + 1, (mCellX + dx - 1) % AREASIZE + 1),
+          --TODO still need a hero animation event! should be easy, though
         })
         
         queue(gridOpEvent(nextArea, "remap")) --why would this not work? :/
       else
         queue(gridOpEvent(CIA, "remap"))
       end
-
-      --debug. just clear obstacles and then add some
-      -- queue(gridOpEvent(GRIDS.debug, "clear obstacles"))
-      -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
-      -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
-      -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
-      -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1}))
-
-      --then once done walking, remap the paths
-      -- queue(gridOpEvent(GRIDS.debug, "remap"))
-      -- queue(gridOpEvent(CIA, "remap")) --TODO ha. this maybe can't be a grid op. OR you have to branch this whole function on whether you're changing areas or not!
     end
   end
 end
@@ -510,26 +431,19 @@ function convertMouseCoordsToOverworldCoords(mx, my)
 end
 
 function love.mousemoved(mx,my)
-  -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
-  -- local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
   local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
 
   --are we now hovering over a grid cell?
   --note that this will not really be a thing when the game is for touchscreens...
   hoveredCell = nil
 
-  -- for y=1, 3 do
-  -- 	for x=1, 3 do
-  -- for k, v in ipairs(allCellsInGrid(GRIDS.debug)) do
   for k, v in ipairs(allCellsInGrid(CIA)) do
     if v.y == mCellY and v.x == mCellX then
-      -- GRIDS.debug[y][x].mouseOver = true
       v.cell.mouseOver = true
-      hoveredCell = {y = mCellY, x = mCellX} --wait, why is this needed?
+      hoveredCell = {y = mCellY, x = mCellX} --wait, why is this needed? TODO
     else
       v.cell.mouseOver = false
     end
-    -- end
   end
 end
 
@@ -553,13 +467,6 @@ function getTopThingAtPos(mx, my)
   --...i still feel like this is the better way, though. TODO some system that puts all drawable things in a list like this. i guess? unless it's 100% not necessary
 
   --TODO yeah, this can definitely be abstracted, since other things use this
-  -- if my >= GRIDS.debug.offsetY and my <= cellSize * 5 + GRIDS.debug.offsetY and mx >= GRIDS.debug.offsetX and mx <= cellSize * 5 + GRIDS.debug.offsetX then
-  --   local cx, cy = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
-  --
-  --   if GRIDS.debug[cy] and GRIDS.debug[cy][cx] and GRIDS.debug[cy][cx].contents then
-  --     return GRIDS.debug[cy][cx].contents
-  --   end
-  -- end
   if my >= CIA.offsetY and my <= cellSize * 5 + CIA.offsetY and mx >= CIA.offsetX and mx <= cellSize * 5 + CIA.offsetX then		
     local cx, cy = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
 
@@ -579,18 +486,15 @@ function love.keypressed(key)
 
   if key == "s" then
     for i = 1, 27 do
-      -- queue(cellSwapEvent(GRIDS.debug, math.random(3), math.random(3), math.random(3), math.random(3)))
       queue(cellSwapEvent(CIA, math.random(3), math.random(3), math.random(3), math.random(3)))
     end
   end
 
   if key == "d" then
-    -- tablePrint(findHeroLocationInGrid(GRIDS.debug))
     tablePrint(findHeroLocationInGrid(CIA))
   end
 
   if key == "i" then
-    -- tablePrint(GRIDS)
     tablePrint(island)
   end
   
@@ -603,7 +507,6 @@ end
 
 --not sure if this is really that helpful...
 function cellExistsAt(x, y)
-  -- if GRIDS.debug[y] and GRIDS.debug[y][x] then
   if CIA[y] and CIA[y][x] then
     return true
   else
