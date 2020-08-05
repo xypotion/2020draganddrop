@@ -37,3 +37,30 @@ function process_cellSwapEvent(e)
 	
 	e.finished = true
 end
+
+-----------------------------------------------------------------------------------------------------------
+
+--transfer contents of a cell in one grid to a cell in another grid
+function areaTransferEvent(sg, sy, sx, dg, dy, dx) --source and destination: grid, y, and x
+  local e = {
+    class = "areaTransfer",
+    sourceGrid = sg, 
+    sourceY = sy, 
+    sourceX = sx, 
+    destGrid = dg, 
+    destY = dy,
+    destX = dx, 
+  }
+  
+  return e
+end
+
+function process_areaTransferEvent(e)
+  -- tablePrint(e, 2)
+  
+  e.destGrid[e.destY][e.destX].contents = e.sourceGrid[e.sourceY][e.sourceX].contents
+  e.sourceGrid[e.sourceY][e.sourceX].contents = {class = "clear"} 
+  --you COULD make this event swappy, but it'll basically only be used for hero movement, so maybe doesn't matter
+  
+  e.finished = true
+end

@@ -23,24 +23,27 @@ function initIsland()
 	
 	addOuterIslandBorder(island)
 	
-  print("area 1 is...")
-  tablePrint(island.areaNumbersReference[1])
+  -- print("area 1 is...")
+  -- tablePrint(island.areaNumbersReference[1])
+  tablePrint(island.areaNumbersReference)
 
   return island
 end
 
+--each island gets 9 of these
+--each islandArea is designed to be manipulated and drawn on its own
 function initIslandArea()
   local grid = {
 			 offsetX = 0,
 			 offsetY = 0,}
 
-  local size = 5
+  local size = 5 --TODO make this more global... gridOps and other places refer to it
 
   --build out the grid itself & initialize cells
   for y=1, size do
     grid[y] = {}
     for x=1, size do
-      local r, g, b = math.random(), math.random(), math.random()
+			local r, g, b = 0.5 * math.random(), 0.75 + math.random(), 0.5 * math.random()
       grid[y][x] = {
        mouseOver = false,
        bgColor = {r, g, b, 0.25},
@@ -55,7 +58,7 @@ function initIslandArea()
       --add basic borders. explanation: if row or column 1 or 5, add block; otherwise clear
       -- if y % 4 == 1 or x % 4 == 1 then
 			if y % 4 == 1 and x ~= 3 or x % 4 == 1 and y ~= 3 then --same but allows for basic connecting roads. this is DEBUG obviously
-				local r, g, b = math.random(), math.random(), math.random()
+				local r, g, b = 0.25 + 0.25 * math.random(), 0.125 + 0.25 * math.random(), 0.125 * math.random()
 				
 	      cell.contents = {
 					class = "block",
@@ -77,7 +80,7 @@ end
 function addOuterIslandBorder(island)
 	local outerBorderBlock = {
 		class = "block",
-		color = {0, 0, 0, 1},
+		color = {0, 0, 0.25, 1},
 		fadeColor = {0, 0, 0, 0.5},
     message = "I'M A BORDER CELL",
 		yOffset = 0,
@@ -90,6 +93,7 @@ function addOuterIslandBorder(island)
 		    for areaX, cell in ipairs(areaRow) do
 					if (y == 1 and areaY == 1) or (y == 3 and areaY == 5) or (x == 1 and areaX == 1) or (x == 3 and areaX == 5) then
             cell.contents = deepClone(outerBorderBlock)
+            cell.contents.color[3] = 0.5 + 0.25 * math.random() --a little ~bluer~ (DEBUG)
 					end
 				end
 			end

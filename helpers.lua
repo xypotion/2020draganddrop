@@ -59,15 +59,23 @@ end
 
 --an old debug-helper function i made in 2014 :)
 --reminder: never pass _G here, or other weird/global/self-nested tables here 
-function tablePrint(table, offset)
+function tablePrint(table, depth, offset)
+  if not depth then
+    depth = 16
+  else
+    depth = depth - 1
+  end
+  
   offset = offset or "  "
-
-  for k,v in pairs(table) do
-    if type(v) == "table" then
-      print(offset.."sub-table ["..k.."]:")
-      tablePrint(v, offset.."  ")
-    else
-      print(offset.."["..k.."] = "..tostring(v))
+  
+  if depth > 0 then
+    for k,v in pairs(table) do
+      if type(v) == "table" then
+        print(offset.."sub-table ["..k.."]:")
+        tablePrint(v, depth, offset.."  ")
+      else
+        print(offset.."["..k.."] = "..tostring(v))
+      end
     end
   end	
 end

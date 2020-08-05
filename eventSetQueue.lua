@@ -6,12 +6,13 @@
 require "events/cellOp"
 require "events/gridOps"
 require "events/spriteMove"
+require "events/areaMove"
 
 function initEventQueueSystem()
 	eventSetQueue = {}
 	
 	eventFrame = 0
-	eventFrameLength = 0.0125
+	eventFrameLength = 0.0125 --this is the animation speed for the whole game. could be configurable or at least more formalized somewhere... TODO
 	
 	currentEvents = {}
 end
@@ -55,7 +56,7 @@ function eventProcessing(dt)
 		-- for k, e in pairs(currentEvents) do --TODO figure out why this breaks it. it should work BETTER, but it doesn't.
 			--if not already finished, process this event 
 			if not e.finished then
-				-- print("processing "..e.class)
+        -- print("processing "..e.class) --DEBUG but useful
 			
 				-- if e.class == "function" then --i kind of want to avoid doing this again
 				-- 	-- print("...calling "..e.func)
@@ -66,6 +67,7 @@ function eventProcessing(dt)
 				-- end
 				
 				if e.finished then
+          -- print(e.class, "finished!!!") --DEBUG useful
 					currentEvents[k] = nil
 					-- print("something")
 					-- numFinished = numFinished + 1
@@ -80,6 +82,8 @@ function eventProcessing(dt)
 end
 
 --force queue set to be processed immediately, not at next scheduled interval. should start normally again after this
+--  ...unfortunately it's not actually NOW, it's at the top of the next update() cycle. 
+--  TODO maybe rename and/or make a version that ACTUALLY processes "now", not just "very soon"
 --in HDBS this was used only when player input needed to be processed, namely heroMove, heroFight, heroGetPowerup, and heroSpecialAttack
 --it will probably be used for more than this
 function processNow()

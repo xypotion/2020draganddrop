@@ -1,4 +1,6 @@
 --the intention is for these "grid ops" to be self explanatory
+--i.e. look at the "command" parameters. "grid ops" can cover a lot of different things, which is the intent.
+--i feel like this is a slightly unhealthy pattern... examine if you ever get more than 10~20 different commands
 
 function gridOpEvent(g, command, params)
 	local e = {
@@ -50,3 +52,7 @@ function process_gridOpEvent(e)
 	
 	e.finished = true
 end
+
+-----------------------------------------------------------------------------------------------------------
+
+--don't put other event types in this file. :)
