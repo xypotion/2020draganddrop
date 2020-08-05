@@ -354,7 +354,7 @@ function love.mousereleased(mx, my, button)
   if cellExistsAt(mCellX, mCellY) then
 
     --is this somewhere that can be walked to?
-    if CIA[mCellY][mCellX].pathFromHero then  
+    if CIA[mCellY][mCellX].pathFromHero and CIA[mCellY][mCellX].pathFromHero[1] then  
       --TODO make this more readable, including renaming "starty" 9_9
       local starty = findHeroLocationInGrid(CIA)
           
