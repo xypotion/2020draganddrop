@@ -34,13 +34,13 @@ function love.load()
   love.window.setTitle("<3")
 
   cellSize, overworldZoom = 72, 1
-  
+
   ISLANDSIZE = 3
   AREASIZE = 5
-  
-	overworldCanvas = love.graphics.newCanvas(cellSize * AREASIZE, cellSize * AREASIZE)
+
+  overworldCanvas = love.graphics.newCanvas(cellSize * AREASIZE, cellSize * AREASIZE)
   overworldCanvas:setFilter("nearest")
-  
+
   love.window.setMode(cellSize * overworldZoom * AREASIZE, cellSize * overworldZoom * (AREASIZE * 2 - 1))
 
   initEventQueueSystem()
@@ -55,10 +55,10 @@ function love.load()
   --init island and CIA "current island area"
   currentIsland = initIsland()
   CIA = currentIsland[currentIsland.areaNumbersReference[1].y][currentIsland.areaNumbersReference[1].x]
-  
+
   queue(gridOpEvent(CIA, "add obstacles", {type = "item", threshold = 0.1}))
   queue(gridOpEvent(CIA, "remap"))
-  
+
   CIA[3][3].contents = {
     class = "hero",
     color = {1,1,1,1},
@@ -67,7 +67,7 @@ function love.load()
     yOffset = 0,
     xOffset = 0
   }
-  
+
   CIA = mapAllPathsFromHero(CIA) --TODO might rather make this just "mapAllPathsFrom", then provide coordinates. also maybe a mode?
 
 --  grabbedThing = nil
@@ -184,7 +184,7 @@ function moveThingAtYX(y, x, dy, dx, max)
 
   --max = the number of movement frames it'll take this movement to finish
   max = max or 6
-  
+
   local moveFrames = {}
 
   for k = max - 1, 0, -1 do
@@ -194,7 +194,7 @@ function moveThingAtYX(y, x, dy, dx, max)
         xOffset = dx * -(cellSize * k / max)
       })
   end
-  
+
   --queue pose and cell ops
   queueSet({
       cellSwapEvent(CIA, y, x, ty, tx), --eventually swapping won't work, but ok for now. DEBUG
@@ -220,7 +220,7 @@ function love.mousepressed(mx, my, button)
   -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
   -- local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
   local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
-  
+
   mouseDownAtX, mouseDownAtY = mx, my
 
   --if we're clicking in the grid and there's an item there, "grab" it... TODO this sucks. clean it up
@@ -244,7 +244,7 @@ end
 --TODO prevent input from doing anything when an animation (event) is in progress!
 function love.mousereleased(mx, my, button)
   local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
-  
+
   -- if gameMode == "map" then
   if cellExistsAt(mCellX, mCellY) then
 
@@ -252,7 +252,7 @@ function love.mousereleased(mx, my, button)
     if CIA[mCellY][mCellX].pathFromHero and CIA[mCellY][mCellX].pathFromHero[1] then  
       --TODO make this more readable, including renaming "starty" 9_9
       local starty = findHeroLocationInGrid(CIA)
-          
+
       --queue up move/swap events from step to step along path
       for i, step in ipairs(CIA[mCellY][mCellX].pathFromHero) do			
         moveThingAtYX(starty.y, starty.x, step.y - starty.y, step.x - starty.x)
@@ -266,7 +266,7 @@ function love.mousereleased(mx, my, button)
       starty = findHeroLocationInGrid(CIA)
       local ciaCoords = currentIsland.areaNumbersReference[CIA.areaNumber]
       local dy, dx = 0, 0
-      
+
       --which way are we going?
       if mCellY == 1 and starty.y ~= 1 then
         dy = -1
@@ -277,21 +277,21 @@ function love.mousereleased(mx, my, button)
       elseif mCellX == 5 and starty.x ~= 5 then
         dx = 1
       end
-      
+
       --so are we switching areas?
       if (dy ~= 0 or dx ~= 0) then
         --confusing math, but this should find the next area over per dy and dx
         local nextArea = currentIsland[(ciaCoords.y + dy - 1) % ISLANDSIZE + 1][(ciaCoords.x + dx - 1) % ISLANDSIZE + 1]
-                
+
         queueSet({
-          primeAreaMoveEvent(dy, dx, nextArea),
-          --TODO i HATE having to refer to CIA and PIA this way. is there a better way?
-          areaMoveEvent(nextArea, dy, dx), --by the time this processes, nextArea will be CIA (because of the primer)
-          areaMoveEvent(CIA, dy, dx), --by the time this processes, CIA will be PIA
-          areaTransferEvent(CIA, mCellY, mCellX, nextArea, (mCellY + dy - 1) % AREASIZE + 1, (mCellX + dx - 1) % AREASIZE + 1),
-          --TODO still need a hero animation event! should be easy, though
-        })
-        
+            primeAreaMoveEvent(dy, dx, nextArea),
+            --TODO i HATE having to refer to CIA and PIA this way. is there a better way?
+            areaMoveEvent(nextArea, dy, dx), --by the time this processes, nextArea will be CIA (because of the primer)
+            areaMoveEvent(CIA, dy, dx), --by the time this processes, CIA will be PIA
+            areaTransferEvent(CIA, mCellY, mCellX, nextArea, (mCellY + dy - 1) % AREASIZE + 1, (mCellX + dx - 1) % AREASIZE + 1),
+            --TODO still need a hero animation event! should be easy, though
+          })
+
         queue(gridOpEvent(nextArea, "remap")) --why would this not work? :/
       else
         queue(gridOpEvent(CIA, "remap"))
@@ -299,29 +299,29 @@ function love.mousereleased(mx, my, button)
     end
   end
 end
-  -- else
-  -- 	if grabbedThing and grabbedThing.item then
-  -- 		if cellExistsAt(mCellX, mCellY) then
-  -- 			queue(cellSwapEvent(GRIDS.debug, mCellY, mCellX, grabbedThing.originY, grabbedThing.originX))
-  -- 		end
-  --
-  -- 		grabbedThing = nil
-  -- 		processNow()
-  -- 	end
-  --
-  -- 	-- grabbedThing = nil
-  -- 	-- mouseDownAtX, mouseDownAtY = 0, 0 --i really feel like there should be a more efficient way to do this...
-  -- 	mouseDownTimer = 0
-  -- 	mouseStillDown = false
-  -- 	mouseHasntMovedFar = false
-  --
-  -- 	processNow()
-  -- end
+-- else
+-- 	if grabbedThing and grabbedThing.item then
+-- 		if cellExistsAt(mCellX, mCellY) then
+-- 			queue(cellSwapEvent(GRIDS.debug, mCellY, mCellX, grabbedThing.originY, grabbedThing.originX))
+-- 		end
+--
+-- 		grabbedThing = nil
+-- 		processNow()
+-- 	end
+--
+-- 	-- grabbedThing = nil
+-- 	-- mouseDownAtX, mouseDownAtY = 0, 0 --i really feel like there should be a more efficient way to do this...
+-- 	mouseDownTimer = 0
+-- 	mouseStillDown = false
+-- 	mouseHasntMovedFar = false
+--
+-- 	processNow()
+-- end
 
 function convertMouseCoordsToOverworldCoords(mx, my)
   local x = math.floor((mx-CIA.offsetX+cellSize*overworldZoom)/cellSize/overworldZoom)
   local y = math.floor((my-CIA.offsetY+cellSize*overworldZoom)/cellSize/overworldZoom)
-  
+
   return x, y
 end
 
@@ -392,7 +392,7 @@ function love.keypressed(key)
   if key == "i" then
     tablePrint(island)
   end
-  
+
   if key == "e" then --move screen east
     queue(areaMoveEvent(currentIsland.areaNumbersReference[CIA.areaNumber], currentIsland, "east"))
     tablePrint(eventSetQueue)

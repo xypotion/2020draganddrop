@@ -65,9 +65,9 @@ function tablePrint(table, depth, offset)
   else
     depth = depth - 1
   end
-  
+
   offset = offset or "  "
-  
+
   if depth > 0 then
     for k,v in pairs(table) do
       if type(v) == "table" then
@@ -84,7 +84,7 @@ end
 --e.g. rollRound(1.11) will usually round to 1, but you'll sometimes get 2, instead
 function rollRound(num)
   local remainder = num % 1
-  
+
   if math.random() <= remainder then
     return math.ceil(num)
   else
@@ -103,9 +103,9 @@ function deepClone(original, safety)
   else
     safety = 0
   end
-    
+
   local clone = {}
-  
+
   for k, v in pairs(original) do
     if type (v) == "table" then
       clone[k] = deepClone(v, safety + 1)
@@ -113,7 +113,7 @@ function deepClone(original, safety)
       clone[k] = v
     end
   end
-  
+
   return clone
 end
 

@@ -2,14 +2,14 @@ require "draw/drawOverworld"
 
 function love.draw()
   drawOverworld()
-  
+
   --other canvases... grids, menus
-  
+
   --particle effects
-  
+
   --flying text, and just text of all kinds
-  
-  
+
+
   -- old drag-and-drop test. will need parts of this later!
   --things in grid
   -- for y=1, 3 do

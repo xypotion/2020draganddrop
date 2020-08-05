@@ -1,7 +1,7 @@
 function drawOverworld()
   love.graphics.setCanvas(overworldCanvas)  
   love.graphics.clear(0,0,0,1)
-  
+
   --draw CIA, PIA cells' backgrounds and contents
   drawIslandAreaBackgrounds(CIA)
 
@@ -25,11 +25,11 @@ function drawOverworld()
   end
 
   white()
-  
-	--draw gameCanvas
+
+  --draw gameCanvas
   --TODO move ALL of this to drawOverworld :) ...better yet, in draw.lua, or even drawOverworld.lua
-	love.graphics.setCanvas()
-	love.graphics.draw(overworldCanvas, 0, 0, 0, overworldZoom, overworldZoom)
+  love.graphics.setCanvas()
+  love.graphics.draw(overworldCanvas, 0, 0, 0, overworldZoom, overworldZoom)
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ function drawIslandAreaBackgrounds(ia)
     else
       setColor(v.cell.bgColor)
     end
-    
+
     love.graphics.rectangle("fill", (v.x-1) * cellSize + ia.offsetX, (v.y-1) * cellSize + ia.offsetY, cellSize, cellSize)
   end
 end
