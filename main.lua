@@ -19,11 +19,14 @@ BUGS... FIXME
 ]]
 
 
-require "eventSetQueue"
 require "pathfinding"
 require "hero"
 require "helpers"
 require "island"
+
+require "draw/draw"
+
+require "events/eventSetQueue"
 
 function love.load()
   math.randomseed(os.time())
@@ -170,115 +173,7 @@ function love.update(dt)
   end
 end
 
-function love.draw()
-  
-  
-  love.graphics.setCanvas(overworldCanvas)  
-  love.graphics.clear(0,0,0,1)
-  
-  for k, v in ipairs(allCellsInGrid(CIA)) do
-    if v.cell.mouseOver then
-      setColor(v.cell.bgHoverColor)
-    else
-      setColor(v.cell.bgColor)
-    end
-    love.graphics.rectangle("fill", (v.x-1)*cellSize+CIA.offsetX, (v.y-1)*cellSize+CIA.offsetY, cellSize, cellSize)
-  end  
-  
-  --this is just a copy of the above... abstract that shit TODO
-  if PIA then
-    for k, v in ipairs(allCellsInGrid(PIA)) do
-      if v.cell.mouseOver then
-        setColor(v.cell.bgHoverColor)
-      else
-        setColor(v.cell.bgColor)
-      end
-      
-      love.graphics.rectangle("fill", (v.x-1)*cellSize+PIA.offsetX, (v.y-1)*cellSize+PIA.offsetY, cellSize, cellSize)
-    end
-  end
 
-  white()
-
-  --draw cell contents
-  for y, row in ipairs(CIA) do
-    for x, c in ipairs(row) do
-      if c.contents and c.contents.class ~= "clear" then
-        drawCellContents(c.contents, (y-0.5)*cellSize + CIA.offsetY, (x-0.5)*cellSize + CIA.offsetX)
-      end
-    end
-  end
-
-  --again, abstract instead of copying. TODO
-  if PIA then  
-    for y, row in ipairs(PIA) do
-      for x, c in ipairs(row) do
-        if c.contents and c.contents.class ~= "clear" then
-          drawCellContents(c.contents, (y-0.5)*cellSize + PIA.offsetY, (x-0.5)*cellSize + PIA.offsetX)
-        end
-      end
-    end
-  end
-
-  white()
-
-  --draw path to currently hovered destination
-  if hoveredCell and CIA[hoveredCell.y][hoveredCell.x].pathFromHero then --TODO this second condition was not always necessary. investigate
-    for i, step in pairs(CIA[hoveredCell.y][hoveredCell.x].pathFromHero) do
-      love.graphics.circle("line", (step.x-0.5)*cellSize + CIA.offsetX, (step.y-0.5)*cellSize + CIA.offsetY, cellSize*0.45)
-    end
-  end
-  
-  -- else
-  --things in grid		--
-  -- for y=1, 3 do
-  -- 	for x=1, 3 do
-  -- 		if GRIDS.debug[y][x].contents and GRIDS.debug[y][x].contents.color then
-  -- 			love.graphics.setColor(GRIDS.debug[y][x].contents.color)
-  -- 			love.graphics.circle("fill", (x-0.5)*cellSize + GRIDS.debug.offsetX, (y-0.5)*cellSize + GRIDS.debug.offsetY, cellSize*0.45)
-  -- 		end
-  -- 	end
-  -- end
-  --
-  -- --grabbedThing
-  -- if grabbedThing then
-  -- 	local mx, my = love.mouse.getPosition()
-  -- 	-- tablePrint(grabbedThing)
-  -- 	setColor(grabbedThing.item.fadeColor)
-  -- 	love.graphics.circle("fill", mx - grabbedThing.relMouseX + cellSize/2, my - grabbedThing.relMouseY + cellSize/2, cellSize*0.45)
-  -- end
-  -- end
-
-  white()
-  
-	--draw gameCanvas
-  --TODO move ALL of this to drawOverworld :) ...better yet, in draw.lua, or even drawOverworld.lua
-	love.graphics.setCanvas()
-	love.graphics.draw(overworldCanvas, 0, 0, 0, overworldZoom, overworldZoom)
-end
-
-
------------------------------------------------------------------------------------------------------------
-
-function drawStage()
-end
-
-function drawCellContents(obj, screenY, screenX)
-  setColor(obj.color)
-
-  if obj.class == "block" then
-    love.graphics.rectangle("fill", screenX - cellSize/2, screenY - cellSize/2, cellSize, cellSize)
-  elseif obj.class == "danger" then
-    love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize * 0.4, 4)
-  elseif obj.class == "npc" then
-    love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.35)
-  elseif obj.class == "item" then
-    love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.15)
-  elseif obj.class == "hero" then
-    love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize * softOscillator)
-  end
-  -- love.graphics.polygon("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize*0.45)
-end
 
 -----------------------------------------------------------------------------------------------------------
 
