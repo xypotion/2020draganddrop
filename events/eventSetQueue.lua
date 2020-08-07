@@ -7,6 +7,8 @@ require "events/cellOp"
 require "events/gridOps"
 require "events/spriteMove"
 require "events/areaMove"
+require "events/gameState"
+-- require
 
 function initEventQueueSystem()
 	eventSetQueue = {}

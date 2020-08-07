@@ -4,8 +4,22 @@ sort of hilarious that this doesn't do dragging and dropping anymore, and it nev
 TODO features
 - UX for non-overworld grids; nav on top, drag & drop on bottom
   - "inventory" or "drawer" of items to drag into/between grids. maybe can drag obstacles from bottom to top? :)
-- obs-tacular pathing, like different ways of pathing near/around/over different types of things
-- add: clicking on hero immediately after arriving in a new area will walk them back to the previous area
+  - uh, and a million other non-overworld, non-battle things
+- obs-tacular pathing, like different ways of pathing near/around/over different types of things to avoid danger if possible. 
+  - maybe just add "danger" rating to all cells, then use that to make decisions in the pathfinding algo; enemies have dangerous zones around them
+  - alternative, maybe easier: can you map to a cell without passing by an enemy, i.e. enemy-adjacent cells = "blocked"? if so, do that. if not, then path normally
+  - if possible, maybe also make it so hero always walks through the middle of an area if it's clear & safe, just to prevent unnecessary zig-zagging
+- color-coded map dots/something to indicate what all happens when you tap them
+- actual island-building rules :)
+- minimap; show only visited areas
+- battle system!
+  1. very basic screen transition from overworld (use debug key) + show hero stats, enemy life bars
+  2. show basic command grid, then allow UI switching
+  3. implement BattleEffect and make things happen when you do battle actions; somewhere here make all info/stats update whenever something happens (use actuators!)
+  4. long-press on stuff to see info
+  5. implement AP & turns, then basic enemy AI
+  6. more complicated battle effects, and start battle animations (particle effects and/or frame-based animations)
+  7. other stuff... grid-switching, battle start + end transitions, pets/summons, ally AI, potions, multipage command grid & customization, ...
 
 TODO random things
 - idea: make a "luaMod" or "highMod" or even %% operator that shifts the modulo window up by 1, so we don't have to fuck around with off-by-1 mod ops
@@ -22,6 +36,7 @@ require "pathfinding"
 require "hero"
 require "helpers"
 require "island"
+require "battleLogic"
 
 require "draw/draw"
 
@@ -88,6 +103,10 @@ function love.load()
   --pretending i know how the hero object will be structured
   initHERO()
   -- tablePrint(HERO)
+  
+  initBattleSystem()
+  
+  GAMESTATE = "overworld"
 end
 
 function initDebugGrid()
@@ -437,10 +456,14 @@ function love.keypressed(key)
     tablePrint(island)
   end
 
-  if key == "e" then --move screen east
-    queue(areaMoveEvent(currentIsland.areaNumbersReference[CIA.areaNumber], currentIsland, "east"))
-    tablePrint(eventSetQueue)
-    processNow()
+  -- if key == "e" then --move screen east
+  --   queue(areaMoveEvent(currentIsland.areaNumbersReference[CIA.areaNumber], currentIsland, "east"))
+  --   tablePrint(eventSetQueue)
+  --   processNow()
+  -- end
+  
+  if key == "b" then 
+    queue(gameStateEvent("battle"))
   end
 end
 

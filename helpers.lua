@@ -5,9 +5,23 @@ function white()
 end
 
 function setColor(r,g,b,a)
-  if not a then a = 1 end
-
-  love.graphics.setColor(r,g,b,a)
+  if type(r) == "table" then
+    if r.r then
+      if r.a then
+        love.graphics.setColor(r.r,r.g,r.b,r.a)
+      else
+        love.graphics.setColor(r.r,r.g,r.b,1)
+      end
+    else
+      love.graphics.setColor(r[1],r[2],r[3],r[4])
+    end
+  else
+    if a then 
+      love.graphics.setColor(r,g,b,a)
+    else
+      love.graphics.setColor(r,g,b,1)
+    end
+  end 
 end
 
 --mutates the input, so ONLY use this in the form foo = shuffle(foo)

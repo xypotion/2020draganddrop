@@ -1,7 +1,13 @@
 require "draw/drawOverworld"
+require "draw/drawBattle"
 
 function love.draw()
-  drawOverworld()
+  
+  if GAMESTATE == "overworld" then
+    drawOverworld()
+  elseif GAMESTATE == "battle" then 
+    drawBattle()
+  end
 
   --other canvases... grids, menus
 
