@@ -326,7 +326,9 @@ function love.mousereleased(mx, my, button)
         dx = 1
       end
       
-      queueNextAreaMoveAndRemapEvents(dy, dx, mCellY, mCellX)
+      if (dy ~= 0 or dx ~= 0) then
+        queueNextAreaMoveAndRemapEvents(dy, dx, mCellY, mCellX)
+      end
       
     elseif cell.contents.class == "clear" and cell.pathFromHero[1] then
       local starty = findHeroLocationInGrid(CIA)
