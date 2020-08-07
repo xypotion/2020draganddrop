@@ -1,17 +1,16 @@
 --[[
 sort of hilarious that this doesn't do dragging and dropping anymore, and it never related to matching :P
 
-things that would be good to do next
-- multiple grids; nav on top, drag & drop on bottom
-- "inventory" or "drawer" of items to drag into/between grids. maybe can drag obstacles from bottom to top? :)
+TODO features
+- UX for non-overworld grids; nav on top, drag & drop on bottom
+  - "inventory" or "drawer" of items to drag into/between grids. maybe can drag obstacles from bottom to top? :)
 - obs-tacular pathing, like different ways of pathing near/around/over different types of things
-- canvases + click input
+- add: clicking on hero immediately after arriving in a new area will walk them back to the previous area
+
+TODO random things
+- idea: make a "luaMod" or "highMod" or even %% operator that shifts the modulo window up by 1, so we don't have to fuck around with off-by-1 mod ops
 - build & test this shit on android
   - ugh, and start building a quicksave framework with auto-serialize or recursive table-zipping... but also check forums to see if there's a better way. :/
-
-TODO 
-- idea: make a "luaMod" or "highMod" or even %% operator that shifts the modulo window up by 1, so we don't have to fuck around with off-by-1 mod ops
-- add: clicking on hero immediately after arriving in a new area will walk them back to the previous area
 
 BUGS... FIXME
 - hovered tile stays hovered after you leave area, and it still looks that way when you return
@@ -241,67 +240,112 @@ function love.mousepressed(mx, my, button)
   end
 end
 
+--dy and dx describe the way the hero is moving... we're moving to a neighboring map, but which way?
+function queueNextAreaMoveAndRemapEvents(dy, dx, heroY, heroX)
+  local ciaCoords = currentIsland.areaNumbersReference[CIA.areaNumber]
+  local nextArea = currentIsland[(ciaCoords.y + dy - 1) % ISLANDSIZE + 1][(ciaCoords.x + dx - 1) % ISLANDSIZE + 1]
+  
+  queueSet({
+      primeAreaMoveEvent(dy, dx, nextArea),
+      areaMoveEvent(nextArea, dy, dx), --by the time this processes, nextArea will be CIA (because of the primer)
+      areaMoveEvent(CIA, dy, dx), --by the time this processes, CIA will be PIA
+      areaTransferEvent(CIA, heroY, heroX, nextArea, (heroY + dy - 1) % AREASIZE + 1, (heroX + dx - 1) % AREASIZE + 1),
+      --TODO still need a hero animation event! should be easy, though
+    })
+  queue(gridOpEvent(nextArea, "remap"))
+end
+
+
 --TODO prevent input from doing anything when an animation (event) is in progress!
 function love.mousereleased(mx, my, button)
   local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
 
-  -- if gameMode == "map" then
-  if cellExistsAt(mCellX, mCellY) then
+--[[
+  this is complicated... what are we doing?
+  1. you've clicked a blocked tile -> nothing happens.
+  2. you've clicked an open tile in the interior; it's open and has a pathFromHero -> build a path & queue up movement, then remap that area
+  3. you've clicked an open tile on a boundary -> do above, except also queue up areaMoveEvent stuff, then remap for the NEXT area
+  4. you've clicked on the hero not on a boundary -> nothing happens
+  5. you've clicked on the hero ON a boundary -> send them back across that boundary to the neighboring area
+  so logic... first check cell contents' class
+    if blocked then do nothing
+    if hero then 
+      if on boundary
+        area move, remap in new area
+      else do nothing
+    if clear then
+      map there
+      if boundary and not starting at boundary then
+        area move
+        remap in new area
+      else
+        remap in current area
+      end
+    end
+  
+  eh. try this?
+  ]]  
 
-    --is this somewhere that can be walked to?
-    if CIA[mCellY][mCellX].pathFromHero and CIA[mCellY][mCellX].pathFromHero[1] then  
-      --TODO make this more readable, including renaming "starty" 9_9
+  local cell = cellAt(mCellY, mCellX) 
+  
+  if cell then          
+    --ok, what kind of cell is this?
+    if cell.contents.class == "blocked" then
+      --no-op :)
+      
+    elseif cell.contents.class == "hero" then
+      --usually do nothing, unless we're on a border, in which case cross it again
+      local dy, dx = 0, 0
+
+      if mCellY == 1 then
+        dy = -1
+      elseif mCellY == 5 then
+        dy = 1
+      elseif mCellX == 1 then
+        dx = -1
+      elseif mCellX == 5 then
+        dx = 1
+      end
+      
+      queueNextAreaMoveAndRemapEvents(dy, dx, mCellY, mCellX)
+      
+    elseif cell.contents.class == "clear" and cell.pathFromHero[1] then
       local starty = findHeroLocationInGrid(CIA)
-
+      
       --queue up move/swap events from step to step along path
-      for i, step in ipairs(CIA[mCellY][mCellX].pathFromHero) do			
+      for i, step in ipairs(CIA[mCellY][mCellX].pathFromHero) do      
         moveThingAtYX(starty.y, starty.x, step.y - starty.y, step.x - starty.x)
 
         starty = step
       end
-
-      --TODO is the hero going to an edge from somewhere else? then move the stage!            
-      --also determine PIA NOW. or is it more like PIA?
-      --post-queue a gridOp: "clear PIA" so that stops drawing
-      starty = findHeroLocationInGrid(CIA)
-      local ciaCoords = currentIsland.areaNumbersReference[CIA.areaNumber]
+      
+      --now check for area move & do that if needed, then remap one way or the other
+      local endy = findHeroLocationInGrid(CIA)
       local dy, dx = 0, 0
 
-      --which way are we going?
-      if mCellY == 1 and starty.y ~= 1 then
+      --are we going to a border cell from a not-border cell?
+      if mCellY == 1 and endy.y ~= 1 then
         dy = -1
-      elseif mCellY == 5 and starty.y ~= 5 then
+      elseif mCellY == 5 and endy.y ~= 5 then
         dy = 1
-      elseif mCellX == 1 and starty.x ~= 1 then
+      elseif mCellX == 1 and endy.x ~= 1 then
         dx = -1
-      elseif mCellX == 5 and starty.x ~= 5 then
+      elseif mCellX == 5 and endy.x ~= 5 then
         dx = 1
       end
-
-      --so are we switching areas?
+      
       if (dy ~= 0 or dx ~= 0) then
-        --confusing math, but this should find the next area over per dy and dx
-        local nextArea = currentIsland[(ciaCoords.y + dy - 1) % ISLANDSIZE + 1][(ciaCoords.x + dx - 1) % ISLANDSIZE + 1]
-
-        queueSet({
-            primeAreaMoveEvent(dy, dx, nextArea),
-            --TODO i HATE having to refer to CIA and PIA this way. is there a better way?
-            areaMoveEvent(nextArea, dy, dx), --by the time this processes, nextArea will be CIA (because of the primer)
-            areaMoveEvent(CIA, dy, dx), --by the time this processes, CIA will be PIA
-            areaTransferEvent(CIA, mCellY, mCellX, nextArea, (mCellY + dy - 1) % AREASIZE + 1, (mCellX + dx - 1) % AREASIZE + 1),
-            --TODO still need a hero animation event! should be easy, though
-          })
-
-        queue(gridOpEvent(nextArea, "remap")) --why would this not work? :/
+        queueNextAreaMoveAndRemapEvents(dy, dx, mCellY, mCellX)
       else
         queue(gridOpEvent(CIA, "remap"))
       end
     end
   end
 end
+
 -- else
 -- 	if grabbedThing and grabbedThing.item then
--- 		if cellExistsAt(mCellX, mCellY) then
+-- 		if cellAt(mCellX, mCellY) then
 -- 			queue(cellSwapEvent(GRIDS.debug, mCellY, mCellX, grabbedThing.originY, grabbedThing.originX))
 -- 		end
 --
@@ -400,12 +444,13 @@ function love.keypressed(key)
   end
 end
 
---not sure if this is really that helpful...
-function cellExistsAt(x, y)
-  if CIA[y] and CIA[y][x] then
-    return true
+--gives you CIA[y][x] if it exists, otherwise nil
+--TODO consider renaming to CIACellAt and/or making alternate versions
+function cellAt(y, x)
+  if CIA[y] then
+    return CIA[y][x]
   else
-    return false
+    return nil
   end
 end
 
