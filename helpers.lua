@@ -81,6 +81,11 @@ function tablePrint(table, depth, offset)
   end
 
   offset = offset or "  "
+  
+  if not table then
+    print(table)
+    return
+  end
 
   if depth > 0 then
     for k,v in pairs(table) do

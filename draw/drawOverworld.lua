@@ -29,6 +29,8 @@ function drawOverworld()
   --draw gameCanvas
   --TODO move ALL of this to drawOverworld :) ...better yet, in draw.lua, or even drawOverworld.lua
   love.graphics.setCanvas()
+  
+  white()
   love.graphics.draw(overworldCanvas, 0, 0, 0, overworldZoom, overworldZoom)
 end
 
