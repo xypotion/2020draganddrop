@@ -15,6 +15,8 @@ function drawBattle()
   
   white()
   love.graphics.draw(BATTLE.canvas, 0, 0, 0, overworldZoom, overworldZoom)
+  
+  drawBattleDebugInfo()
 end
 
 function drawBattleGrid()
@@ -67,4 +69,13 @@ end
 function drawBattleCellOverlays()
   --was going to put targeted cell here, but that's not appropriate
   --i guess particles and other effects could go here? if necessary?
+end
+
+
+function drawBattleDebugInfo()
+  local debugInfo = "hero stats:\n"
+  debugInfo = debugInfo..HERO.baseStats.maxHP.."\n"
+  
+  white()
+  love.graphics.print(debugInfo, 10, cellSize * overworldZoom * 5 + 10)
 end

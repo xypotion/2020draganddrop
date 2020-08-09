@@ -8,6 +8,7 @@ require "events/gridOps"
 require "events/spriteMove"
 require "events/areaMove"
 require "events/gameState"
+require "events/battlePhase"
 -- require
 
 function initEventQueueSystem()
@@ -57,12 +58,12 @@ function eventProcessing(dt)
 		for k, e in pairs(currentEvents) do --any way of making this work with ipairs()? TODO
 			--if not already finished, process this event 
 			if not e.finished then
-        -- print("processing "..e.class) --DEBUG but useful
+        -- print("PROCESSING "..e.class) --DEBUG useful
 			
 				_G["process_"..e.class.."Event"](e)
 				
 				if e.finished then
-          -- print(e.class, "finished!!!") --DEBUG useful
+          -- print(e.class, " FINISHED") --DEBUG useful
 					currentEvents[k] = nil
 				end
 			end

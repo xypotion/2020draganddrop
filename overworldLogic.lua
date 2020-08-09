@@ -1,3 +1,37 @@
+function initOverworldSystem()
+
+
+  overworldCanvas = love.graphics.newCanvas(cellSize * AREASIZE, cellSize * AREASIZE)
+  overworldCanvas:setFilter("nearest")  
+  
+  currentIsland = initIsland()
+  CIA = currentIsland[currentIsland.areaNumbersReference[1].y][currentIsland.areaNumbersReference[1].x]
+
+  --this is not elegant (you're mapping twice at boot), but it's debug junk anyway. doesn't matter
+  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
+  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
+  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
+  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1})) --TODO document these in gridOps before deleting. lol
+  -- queue(gridOpEvent(GRIDS.debug, "remap"))
+
+  --init island and CIA "current island area"
+
+  queue(gridOpEvent(CIA, "add obstacles", {type = "item", threshold = 0.1}))
+  queue(gridOpEvent(CIA, "remap"))
+
+  CIA[3][3].contents = {
+    class = "hero",
+    color = {1,1,1,1},
+    fadeColor = {1,1,1,0.5},
+    message = "hero?",
+    yOffset = 0,
+    xOffset = 0
+  }
+
+  CIA = mapAllPathsFromHero(CIA) --TODO might rather make this just "mapAllPathsFrom", then provide coordinates. also maybe a mode?
+
+end
+
 function overworldClick(mx, my, button)
   local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
 

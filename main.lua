@@ -44,6 +44,8 @@ require "draw/draw"
 
 require "events/eventSetQueue"
 
+-----------------------------------------------------------------------------------------------------------
+
 function love.load()
   math.randomseed(os.time())
 
@@ -56,37 +58,10 @@ function love.load()
   ISLANDSIZE = 3
   AREASIZE = 5
 
-  overworldCanvas = love.graphics.newCanvas(cellSize * AREASIZE, cellSize * AREASIZE)
-  overworldCanvas:setFilter("nearest")
-
   love.window.setMode(cellSize * overworldZoom * AREASIZE, cellSize * overworldZoom * (AREASIZE * 2 - 1))
 
   initEventQueueSystem()
 
-  --this is not elegant (you're mapping twice at boot), but it's debug junk anyway. doesn't matter
-  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
-  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
-  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
-  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1})) --TODO document these in gridOps before deleting. lol
-  -- queue(gridOpEvent(GRIDS.debug, "remap"))
-
-  --init island and CIA "current island area"
-  currentIsland = initIsland()
-  CIA = currentIsland[currentIsland.areaNumbersReference[1].y][currentIsland.areaNumbersReference[1].x]
-
-  queue(gridOpEvent(CIA, "add obstacles", {type = "item", threshold = 0.1}))
-  queue(gridOpEvent(CIA, "remap"))
-
-  CIA[3][3].contents = {
-    class = "hero",
-    color = {1,1,1,1},
-    fadeColor = {1,1,1,0.5},
-    message = "hero?",
-    yOffset = 0,
-    xOffset = 0
-  }
-
-  CIA = mapAllPathsFromHero(CIA) --TODO might rather make this just "mapAllPathsFrom", then provide coordinates. also maybe a mode?
 
 --  grabbedThing = nil
 
@@ -97,8 +72,8 @@ function love.load()
   mouseHasntMovedFar = false
 
   --also TODO shouldn't there be a way to not make this return things
-  gameMode = "debug" --TODO shouldn't be necessary! remove & simplify
-  hoveredCell = nil
+  -- gameMode = "debug" --TODO shouldn't be necessary! remove & simplify
+  -- hoveredCell = nil
 
   softOscillator = 1
   oscillatorCounter = 0
@@ -111,10 +86,14 @@ function love.load()
   initHERO()
   -- tablePrint(HERO)
   
+  initOverworldSystem()
+  
   initBattleSystem()
   
   GAMESTATE = "overworld"
 end
+
+-----------------------------------------------------------------------------------------------------------
 
 function initDebugGrid()
   local grid = {}
@@ -161,6 +140,8 @@ function initDebugGrid()
   return grid
 end
 
+-----------------------------------------------------------------------------------------------------------
+
 function love.update(dt)
   oscillatorCounter = oscillatorCounter + dt * 5 % TAU
   softOscillator = 0.25 + math.sin(oscillatorCounter) * 0.0625
@@ -198,13 +179,7 @@ function love.update(dt)
   end
 end
 
-
-
 -----------------------------------------------------------------------------------------------------------
-
-
------------------------------------------------------------------------------------------------------------
-
 
 function love.mousepressed(mx, my, button)
   
@@ -232,6 +207,7 @@ function love.mousepressed(mx, my, button)
   end
 end
 
+-----------------------------------------------------------------------------------------------------------
 
 --TODO prevent input from doing anything when an animation (event) is in progress!
 function love.mousereleased(mx, my, button)
@@ -242,6 +218,7 @@ function love.mousereleased(mx, my, button)
   end
 end
 
+-----------------------------------------------------------------------------------------------------------
 
 function love.mousemoved(mx,my)
   local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
@@ -259,6 +236,8 @@ function love.mousemoved(mx,my)
     end
   end
 end
+
+-----------------------------------------------------------------------------------------------------------
 
 function longPressEventAt(mx, my)
   local t = getTopThingAtPos(mx, my)
@@ -288,6 +267,8 @@ function getTopThingAtPos(mx, my)
     end
   end
 end
+
+-----------------------------------------------------------------------------------------------------------
 
 --basically all debug functions! :P
 function love.keypressed(key)
