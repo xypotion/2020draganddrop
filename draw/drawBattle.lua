@@ -1,4 +1,12 @@
 function drawBattle()
+  drawBattlefield()
+  
+  drawBattleCommands()
+end
+
+-----------------------------------------------------------------------------------------------------------
+
+function drawBattlefield()
   love.graphics.setCanvas(BATTLE.canvas) 
   love.graphics.clear(0,0,0,1)
   -- love.graphics.clear(BATTLE.bgColor)
@@ -9,7 +17,7 @@ function drawBattle()
   -- white()
   love.graphics.rectangle("fill", 0, 0, cellSize * AREASIZE, cellSize * AREASIZE)
   
-  drawBattleGrid()
+  drawBattlefieldGrid()
   
   love.graphics.setCanvas()
   
@@ -19,7 +27,7 @@ function drawBattle()
   drawBattleDebugInfo()
 end
 
-function drawBattleGrid()
+function drawBattlefieldGrid()
   drawBattleCellBackgrounds()
   
   drawBattleCellContents()
@@ -60,8 +68,11 @@ end
 function drawBattleCellContents()
   for k, v in ipairs(allCellsInGrid(BATTLE.grid)) do
     if v.cell.contents.class == "unit" then --or whatever. TODO. could also make this logic safer
+      setColor(v.cell.contents.color) --DEBUG
+      love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10, 10, 10)
+    elseif v.cell.contents.class == "hero" then
       white()
-      love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX, (v.y-1) * cellSize + BATTLE.grid.offsetY, 10, 10)
+      love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10, 25, 25)
     end
   end
 end
@@ -71,6 +82,17 @@ function drawBattleCellOverlays()
   --i guess particles and other effects could go here? if necessary?
 end
 
+-----------------------------------------------------------------------------------------------------------
+
+function drawBattleCommands() --i want a better name for this :'(
+  drawBattleMainCommands()
+end
+
+function drawBattleMainCommands()
+  
+end
+
+-----------------------------------------------------------------------------------------------------------
 
 function drawBattleDebugInfo()
   local debugInfo = "hero stats:\n"
@@ -79,3 +101,6 @@ function drawBattleDebugInfo()
   white()
   love.graphics.print(debugInfo, 10, cellSize * overworldZoom * 5 + 10)
 end
+
+-----------------------------------------------------------------------------------------------------------
+

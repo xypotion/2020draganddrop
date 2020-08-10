@@ -4,18 +4,22 @@ function initBattleSystem()
   BATTLE.canvas = love.graphics.newCanvas(cellSize * AREASIZE, cellSize * AREASIZE)
   BATTLE.canvas:setFilter("nearest")
   
+  initBattleGrid()
   
+  BATTLE.bgColor = {r = 0.1, g = 0.05, b = 0.2}
+  
+  BATTLE.targetedCell = nil
+end
+
+function initBattleGrid()
   BATTLE.grid = new3x3Grid({
     contents = "clear",
+    fieldEffect = nil,
     bgColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5},
     lineColor = {r = 0.75, g = 0.75, b = 0.75, a = 0.75},
   })
   
   BATTLE.grid.offsetY, BATTLE.grid.offsetX = cellSize, cellSize
-  
-  BATTLE.bgColor = {r = 0.1, g = 0.05, b = 0.2}
-  
-  BATTLE.targetedCell = nil
 end
 
 function battleClick(mx, my, button)
@@ -49,4 +53,15 @@ function convertMouseCoordsToBattleGridCoords(mx, my)
   local y = math.floor(my / cellSize / overworldZoom)
   
   return x, y
+end
+
+
+-----------------------------------------------------------------------------------------------------------
+
+function battleUnit_enemy()
+  local en = {class = "unit"}
+  
+  en.color = {r = 1, g = math.random(), b = math.random()}
+  
+  return en
 end

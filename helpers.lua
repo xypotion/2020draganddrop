@@ -35,6 +35,19 @@ function shuffle(arr)
   return new
 end
 
+-- function shuffle2D(grid)
+--   --this is actually not super useful. how about randomGridDistribute(array, exceptions)?
+-- end
+--
+-- function randomGridDistribute(grid, array, exceptions)
+--   --shuffle array, then place members in grid, but skip exceptions
+--   --this still feels inefficient...
+-- end
+--
+-- function randomGridPlace(grid, item)
+--   --just call this multiple times; item will be placed somewhere random but only on "clear" cells
+-- end
+
 function empty(t)
   local e = true
   for k, v in pairs(t) do

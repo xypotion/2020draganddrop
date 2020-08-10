@@ -299,7 +299,22 @@ function love.keypressed(key)
   -- end
   
   if key == "b" then 
-    queue(gameStateEvent("battle"))
+    local heroLoc = findHeroLocationInGrid(CIA)
+    
+    if heroLoc.y == 1 or heroLoc.y == 5 or heroLoc.x == 1 or heroLoc.x == 5 then
+      print("lol, no")
+      return
+    end
+    
+    local battleGrid = {
+      {y = math.random(3), x = math.random(3), contents = battleUnit_enemy()},
+      {y = math.random(3), x = math.random(3), contents = battleUnit_enemy()},
+      {y = heroLoc.y - 1, x = heroLoc.x - 1, contents = {class = "hero"}}
+    }
+    
+    queueSet({gameStateEvent("battle"), 
+      battleStartEvent({gridContents = battleGrid})
+    })
   end
 end
 
