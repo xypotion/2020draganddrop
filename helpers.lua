@@ -1,7 +1,28 @@
 --stuff
 
-function white()
-  love.graphics.setColor(1,1,1)
+--TODO use this in more places! :)
+function white(a)
+  a = a or 1
+  
+  local color = {r = 1, g = 1, b = 1, a = a}
+  
+  setColor(color)
+  
+  return color
+end
+
+function black(a)
+  a = a or 1
+  
+  local color = {r = 0, g = 0, b = 0, a = a}
+  
+  setColor(color)
+  
+  return color
+end
+
+function invisible()
+  return white(0)
 end
 
 function setColor(r,g,b,a)

@@ -34,6 +34,7 @@ function drawBattlefieldGrid()
   
   drawBattleCellOverlays()
   
+  --draw targeting ring if a cell is targeted
   if BATTLE.targetedCell then -- AND it's your turn & there's no animation playing TODO
     white()
     local targetY = (BATTLE.targetedCell.y + 0.5) * cellSize
@@ -89,7 +90,24 @@ function drawBattleCommands() --i want a better name for this :'(
 end
 
 function drawBattleMainCommands()
-  
+  for k, v in pairs(allCellsInGrid(mainCommandsGrids[mainCommandsGrids.current])) do
+    -- local offset = cellSize + mainCommandsGrids.offsetX
+    
+    setColor(v.cell.bgColor)
+    -- setColor(1, 1, 0, 0.5)
+    -- setColor({r=1, g=1, b=0, a=0.95})
+    love.graphics.rectangle("fill", (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, cellSize)
+    setColor(v.cell.lineColor)
+    love.graphics.rectangle("line", (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, cellSize)
+    
+    --these draw/print commands are so ugly, not to mention repetetive... find some way to abstract them or make them cleaner! TODO DRY it up
+    
+    if v.cell.contents then
+      white()
+      love.graphics.printf(v.cell.contents, (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, "center")
+    end
+      
+  end
 end
 
 -----------------------------------------------------------------------------------------------------------
