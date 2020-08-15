@@ -16,6 +16,11 @@ function drawBattlefield()
   setColor(BATTLE.bgColor)
   -- white()
   love.graphics.rectangle("fill", 0, 0, cellSize * AREASIZE, cellSize * AREASIZE)
+      
+  --top/bottom gradients. classy!
+  white()
+  love.graphics.draw(blackGradientTop, 0, 0, 0, cellSize * 5, cellSize)
+  love.graphics.draw(blackGradientBottom, 0, cellSize * 4, 0, cellSize * 5, cellSize)
   
   drawBattlefieldGrid()
   
@@ -24,7 +29,7 @@ function drawBattlefield()
   white()
   love.graphics.draw(BATTLE.canvas, 0, 0, 0, overworldZoom, overworldZoom)
   
-  drawBattleDebugInfo()
+  drawBattleDebugInfo() --DEBUG, obviously
 end
 
 function drawBattlefieldGrid()
@@ -121,4 +126,3 @@ function drawBattleDebugInfo()
 end
 
 -----------------------------------------------------------------------------------------------------------
-

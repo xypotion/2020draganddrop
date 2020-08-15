@@ -1,5 +1,6 @@
 require "draw/drawOverworld"
 require "draw/drawBattle"
+require "draw/gradient"
 
 function love.draw()
   

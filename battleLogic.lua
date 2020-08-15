@@ -6,7 +6,7 @@ function initBattleSystem()
   
   initBattleGrid()
   
-  BATTLE.bgColor = {r = 0.1, g = 0.05, b = 0.2}
+  BATTLE.bgColor = {r = 0.125, g = 0.0625, b = 0.25}
   
   BATTLE.targetedCell = nil
   
@@ -24,6 +24,10 @@ function initBattleSystem()
   mainCommandsGrids[1][3][3] = {contents = "RUN AWAY", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5)}
   
   -- tablePrint(mainCommandsGrids)
+  
+  --graphical gradients. TODO maybe put these somewhere else? outside of draw() is good, though...
+  blackGradientTop = gradientMesh("vertical", black(), invisible())
+  blackGradientBottom = gradientMesh("vertical", invisible(), black())
 end
 
 function initBattleGrid()
@@ -56,7 +60,7 @@ function setOrRemoveBattleTargetCell(mx, my)
     setBattleTargetCell(mx, my)
   end
   
-  tablePrint(BATTLE.targetedCell)
+  -- tablePrint(BATTLE.targetedCell)
 end
 
 function setBattleTargetCell(mx, my)

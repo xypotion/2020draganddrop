@@ -1,10 +1,10 @@
 --stuff
 
---TODO use this in more places! :)
 function white(a)
   a = a or 1
   
-  local color = {r = 1, g = 1, b = 1, a = a}
+  --this looks weird, but it's so i can access the returned color table by numeric OR named indices
+  local color = {1, 1, 1, a, r = 1, g = 1, b = 1, a = a}
   
   setColor(color)
   
@@ -14,7 +14,7 @@ end
 function black(a)
   a = a or 1
   
-  local color = {r = 0, g = 0, b = 0, a = a}
+  local color = {0, 0, 0, a, r = 0, g = 0, b = 0, a = a}
   
   setColor(color)
   
@@ -22,7 +22,7 @@ function black(a)
 end
 
 function invisible()
-  return white(0)
+  return black(0)
 end
 
 function setColor(r,g,b,a)
