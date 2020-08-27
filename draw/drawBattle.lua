@@ -74,8 +74,12 @@ end
 function drawBattleCellContents()
   for k, v in ipairs(allCellsInGrid(BATTLE.grid)) do
     if v.cell.contents.class == "unit" then --or whatever. TODO. could also make this logic safer
-      setColor(v.cell.contents.color) --DEBUG
+      local unit = v.cell.contents
+      unit.stats.hp = unit.stats.hp or ""
+      setColor(unit.color) --DEBUG
       love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10, 10, 10)
+      white()
+      love.graphics.print(unit.stats.hp, (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 30)
     elseif v.cell.contents.class == "hero" then
       white()
       love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10, 25, 25)
@@ -122,7 +126,7 @@ function drawBattleDebugInfo()
   debugInfo = debugInfo..HERO.baseStats.maxHP.."\n"
   
   white()
-  love.graphics.print(debugInfo, 10, cellSize * overworldZoom * 5 + 10)
+  love.graphics.print(debugInfo, 10, cellSize * overworldZoom * 4 + 10)
 end
 
 -----------------------------------------------------------------------------------------------------------

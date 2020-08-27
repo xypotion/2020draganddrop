@@ -13,7 +13,7 @@ TODO features
 - actual island-building rules :)
 - minimap; show only visited areas
 - battle system!
-  1. very basic screen transition from overworld (use debug key) + show hero stats, enemy life bars
+  1. very basic screen transition from overworld (use debug key) + show hero stats, enemy life bars?
   2. show basic command grid, then allow UI switching
   3. implement BattleEffect and make things happen when you do battle actions; somewhere here make all info/stats update whenever something happens (use actuators!)
   4. long-press on stuff to see info
@@ -39,6 +39,7 @@ require "helpers"
 require "island"
 require "battleLogic"
 require "overworldLogic"
+require "gear" --TODO move this and other requires, i think
 
 require "draw/draw"
 

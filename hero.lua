@@ -19,11 +19,12 @@ function initHERO()
   --stats, including affinities
   HERO.baseStats = {
     maxHP = 99,
+    hp = 99,
     maxIP = 99,
-    str = 9,
-    def = 9,
-    int = 9,
-    wis = 9,
+    ps = 9, --physical strength
+    pr = 9, --physical resistance
+    es = 9, --elemental strength
+    er = 9, --elemental resistance ...these are subject to change, obvs
     level = 0,
     weight = 9,
   }
@@ -39,6 +40,7 @@ function initHERO()
     m = 1,
   }
   HERO.stats = {} --this should be derived (later, i guess) from base + affinities + other other stuff
+  HERO.stats = deepClone(HERO.baseStats) --DEBUG
 
 
   --hero grid stuff
@@ -139,3 +141,10 @@ function calculateHEROStats()
 
 end
 
+---------------------------------------------------------------------------------------------------
+
+function getGearEffectsForCommand(command)
+  --for each piece of gear in current grid, getEffect(command), then return set TODO
+end
+--...should this actually search ENTIRE INVENTORY for things you OWN with Attack, Defend, Potion actions?? is that a thing, or no? could just say no... TODO
+--...could toss in grids, maybe. so search all four grids (body, mind, heart, hero) ?
