@@ -22,7 +22,7 @@ function initBattleSystem()
   mainCommandsGrids.offsetY, mainCommandsGrids.offsetX = cellSize * 5, cellSize
   
   mainCommandsGrids[1][1][1] = {contents = "ATTACK", bgColor = {r = 0.4, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroAttack"}
-  mainCommandsGrids[1][1][2] = {contents = "MOVE", bgColor = {r = 0.2, g = 0.4, b = 0.2}, lineColor = white(0.5)}
+  mainCommandsGrids[1][1][2] = {contents = "MOVE", bgColor = {r = 0.2, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroMove", commandParams = "DEBUG"}
   mainCommandsGrids[1][3][3] = {contents = "RUN AWAY", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5)}
   
   -- tablePrint(mainCommandsGrids)
@@ -61,11 +61,13 @@ function battleClick(mx, my, button)
     mCellY = mCellY - 4
     --TODO mainCommandsGrids[mainCommandsGrids.current] is very clumsy. abstract. abstract all of this!
     -- tablePrint(mainCommandsGrids[mainCommandsGrids.current][mCellY][mCellX])
-    local command = mainCommandsGrids[mainCommandsGrids.current][mCellY][mCellX].command
-    if command then
+    
+    -- local command = mainCommandsGrids[mainCommandsGrids.current][mCellY][mCellX].command
+    local cell = mainCommandsGrids[mainCommandsGrids.current][mCellY][mCellX]
+    if cell.command then
       -- _G[command]() --not like this!
       -- pcall(command)
-      pcall(_G[command])
+      pcall(_G[cell.command], cell.commandParams)
     end
   end
   
@@ -171,3 +173,24 @@ function heroAttack()
     ))
   -- })
 end
+
+function heroMove(test)
+  if test then
+    -- tablePrint(test)
+    print(test)
+  end
+end
+
+
+--[[
+  this is actually a pretty good flow for battle logic, i think...
+1. register click, and find command in grid if present
+2. battleClick() calls command as a function (no args); for MAIN COMMANDS, this is totally fine & makes sense
+3. that function does all damage & effect calculation, then queues up events; NO STATE CHANGE THAT'S NOT EVENT-BASED
+4. events simply resolve effects and animate
+...this should work for pretty much any main command
+
+for skills and grid switches, command should be "skill" or "grid", with a sub-parameter
+battleClick actually just always passes the commandParams, which is a table containing skill or grid data
+
+]]
