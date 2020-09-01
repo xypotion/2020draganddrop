@@ -21,9 +21,11 @@ function initBattleSystem()
   mainCommandsGrids.current = 1
   mainCommandsGrids.offsetY, mainCommandsGrids.offsetX = cellSize * 5, cellSize
   
+  --eventually all of this will need to be loaded from data since the command grids are configurable TODO
   mainCommandsGrids[1][1][1] = {contents = "ATTACK", bgColor = {r = 0.4, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroAttack"}
   mainCommandsGrids[1][1][2] = {contents = "MOVE", bgColor = {r = 0.2, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroMove", commandParams = "DEBUG"}
-  mainCommandsGrids[1][3][3] = {contents = "RUN AWAY", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5)}
+  mainCommandsGrids[1][1][3] = {contents = "POTION", bgColor = {r = 0.2, g = 0.4, b = 0.4}, lineColor = white(0.5), command = "heroPotion"}
+  mainCommandsGrids[1][3][3] = {contents = "RUN AWAY", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEscape"}
   
   -- tablePrint(mainCommandsGrids)
   
@@ -67,7 +69,10 @@ function battleClick(mx, my, button)
     if cell.command then
       -- _G[command]() --not like this!
       -- pcall(command)
-      pcall(_G[cell.command], cell.commandParams)
+      local bc = "battleCommand_"..cell.command
+      if not pcall(_G[bc], cell.commandParams) then
+        print(bc.." isn't defined, dummy.")
+      end
     end
   end
   
@@ -152,7 +157,7 @@ end
 -----------------------------------------------------------------------------------------------------------
 
 --TODO move this somewhere
-function heroAttack()
+function battleCommand_heroAttack()
   print("heroAttack time!")
   
   if not BATTLE.targetedCell then
@@ -174,11 +179,18 @@ function heroAttack()
   -- })
 end
 
-function heroMove(test)
+function battleCommand_heroMove(test)
   if test then
     -- tablePrint(test)
     print(test)
   end
+  
+  --[[
+    brainstorming how to actually do this...
+    pathing, obviously. account for danger the same way you would on the overworld, so as to avoid field effects and stuff
+    on overworld, hero's walking is a series of steps queued via a loop
+    ...so just do that, but add another step while looping! to check for ground effects and stuff. (honestly you should be doing this on the overworld, anyway)
+  ]]
 end
 
 
