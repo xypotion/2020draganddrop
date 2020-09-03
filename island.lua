@@ -1,7 +1,7 @@
 --an "island" is a collection of "island areas" (usually 3x3), each of which is a 5x5 grid of tiles
 
 function initIsland()
-  local island = new3x3Grid(initIslandArea())
+  local island = new3x3Grid(initIslandArea) --initIslandArea is a FUNCTION that will be called once for each member
 
   local ids = {}
   for i = 1, 9 do table.insert(ids, i) end
@@ -46,10 +46,12 @@ function initIslandArea()
         mouseOver = false,
         bgColor = {r, g, b, 0.25},
         bgHoverColor = {r, g, b, 0.5},
+        -- danger = (y+1)%2 + (x+1)%2, --helps with pathing by making the middle tile the least dangerous by default
+        danger = math.random(9), -- DEBUG for testing danger-pathing
       }
     end
   end
-
+  
   --ADD CONTENTS to the grid
   for y, row in ipairs(grid) do
     for x, cell in ipairs(row) do

@@ -45,6 +45,10 @@ function drawIslandAreaBackgrounds(ia)
     end
 
     love.graphics.rectangle("fill", (v.x-1) * cellSize + ia.offsetX, (v.y-1) * cellSize + ia.offsetY, cellSize, cellSize)
+  
+    --DEBUG
+    white()
+    love.graphics.print(v.cell.danger, (v.x-1) * cellSize + ia.offsetX, (v.y-1) * cellSize + ia.offsetY)
   end
 end
 

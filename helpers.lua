@@ -179,13 +179,17 @@ end
 function newGrid(height, width, cellPrimer)
   -- if not height then height, width = 3, 3 end
   cellPrimer = cellPrimer or {}
-
+  
   local g = {}
 
   for y = 1, height do
     g[y] = {}
     for x = 1, width do
-      g[y][x] = deepClone(cellPrimer)
+      if type(cellPrimer) == "function" then
+        g[y][x] = cellPrimer()
+      else
+        g[y][x] = deepClone(cellPrimer)
+      end
     end
   end
 
