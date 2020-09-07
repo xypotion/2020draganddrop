@@ -33,6 +33,7 @@ BUGS... FIXME
 ]]
 
 
+require "constants"
 require "pathfinding"
 require "hero"
 require "helpers"
@@ -52,13 +53,6 @@ function love.load()
 
   love.window.setTitle("<3")
 
-  cellSize = 72 --uppercase this TODO
-  overworldZoom = 1 --TODO probably change this to just ZOOM
-  -- HALFCELLSIZE = cellSize / 2
-
-  ISLANDSIZE = 3
-  AREASIZE = 5
-
   love.window.setMode(cellSize * overworldZoom * AREASIZE, cellSize * overworldZoom * (AREASIZE * 2 - 1))
 
   initEventQueueSystem()
@@ -73,8 +67,6 @@ function love.load()
   
 
 --  grabbedThing = nil
-
-  longPressTime = 0.5
   mouseDownTimer = 0
   mouseDownAtX, mouseDownAtY = 0, 0 --not sure if necessary
   mouseStillDown = false
@@ -86,8 +78,6 @@ function love.load()
 
   softOscillator = 1
   oscillatorCounter = 0
-  PI = math.pi
-  TAU = PI * 2
   
   love.graphics.setLineWidth(2)
 

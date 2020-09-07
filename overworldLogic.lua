@@ -127,8 +127,7 @@ function moveThingAtYX(y, x, dy, dx, max)
   local ty, tx = y + dy, x + dx --t as in "target"
 
   --max = the number of movement frames it'll take this movement to finish
-  --TODO make this into a constant elsewhere. how about a constants.lua? :)
-  max = max or 6
+  max = max or maxFramesForHeroMove
 
   local moveFrames = {}
 
