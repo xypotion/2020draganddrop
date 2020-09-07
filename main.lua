@@ -64,6 +64,14 @@ function love.load()
   initEventQueueSystem()
 
 
+  --DEBUG never tried image fonts before...
+  imgFont = love.graphics.newImageFont("love-wiki-imagefont.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-+/():;%&`'*#=[]\"")
+  love.graphics.setFont(imgFont, 200)
+  imgFont:setFilter("linear", "nearest")
+  -- imgFont:setLineHeight(1.25)
+  -- love.graphics.scale(20) --seemingly does nothing unless called while drawing
+  
+
 --  grabbedThing = nil
 
   longPressTime = 0.5
@@ -92,7 +100,77 @@ function love.load()
   initBattleSystem()
   
   GAMESTATE = "overworld"
+  
+  
+  -- --DEBUG to literally test a bug
+  -- CIA[2][2].danger = 1
+  -- CIA[2][3].danger = 7
+  -- CIA[2][4].danger = 3
+  -- CIA[3][1].danger = 9
+  -- CIA[3][2].danger = 3
+  -- CIA[3][3].danger = 3
+  -- CIA[3][4].danger = 3
+  -- CIA[4][2].danger = 9
+  -- CIA[4][3].danger = 6
+  -- CIA[4][4].danger = 6
+  -- --hmmm  --
+  -- -- CIA[2][2].danger = 6
+  -- -- CIA[2][3].danger = 6
+  -- -- CIA[2][4].danger = 9
+  -- -- -- CIA[3][1].danger = 9
+  -- -- CIA[3][2].danger = 3
+  -- -- CIA[3][3].danger = 3
+  -- -- CIA[3][4].danger = 3
+  -- -- CIA[4][2].danger = 3
+  -- -- CIA[4][3].danger = 7
+  -- -- CIA[4][4].danger = 1
+  -- --more extreme
+  -- CIA[2][2].danger = 1
+  -- CIA[2][3].danger = 9
+  -- CIA[2][4].danger = 1
+  -- CIA[3][2].danger = 1
+  -- CIA[3][3].danger = 1
+  -- CIA[3][4].danger = 1
+  -- CIA[4][2].danger = 9
+  -- CIA[4][3].danger = 2
+  -- CIA[4][4].danger = 1
+  --
+  -- for k, v in pairs(allCellsInGrid(CIA)) do
+  --   dangerNudge(CIA, v.y, v.x)
+  -- end
 end
+
+--DEBUG but maybe will stay? move & rename if so... trying to have neighbors' danger levels affect each cell
+-- function dangerNudge(g, y, x)
+--   local nudge = 0
+--   local numNeighbors = 0
+--
+--   if g[y-1] and g[y-1][x] then
+--     nudge = nudge + g[y-1][x].danger
+--     numNeighbors = numNeighbors + 1
+--   end
+--
+--   if g[y] and g[y][x-1] then
+--     nudge = nudge + g[y][x-1].danger
+--     numNeighbors = numNeighbors + 1
+--   end
+--
+--   if g[y+1] and g[y+1][x] then
+--     nudge = nudge + g[y+1][x].danger
+--     numNeighbors = numNeighbors + 1
+--   end
+--
+--   if g[y] and g[y][x+1] then
+--     nudge = nudge + g[y][x+1].danger
+--     numNeighbors = numNeighbors + 1
+--   end
+--
+--   --lol, probably could have used findNextsUnvisitedNeighbors()
+--
+--   g[y][x].danger = g[y][x].danger + math.floor(10 * nudge / numNeighbors) / 100
+-- end
+-- DEBUG this wasn't necessary to fix the bug
+  
 
 -----------------------------------------------------------------------------------------------------------
 
@@ -328,6 +406,9 @@ function cellAt(y, x)
     return nil
   end
 end
+
+-- function cellAt(g, y, x) --i want this one, too... how?
+--ugh, it's just not worth it! g[y][x] is not harder to type than cellAt(g, y, x)!
 
 --TODO decide you need this or not. not sure if it's necessary when you can just do grid[y][x]
 --copied from HDBS:

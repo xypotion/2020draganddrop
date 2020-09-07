@@ -1,3 +1,5 @@
+--need a dijkstra refresher? https://www.youtube.com/watch?v=pVfj6mxhdMwx
+
 function mapAllPathsFromHero(grid)--, start)
   -- local failsafe = 0
   -- print("mapAllPathsFromHero") DEBUG
@@ -182,7 +184,7 @@ function updateUnvisitedNeighborsDistancesAndParentCells(neighbors, g, current)
   -- print("updateUnvisitedNeighborsDistancesAndParentCells")--, current.y, current.x) DEBUG
   
   if not neighbors[1] then
-    print("no unvisited neighbors!") -- DEBUG
+    -- print("no unvisited neighbors!") -- DEBUG
     return
   end
   
@@ -233,19 +235,24 @@ function updateUnvisitedNeighborsDistancesAndParentCells(neighbors, g, current)
     local nCell = g[n.y][n.x]
     local cCell = g[current.y][current.x]
     if nCell.parentCell then
-      local pCell = g[nCell.parentCell.y][nCell.parentCell.x]
+      local pCell = g[nCell.parentCell.y][nCell.parentCell.x] --TODO not necessary, right?
+      -- local pDanger = 
       --this neighbor already has a parent cell. how does current compare?
-      if cCell.danger < pCell.danger then
+      -- if cCell.danger < pCell.danger then --TODO what i'm changing: not just each tile's danger, but the total danger of its path to the origin
+      if tallyDangerOfPathToHeroForTile(g, current.y, current.x) < tallyDangerOfPathToHeroForTile(g, nCell.parentCell.y, nCell.parentCell.x) then
         g[n.y][n.x].parentCell = current
         g[n.y][n.x].shortestDistanceFromStart = currentCellsShortestDistanceFromStart
+        print("parent cell for", n.y, n.x, "was DANGEROUS! setting parent to ", current.y, current.x)
       elseif cCell.shortestDistanceFromStart + 1 < nCell.shortestDistanceFromStart then
         g[n.y][n.x].parentCell = current
         g[n.y][n.x].shortestDistanceFromStart = currentCellsShortestDistanceFromStart
+        print("parent cell for", n.y, n.x, "was on a longer path; setting parent to ", current.y, current.x)
       end
     else
       --no parent cell yet, so just set to current
       g[n.y][n.x].parentCell = current
       g[n.y][n.x].shortestDistanceFromStart = currentCellsShortestDistanceFromStart
+      print(n.y, n.x, "had no parent cell, so setting parent to ", current.y, current.x)
     end
     
     --OH MY GOD, FINALLY. F*CKING EUREKA. that took way too long to implement. it's at least basically working now.
@@ -255,7 +262,24 @@ function updateUnvisitedNeighborsDistancesAndParentCells(neighbors, g, current)
     --but ah, keep the logic flexible enough so that the player can maybe change it via a setting
       
   end
+  
+  -- print("ok, final decision for "..current.y..", "..current.x.."'s parent cell: ", n.y, n.x) lol you forgot AGAIN how dijkstra works
+  print("done setting ", current.y, current.x, "as neighbors' parent cell\n")
 end
 
 --so yeah, you are (or were) misunderstanding this function, i think. you're not trying to find "the safest neighbor" among uvn...
 --rather, you're seeing if, for each unvisited neighbor, currentLocation is less dangerous than its current parent cell
+
+
+--make it recursive? :)
+function tallyDangerOfPathToHeroForTile(g, y, x)
+  --kind of like how each node is sort of tracking its distance to the origin, this could be called (a lot) during above function to assess total danger
+  --line 241 is what you want, i think. not just the single neighbor's danger rating, but the total danger of it and its ancestors
+  local pCell = g[y][x].parentCell
+  
+  if pCell then
+    return g[y][x].danger + tallyDangerOfPathToHeroForTile(g, pCell.y, pCell.x)
+  else
+    return g[y][x].danger
+  end
+end

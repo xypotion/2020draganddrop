@@ -1,0 +1,4 @@
+BUGS:
+1   hero doesn't actually walk safest path; see 9/3 and 9/6 screenshots. this is because only CURRENT's danger levels is checked when deciding on a parent cell
+    FIXED 9/7: now checking the *total* danger of the path back to the origin when choosing a parent, rather than just the current cell's danger level
+    solution *partially* inspired by https://www.researchgate.net/publication/282187479_Modification_of_Dijkstra's_algorithm_for_safest_and_shortest_path_during_emergency_evacuation, but i used a different fix

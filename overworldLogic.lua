@@ -19,6 +19,7 @@ function initOverworldSystem()
   queue(gridOpEvent(CIA, "add obstacles", {type = "item", threshold = 0.1}))
   queue(gridOpEvent(CIA, "remap"))
 
+  --obviously DEBUG; put hero in middle of CIA
   CIA[3][3].contents = {
     class = "hero",
     color = {1,1,1,1},

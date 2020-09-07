@@ -36,6 +36,17 @@ function love.draw()
   -- 	love.graphics.circle("fill", mx - grabbedThing.relMouseX + cellSize/2, my - grabbedThing.relMouseY + cellSize/2, cellSize*0.45)
   -- end
   -- end
+  
+  
+  --DEBUG thank you pekka at love wiki, https://love2d.org/forums/viewtopic.php?f=4&t=1859
+  -- setColor(0,1,1)--,0.1)
+  -- love.graphics.scale(3) --it works!
+  -- love.graphics.print(
+  --     "abcdefghijklm\nnopqrstuvwxyz\n" ..
+  --     "ABCDEFGHIJKLM\nNOPQRSTUVWXYZ\n" ..
+  --     "0123456789.,!\n?-+/():;%&`'*\n" ..
+  --     "#=[]\"", 1, 1)
+
 end
 
 -----------------------------------------------------------------------------------------------------------

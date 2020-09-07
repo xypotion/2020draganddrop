@@ -69,6 +69,7 @@ function drawCellContents(obj, screenY, screenX)
   setColor(obj.color)
 
   if obj.class == "block" then
+    setColor(0,0,1,0.75)
     love.graphics.rectangle("fill", screenX - cellSize/2, screenY - cellSize/2, cellSize, cellSize)
   elseif obj.class == "danger" then
     love.graphics.circle("fill", screenX + obj.xOffset, screenY + obj.yOffset, cellSize * 0.4, 4)
