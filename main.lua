@@ -92,6 +92,11 @@ function love.load()
   GAMESTATE = "overworld"
   
   
+  -- CIA[3][2].danger = 100 --to test safety-pathing
+  -- CIA[3][3].danger = 100 --to test safety-pathing
+  -- CIA[3][4].danger = 100 --to test safety-pathing
+  
+  
   -- --DEBUG to literally test a bug
   -- CIA[2][2].danger = 1
   -- CIA[2][3].danger = 7
@@ -115,16 +120,36 @@ function love.load()
   -- -- CIA[4][3].danger = 7
   -- -- CIA[4][4].danger = 1
   -- --more extreme
-  -- CIA[2][2].danger = 1
-  -- CIA[2][3].danger = 9
-  -- CIA[2][4].danger = 1
-  -- CIA[3][2].danger = 1
-  -- CIA[3][3].danger = 1
-  -- CIA[3][4].danger = 1
-  -- CIA[4][2].danger = 9
-  -- CIA[4][3].danger = 2
-  -- CIA[4][4].danger = 1
-  --
+  
+  
+  CIA[2][2].danger = 1
+  CIA[2][3].danger = 9
+  CIA[2][4].danger = 9
+  CIA[3][2].danger = 1
+  CIA[3][3].danger = 1
+  CIA[3][4].danger = 1
+  CIA[4][2].danger = 9
+  CIA[4][3].danger = 9
+  CIA[4][4].danger = 9
+  
+  CIA[2][2].danger = 1
+  CIA[2][3].danger = 1
+  CIA[2][4].danger = 1
+  CIA[3][2].danger = 1
+  CIA[3][3].danger = 9
+  CIA[3][4].danger = 9
+  CIA[4][2].danger = 9
+  CIA[4][3].danger = 9
+  CIA[4][4].danger = 1
+  
+  CIA[3][4].contents = {
+          class = "block",
+          color = {1, 1, 0, 1},
+          fadeColor = {1, 1, 1, 0.5},
+          yOffset = 0,
+          xOffset = 0
+        }
+  
   -- for k, v in pairs(allCellsInGrid(CIA)) do
   --   dangerNudge(CIA, v.y, v.x)
   -- end

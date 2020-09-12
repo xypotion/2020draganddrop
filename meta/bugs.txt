@@ -2,3 +2,10 @@ BUGS:
 1   hero doesn't actually walk safest path; see 9/3 and 9/6 screenshots. this is because only CURRENT's danger levels is checked when deciding on a parent cell
     FIXED 9/7: now checking the *total* danger of the path back to the origin when choosing a parent, rather than just the current cell's danger level
     solution *partially* inspired by https://www.researchgate.net/publication/282187479_Modification_of_Dijkstra's_algorithm_for_safest_and_shortest_path_during_emergency_evacuation, but i used a different fix
+2   hero won't avoid hazards on the shortest path TO a hazard tile, even if there is a safe path around. see 9/7 screenshots. test with an area of dangers 999111999, and try to walk from 4,2 to 4,4
+    proposed fix: treat hazard tiles as obstacles, making a "hazard-free" parent for each tile if possible (?); when building path, ignore start and end tiles' hazards
+    FIXED 9/10: i can't believe this took this long to figure out (days!), but the solution was to use normal Dijkstra pathing but make crossing hazard tiles cost a really high distance (100). works perfectly afaict.
+    - the fix for bug 1 wasn't even necessary 9_9 this covers the whole thing. yay, i guess.
+3   if hero is stuck in the entrance to an area after previously existing in it, pathing acts as if they're still in the last tile they occupied there. 9/10 9:25 PM screenshots illustrate
+    this is probably because since there are NO paths for the hero, the old path map just doesn't get replaced when it tries to remap. like, no new path map is made or returned (?)
+    FIXED 9/11 (i somehow fixed and then un-fixed this yesterday? lol): just had to give cells empty paths if there's no way to reach them. i think this is safe??

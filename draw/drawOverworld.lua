@@ -47,7 +47,11 @@ function drawIslandAreaBackgrounds(ia)
     love.graphics.rectangle("fill", (v.x-1) * cellSize + ia.offsetX, (v.y-1) * cellSize + ia.offsetY, cellSize, cellSize)
   
     --DEBUG
-    white()
+    if v.cell.danger >= PATHING_DANGER_THRESHOLD then
+      setColor(1,0,0)
+    else
+      white()
+    end
     love.graphics.print(v.cell.danger, (v.x-1) * cellSize + ia.offsetX, (v.y-1) * cellSize + ia.offsetY)
   end
 end

@@ -19,3 +19,7 @@ TAU = PI * 2
 
 
 maxFramesForHeroMove = 6
+
+
+PATHING_DANGER_THRESHOLD = 7
+AVOID_HAZARDS = true --TODO make this a configured setting

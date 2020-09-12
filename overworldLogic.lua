@@ -29,7 +29,7 @@ function initOverworldSystem()
     xOffset = 0
   }
 
-  CIA = mapAllPathsFromHero(CIA) --TODO might rather make this just "mapAllPathsFrom", then provide coordinates. also maybe a mode?
+  -- CIA = mapAllPathsFromHero(CIA) --TODO might rather make this just "mapAllPathsFrom", then provide coordinates. also maybe a mode?
 
 end
 
