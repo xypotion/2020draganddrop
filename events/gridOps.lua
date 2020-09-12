@@ -2,6 +2,8 @@
 --i.e. look at the "command" parameters. "grid ops" can cover a lot of different things, which is the intent.
 --i feel like this is a slightly unhealthy pattern... examine if you ever get more than 10~20 different commands
 
+--TODO maybe rename to overworldGridOps? gridMGMT? gridControl?
+
 function gridOpEvent(g, command, params)
   local e = {
     class = "gridOp",

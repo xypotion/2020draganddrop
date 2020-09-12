@@ -323,15 +323,24 @@ function love.keypressed(key)
       return
     end
     
+    -- tablePrint(BATTLE, 2)
+    
+    --this will be overlaid on the existing BATTLE.grid. hero is "placed" at this point
     local battleGrid = {
       {y = math.random(3), x = math.random(3), contents = battleUnit_enemy()},
       {y = math.random(3), x = math.random(3), contents = battleUnit_enemy()},
-      {y = heroLoc.y - 1, x = heroLoc.x - 1, contents = {class = "hero"}}
+      {y = heroLoc.y - 1, x = heroLoc.x - 1, contents = battleUnit_hero()}--{class = "hero"}} --TODO battleUnit_hero()?
     }
     
     queueSet({gameStateEvent("battle"), 
       battleStartEvent({gridContents = battleGrid})
-    })
+    })  
+    --kinda DEBUG, just since there's no guarantee you'll get the first turn. but for now...
+    queue(battleGridOpEvent("hero remap"))
+  end
+  
+  if key == "h" then
+    tablePrint(findHeroLocationInGrid(BATTLE.grid))
   end
 end
 

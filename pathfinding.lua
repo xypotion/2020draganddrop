@@ -86,7 +86,7 @@ function findHeroLocationInGrid(g)
   end
 
   --just for DEBUG purposes...
-  if not heroLocation then print("there's no hero in this grid, chief") end
+  if not heroLocation then print("THERE'S NO HERO IN THIS GRID, CHIEF") end
 
   return heroLocation
 end

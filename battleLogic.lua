@@ -25,6 +25,7 @@ function initBattleSystem()
   mainCommandsGrids[1][1][1] = {contents = "ATTACK", bgColor = {r = 0.4, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroAttack"}
   mainCommandsGrids[1][1][2] = {contents = "MOVE", bgColor = {r = 0.2, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroMove", commandParams = "DEBUG"}
   mainCommandsGrids[1][1][3] = {contents = "POTION", bgColor = {r = 0.2, g = 0.4, b = 0.4}, lineColor = white(0.5), command = "heroPotion"}
+  mainCommandsGrids[1][3][1] = {contents = "END TURN (debug)", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEndTurn"}
   mainCommandsGrids[1][3][3] = {contents = "RUN AWAY", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEscape"}
   
   -- tablePrint(mainCommandsGrids)
@@ -36,10 +37,11 @@ end
 
 function initBattleGrid()
   BATTLE.grid = new3x3Grid({
-    contents = "clear",
+    contents = {class = "clear"},
     fieldEffect = nil,
     bgColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5},
     lineColor = {r = 0.75, g = 0.75, b = 0.75, a = 0.75},
+    danger = 1,
   })
   
   BATTLE.grid.offsetY, BATTLE.grid.offsetX = cellSize, cellSize
@@ -70,13 +72,15 @@ function battleClick(mx, my, button)
       -- _G[command]() --not like this!
       -- pcall(command)
       local bc = "battleCommand_"..cell.command
-      if not pcall(_G[bc], cell.commandParams) then
-        print(bc.." isn't defined, dummy.")
+      local success, error = pcall(_G[bc], cell.commandParams)
+      if error and not success then
+        print("tried to run "..bc..", but this happened:\n"..error)
       end
     end
   end
   
-  print(mCellX, mCellY)
+  -- print(mCellX, mCellY)
+  -- tablePrint(BATTLE.grid[mCellX][mCellY].pathFromHero)
 end
 
 --sets the target if it doesn't exist or needs to be moved; otherwise deletes it
@@ -114,6 +118,29 @@ end
 
 
 -----------------------------------------------------------------------------------------------------------
+
+function battleUnit_hero()
+  local en = {
+    class = "hero",
+    yOffset = 0,
+    xOffset = 0
+  }
+  
+  en.color = {r = 1, g = math.random(), b = math.random()}
+  
+  -- en.stats = {
+  --   maxHP = 999,
+  --   hp = 999,
+  --   ps = 9, --physical strength
+  --   pr = 9, --physical resistance
+  --   es = 9, --elemental strength
+  --   er = 9, --elemental resistance ...these are subject to change, obvs
+  --   level = 1,
+  --   weight = 9,
+  -- }
+  
+  return en
+end
 
 function battleUnit_enemy()
   local en = {class = "unit"}
@@ -156,7 +183,7 @@ end
 
 -----------------------------------------------------------------------------------------------------------
 
---TODO move this somewhere
+--TODO move this somewhere, probably a new file
 function battleCommand_heroAttack()
   print("heroAttack time!")
   
@@ -185,12 +212,57 @@ function battleCommand_heroMove(test)
     print(test)
   end
   
-  --[[
-    brainstorming how to actually do this...
-    pathing, obviously. account for danger the same way you would on the overworld, so as to avoid field effects and stuff
-    on overworld, hero's walking is a series of steps queued via a loop
-    ...so just do that, but add another step while looping! to check for ground effects and stuff. (honestly you should be doing this on the overworld, anyway)
-  ]]
+  --TODO check for other things... what's actually in the targeted cell (it doesn't actually have to be "clear")? it's not where you already are, right? etc
+  if BATTLE.targetedCell then
+    local tCell = BATTLE.grid[BATTLE.targetedCell.y][BATTLE.targetedCell.x]
+    local starty = findHeroLocationInGrid(BATTLE.grid)
+    
+    if tCell.pathFromHero[1] and tCell.contents.class == "clear" then --can we actually go there?
+      queue(battleGridOpEvent("clear target"))
+      
+      for k, step in ipairs(tCell.pathFromHero) do
+        print("step:", step.y, step.x)
+        moveBattleUnitAtYX(starty.y, starty.x, step.y - starty.y, step.x - starty.x)
+        --TODO decrement AP
+        --TODO interact with field effects
+
+        starty = step
+      end
+      
+      --TODO actual sprite animations? including poses & directions
+      --TODO turn hero back south ("towards camera") after walk is done
+      
+      queue(battleGridOpEvent("hero remap")) --it's really perplexing that WITHOUT this, movement doesn't complete. why would that be?? TODO should really figure this out... it hints at deeper problem
+      
+      processNow()
+    end
+  end
+end
+
+--TODO this was *copied* from overworldLogic; DRY it up!
+function moveBattleUnitAtYX(y, x, dy, dx, max)
+  local ty, tx = y + dy, x + dx --t as in "target"
+
+  --max = the number of movement frames it'll take this movement to finish
+  max = max or maxFramesForHeroMove
+
+  local moveFrames = {}
+
+  for k = max - 1, 0, -1 do
+    push(moveFrames, {
+        pose = "idle", 
+        yOffset = dy * -(cellSize * k / max), 
+        xOffset = dx * -(cellSize * k / max)
+      })
+  end
+
+  --queue pose and cell ops
+  queueSet({
+      cellSwapEvent(BATTLE.grid, y, x, ty, tx), --eventually swapping won't work, but ok for now. DEBUG
+      spriteMoveEvent(BATTLE.grid, ty, tx, moveFrames)
+    })
+
+  -- processNow()
 end
 
 

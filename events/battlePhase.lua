@@ -13,7 +13,7 @@ end
 function process_battleStartEvent(e)
   initBattleGrid()  
 
-  if e. data and e.data.gridContents then
+  if e.data and e.data.gridContents then
     for k, cell in pairs(e.data.gridContents) do
       -- tablePrint(cell)
       BATTLE.grid[cell.y][cell.x].contents = cell.contents

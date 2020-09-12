@@ -46,8 +46,13 @@ function drawBattlefieldGrid()
     local targetX = (BATTLE.targetedCell.x + 0.5) * cellSize
     -- love.graphics.arc("line", "open", targetX, targetY, cellSize/2, (softOscillator * 8 + 0.0) * TAU, (softOscillator * 8 + 0.25) * TAU)
     -- love.graphics.arc("line", "open", targetX, targetY, cellSize/2, (softOscillator * 8 + 0.5) * TAU, (softOscillator * 8 + 0.75) * TAU)
-    love.graphics.arc("line", "open", targetX, targetY, cellSize/2, (oscillatorCounter * 0.25 + 0.0) * TAU, (oscillatorCounter * 0.25 + 0.125) * TAU)
+    love.graphics.arc("line", "open", targetX, targetY, cellSize/2, (oscillatorCounter * 0.25 + 0.0) * TAU, (oscillatorCounter * 0.25 + 0.125) * TAU) --TODO make this a little less hacky
     love.graphics.arc("line", "open", targetX, targetY, cellSize/2, (oscillatorCounter * 0.25 + 0.5) * TAU, (oscillatorCounter * 0.25 + 0.625) * TAU)
+    
+    --draw hero's path to that cell
+    for i, step in ipairs(BATTLE.grid[BATTLE.targetedCell.y][BATTLE.targetedCell.x].pathFromHero) do
+      love.graphics.circle("line", (step.x-0.5)*cellSize + BATTLE.grid.offsetX, (step.y-0.5)*cellSize + BATTLE.grid.offsetY, cellSize*0.05)
+    end
   end
   
   --drawBattleAnimations() --tough one. so many possibilities here.
@@ -82,7 +87,7 @@ function drawBattleCellContents()
       love.graphics.print(unit.stats.hp, (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 30)
     elseif v.cell.contents.class == "hero" then
       white()
-      love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10, 25, 25)
+      love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX + 10 + v.cell.contents.xOffset, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10 + v.cell.contents.yOffset, 25, 25)
     end
   end
 end
