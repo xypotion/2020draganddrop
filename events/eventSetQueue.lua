@@ -58,7 +58,7 @@ function eventProcessing(dt)
 		for k, e in pairs(currentEvents) do --any way of making this work with ipairs()? TODO
 			--if not already finished, process this event 
 			if not e.finished then
-        print("PROCESSING "..e.class.." EVENT") --DEBUG useful
+        -- print("PROCESSING "..e.class.." EVENT") --DEBUG useful
 			
 				_G["process_"..e.class.."Event"](e)
 				
