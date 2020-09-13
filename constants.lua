@@ -3,7 +3,7 @@
 
 cellSize = 72 --uppercase this TODO
 overworldZoom = 1 --TODO probably change this to just ZOOM
--- HALFCELLSIZE = cellSize / 2
+HALFCELLSIZE = cellSize * overworldZoom / 2
 
 ISLANDSIZE = 3
 AREASIZE = 5
