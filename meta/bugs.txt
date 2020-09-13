@@ -9,3 +9,5 @@ BUGS:
 3   if hero is stuck in the entrance to an area after previously existing in it, pathing acts as if they're still in the last tile they occupied there. 9/10 9:25 PM screenshots illustrate
     this is probably because since there are NO paths for the hero, the old path map just doesn't get replaced when it tries to remap. like, no new path map is made or returned (?)
     FIXED 9/11 (i somehow fixed and then un-fixed this yesterday? lol): just had to give cells empty paths if there's no way to reach them. i think this is safe??
+4   argh, pathing is still not perfect; see 9/12 screenshot. for some reason chose to path through 3 hazards when it could have done just 2 :/ 
+    FIXED 9/12... basically... just gotta set the hazards' danger levels higher and pathing will avoid them. it feels hacky, but it works... i'm pretty sure. don't really want to work on pathing anymore right now, lol

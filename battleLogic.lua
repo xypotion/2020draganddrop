@@ -75,12 +75,17 @@ function battleClick(mx, my, button)
       local success, error = pcall(_G[bc], cell.commandParams)
       if error and not success then
         print("tried to run "..bc..", but this happened:\n"..error)
+        if error == "attempt to call a nil value" then 
+          print("("..bc.." probably isn't defined, dummy)") 
+        end
       end
     end
   end
   
   -- print(mCellX, mCellY)
   -- tablePrint(BATTLE.grid[mCellX][mCellY].pathFromHero)
+  
+  processNow()
 end
 
 --sets the target if it doesn't exist or needs to be moved; otherwise deletes it
@@ -199,11 +204,15 @@ function battleCommand_heroAttack()
   local damage = damageFormula("attack", {user = HERO, target = getBattleTargetCell().contents, potency = 100})
   
   --queue events: damage, animation; hp actuation
-  -- queueSet({
-    queue(battleEvent(
-      {user = HERO, target = getBattleTargetCell().contents, damage = damage}
-    ))
-  -- })
+  queueSet({
+    battleEvent({
+      user = HERO, 
+      target = getBattleTargetCell().contents, 
+      damage = damage, 
+      apCost = 1
+    }),
+    particleEvent(100, 100, "bash") --TODO obvs put on target
+  })
 end
 
 function battleCommand_heroMove(test)

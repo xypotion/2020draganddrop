@@ -11,6 +11,8 @@ require "events/gameState"
 require "events/battlePhase"
 require "events/battleActionEvent" --TODO change name 9_9
 require "events/battleGridOps"
+require "events/particle"
+--TODO shouldn't there be an elegant way to do this? require all in directory?
 
 function initEventQueueSystem()
 	eventSetQueue = {}

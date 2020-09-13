@@ -91,6 +91,10 @@ function love.load()
   
   GAMESTATE = "overworld"
 
+
+  particles = {} --TODO obviously move. probably a particlesystem file
+  
+  
   -- CIA[2][2].danger = 5
   -- CIA[2][3].danger = 5
   -- CIA[2][4].danger = 5
@@ -108,6 +112,18 @@ function love.load()
   --         yOffset = 0,
   --         xOffset = 0
   --       }
+  
+
+
+  -- currentIsland[2][2][2][2].danger = 5
+  -- currentIsland[2][2][2][3].danger = 5
+  -- currentIsland[2][2][2][4].danger = 6
+  -- currentIsland[2][2][3][2].danger = 8
+  -- currentIsland[2][2][3][3].danger = 8
+  -- currentIsland[2][2][3][4].danger = 9
+  -- currentIsland[2][2][4][2].danger = 2
+  -- currentIsland[2][2][4][3].danger = 1
+  -- currentIsland[2][2][4][4].danger = 7
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -192,6 +208,27 @@ function love.update(dt)
       mouseStillDown = false
       mouseHasntMovedFar = false
       grabbedThing = nil
+    end
+  end
+  
+  --process particles: make them move, etc
+  for i, p in pairs(particles) do
+    if p.ttl <= 0 then
+      table.remove(particles, i)
+    else
+      p.y = p.y + p.dy * dt
+      p.x = p.x + p.dx * dt
+
+      p.dy = p.dy + p.ay * dt
+      p.dx = p.dx + p.ax * dt
+    
+      --jerk?
+    
+      --size change.
+    
+      --color change.
+      
+      p.ttl = p.ttl - dt
     end
   end
 end

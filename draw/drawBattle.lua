@@ -128,7 +128,8 @@ end
 
 function drawBattleDebugInfo()
   local debugInfo = "hero stats:\n"
-  debugInfo = debugInfo..HERO.baseStats.maxHP.."\n"
+  debugInfo = debugInfo.."HP: "..HERO.stats.hp.."/"..HERO.stats.maxHP.."\n"
+  debugInfo = debugInfo.."AP: "..HERO.stats.ap.."/"..HERO.stats.maxAP.."\n"  
   
   white()
   love.graphics.print(debugInfo, 10, cellSize * overworldZoom * 4 + 10)

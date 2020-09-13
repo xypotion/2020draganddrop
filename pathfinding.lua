@@ -187,6 +187,7 @@ function updateUnvisitedNeighborsDistancesAndParentCells(neighbors, g, current)
   local currentCellsShortestDistanceFromStart = g[current.y][current.x].shortestDistanceFromStart --+ 1
   if g[current.y][current.x].danger >= PATHING_DANGER_THRESHOLD then
     currentCellsShortestDistanceFromStart = currentCellsShortestDistanceFromStart + 100 --TODO it does feel a little hacky. at some point, when there are multiple hazard types that can be ranked, change this
+    --ok.. so to fix bug 4, you need to increase danger levels a lot. 1-9 doesn't cut it; hazards need to be at least 10x normal. just noting this here in case it's ever an issue again!
   else
     currentCellsShortestDistanceFromStart = currentCellsShortestDistanceFromStart + 1
   end
@@ -205,7 +206,7 @@ function updateUnvisitedNeighborsDistancesAndParentCells(neighbors, g, current)
         nCell.parentCell = current
         nCell.shortestDistanceFromStart = currentCellsShortestDistanceFromStart
         -- print("parent cell for", n.y, n.x, "was dangerous! setting parent to ", current.y, current.x)
-        
+
       --next, see if current cell is CLOSER than known parent cell; if it is, redirect to current
       --again, currentCellsShortestDistanceFromStart will be way bigger if the current tile is a hazard that needs to be avoided (this is by design. thanks, Dijkstra)
       elseif currentCellsShortestDistanceFromStart < nCell.shortestDistanceFromStart then

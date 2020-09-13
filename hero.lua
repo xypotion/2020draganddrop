@@ -18,6 +18,8 @@ function initHERO()
 
   --stats, including affinities
   HERO.baseStats = {
+    maxAP = 9,
+    ap = 9,
     maxHP = 99,
     hp = 99,
     maxIP = 99,
@@ -39,7 +41,7 @@ function initHERO()
     v = 1,
     m = 1,
   }
-  HERO.stats = {} --this should be derived (later, i guess) from base + affinities + other other stuff
+  -- HERO.stats = {} --this all should be derived (later, i guess) from base + affinities + other other stuff
   HERO.stats = deepClone(HERO.baseStats) --DEBUG
 
 

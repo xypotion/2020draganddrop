@@ -95,6 +95,8 @@ function process_battleEvent(e)
     
   t.stats.hp = t.stats.hp - e.params.damage --DEBUG... but only a little :)
   
+  u.stats.ap = u.stats.ap - e.params.apCost --DEBUG... ditto :)
+  
   --change scalars, e.g. apply damage to actual HP
   -- for scalar, value in pairs(e.scalarEffects) do
   --   t[scalar].actual = t[scalar].actual + value

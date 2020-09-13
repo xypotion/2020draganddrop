@@ -47,6 +47,16 @@ function love.draw()
   --     "0123456789.,!\n?-+/():;%&`'*\n" ..
   --     "#=[]\"", 1, 1)
 
+
+  --DEBUG thinking about building a particle engine again... can we make stars with the polygon function?
+  -- love.graphics.polygon("fill", {10, 50, 50, 0, 90, 50, 0, 20, 100, 20}) --NO! not filled, at least. bummer. i guess you could build it with TEN vertices, but... bleh. you don't want this, anyway!
+  -- love.graphics.polygon("line", {10, 50, 50, 0, 90, 50, 0, 20, 100, 20}) --linear stars work fine, fwiw
+
+  --draw all particles on top of everything else TODO probably move this
+  for i, p in pairs(particles) do
+    setColor(p.color)
+    love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
+  end
 end
 
 -----------------------------------------------------------------------------------------------------------

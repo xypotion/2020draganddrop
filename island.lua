@@ -49,6 +49,10 @@ function initIslandArea()
         -- danger = (y+1)%2 + (x+1)%2, --helps with pathing by making the middle tile the least dangerous by default
         danger = math.random(9), -- DEBUG for testing danger-pathing
       }
+      
+      if grid[y][x].danger >= PATHING_DANGER_THRESHOLD then
+        grid[y][x].danger = grid[y][x].danger * 9
+      end
     end
   end
   
