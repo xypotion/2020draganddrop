@@ -88,8 +88,11 @@ end
 -- so... all damage formulas and stuff happen BEFORE this event is processed? would kinda make sense & be cleaner. but where should all that happen...
 -- ...maybe ^^^ when the event is made? just call to damageFormula(x, y, z) and other things? what about multiple targets & effects? I THINK THAT'S NOT A GOOD PLACE
 
---happens instantaneously, i think...
-function process_battleEvent(e)
+--happens instantaneously, and is only used for stat & status effect changes
+--since other parallel events will need to know & change when various things happen (like animations for variable skills), VERY LITTLE CALCULATION should be done here
+--ideally should work for normal battle commands (like Attack), skills, and even the attacks of non-hero units
+--animations, actuations, moves all happen elsewhere
+function process_battleEvent(e) --TODO i think ultimately rename this. it's too vague
   local t = e.params.target
   local u = e.params.user
     
@@ -108,6 +111,8 @@ function process_battleEvent(e)
   --remove effects from target
   
   --special: run anonymous functions? use pcall()!
+  
+  --POSSIBILITY (TODO consider): little floating damage numbers could be spawned (as particles, basically) HERE. will you ever actually want them separated?
   
   e.finished = true
 end

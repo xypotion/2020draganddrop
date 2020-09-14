@@ -42,6 +42,8 @@ require "battleLogic"
 require "overworldLogic"
 require "gear" --TODO move this and other requires, i think
 
+require "data/dataManager"
+
 require "draw/draw"
 
 require "events/eventSetQueue"

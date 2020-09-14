@@ -26,7 +26,7 @@ function battleCommand(cmd, params)
   return success, error --probably not necessary, but what the heck
 end
 
---TODO move this somewhere, probably a new file
+--when Attack is clicked
 function battleCommand_heroAttack()
   print("heroAttack time!")
   
@@ -39,20 +39,25 @@ function battleCommand_heroAttack()
   print("ping")
   
   --calculate damage
-  local damage = damageFormula("attack", {user = HERO, target = getBattleTargetCell().contents, potency = 100})
+  local ty, tx = unpack(BATTLE.targetedCell)
+  local tc = BATTLE[ty][tx]--getBattleTargetCell()
+  local damage = damageFormula("attack", {user = HERO, target = tc.contents, potency = 100})
   
   --queue events: damage, animation; hp actuation
   queueSet({
     battleEvent({
       user = HERO, 
-      target = getBattleTargetCell().contents, 
+      target = tc.contents, 
       damage = damage, 
       apCost = 1
     }),
-    particleEvent(100, 100, "bash") --TODO obvs put on target
+    particleEvent(ty * cellSize * overworldZoom + HALFCELLSIZE, tx * cellSize * overworldZoom + HALFCELLSIZE, "bash"),
+    --TODO sound effect!
   })
 end
 
+--when Move is clicked; only works if some cell is targeted
+--TODO Move/Push is still a thing, right? one command that changes based on what you're targeting? Push should show success chance if so
 function battleCommand_heroMove(test)
   if test then
     -- tablePrint(test)

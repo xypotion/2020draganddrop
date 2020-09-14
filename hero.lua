@@ -128,20 +128,24 @@ end
 ---------------------------------------------------------------------------------------------------
 
 
---will be called often; accounts for everything! racial skills, gear, grid bonuses, etc
+--will be called often; accounts for everything! bonuses from racial skills (?), gear, grid bonuses, key items, etc
 function calculateHEROStats()
   --use HERO.baseStats to initialize
 
 
-  --factor in affinity levels
+  --calculate affinity levels & add to stats
 
 
-  --factor in current all bonuses from equipped, active grids in hero grid
+  --factor in current all bonuses from equipped, active grids in hero grid, key items
 
 
   --factor in stat bonuses from current body's gear
+  
+  
+  --factor in buffs & debuffs? i guess?
 
 end
+--TODO somewhere: a version of this for other units. i think DON'T merge with this function... too much going on with hero; other units are pretty simple by comparison
 
 ---------------------------------------------------------------------------------------------------
 
