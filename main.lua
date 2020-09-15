@@ -95,6 +95,10 @@ function love.load()
 
 
   particles = {} --TODO obviously move. probably a particlesystem file
+  --LOL, DID YOU KNOW THIS IS A THING LOVE CAN DO FOR YOU?
+  
+  
+  loadGraphics()
   
   
   -- CIA[2][2].danger = 5
@@ -126,6 +130,8 @@ function love.load()
   -- currentIsland[2][2][4][2].danger = 2
   -- currentIsland[2][2][4][3].danger = 1
   -- currentIsland[2][2][4][4].danger = 7
+  
+  -- loadData("enemy", "ditto")
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -295,6 +301,11 @@ end
 
 -----------------------------------------------------------------------------------------------------------
 
+--TODO https://love2d.org/wiki/love.lowmemory and other callbacks... probably think about implementing! :)
+--https://love2d.org/wiki/love.displayrotated is interesting....
+
+-----------------------------------------------------------------------------------------------------------
+
 function longPressEventAt(mx, my)
   local t = getTopThingAtPos(mx, my)
 
@@ -366,8 +377,8 @@ function love.keypressed(key)
     
     --this will be overlaid on the existing BATTLE.grid. hero is "placed" at this point
     local battleGrid = {
-      {y = math.random(3), x = math.random(3), contents = battleUnit_enemy()},
-      {y = math.random(3), x = math.random(3), contents = battleUnit_enemy()},
+      {y = math.random(3), x = math.random(3), contents = loadEnemy("ditto")},--battleUnit_enemy("ditto")},
+      {y = math.random(3), x = math.random(3), contents = loadEnemy("ditto")},--battleUnit_enemy("ditto")},
       {y = heroLoc.y - 1, x = heroLoc.x - 1, contents = battleUnit_hero()}--{class = "hero"}} --TODO battleUnit_hero()?
     }
     

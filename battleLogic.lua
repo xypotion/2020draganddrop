@@ -26,6 +26,7 @@ function initBattleSystem()
   mainCommandsGrids[1][1][1] = {contents = "ATTACK", bgColor = {r = 0.4, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroAttack"}
   mainCommandsGrids[1][1][2] = {contents = "MOVE", bgColor = {r = 0.2, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroMove", commandParams = "DEBUG"}
   mainCommandsGrids[1][1][3] = {contents = "POTION", bgColor = {r = 0.2, g = 0.4, b = 0.4}, lineColor = white(0.5), command = "heroPotion"}
+  mainCommandsGrids[1][2][3] = {contents = "DISMISS", bgColor = {r = 0.4, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroDismiss"}
   mainCommandsGrids[1][3][1] = {contents = "END TURN (debug)", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEndTurn"}
   mainCommandsGrids[1][3][3] = {contents = "RUN AWAY", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEscape"}
   
@@ -140,7 +141,7 @@ function battleUnit_hero()
 end
 
 function battleUnit_enemy()
-  local en = {class = "unit"}
+  local en = {class = "enemy"}
   
   en.color = {r = 1, g = math.random(), b = math.random()}
   

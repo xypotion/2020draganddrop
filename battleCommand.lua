@@ -39,8 +39,8 @@ function battleCommand_heroAttack()
   print("ping")
   
   --calculate damage
-  local ty, tx = unpack(BATTLE.targetedCell)
-  local tc = BATTLE[ty][tx]--getBattleTargetCell()
+  local ty, tx = BATTLE.targetedCell.y, BATTLE.targetedCell.x
+  local tc = BATTLE.grid[ty][tx]
   local damage = damageFormula("attack", {user = HERO, target = tc.contents, potency = 100})
   
   --queue events: damage, animation; hp actuation

@@ -110,7 +110,8 @@ function interpretGrid(g)
       }
 
       --is there something here that we can't walk over?
-      if cell.contents.class == "block" 
+      if cell.contents.class == "enemy" 
+      or cell.contents.class == "block" 
       or cell.contents.class == "danger" 
       or cell.contents.class == "npc" then
         copy[y][x].obstacle = true

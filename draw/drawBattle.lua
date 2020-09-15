@@ -78,11 +78,12 @@ end
 
 function drawBattleCellContents()
   for k, v in ipairs(allCellsInGrid(BATTLE.grid)) do
-    if v.cell.contents.class == "unit" then --or whatever. TODO. could also make this logic safer
+    if v.cell.contents.class == "enemy" then --or whatever. TODO. could also make this logic safer
       local unit = v.cell.contents
       unit.stats.hp = unit.stats.hp or ""
-      setColor(unit.color) --DEBUG
-      love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10, 10, 10)
+      -- setColor(unit.color) --DEBUG
+      -- love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10, 10, 10)
+      love.graphics.draw(IMG[v.cell.contents.graphic], (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10)--, 10, 10)
       white()
       love.graphics.print(unit.stats.hp, (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 30)
     elseif v.cell.contents.class == "hero" then
