@@ -2,6 +2,10 @@ function drawBattle()
   drawBattlefield()
   
   drawBattleCommands()
+  
+  --draw info for targeted enemy/cell
+  
+  --draw other buttons and stuff in top canvas?
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -77,6 +81,7 @@ function drawBattleCellBackgrounds()
 end
 
 function drawBattleCellContents()
+  white()
   for k, v in ipairs(allCellsInGrid(BATTLE.grid)) do
     if v.cell.contents.class == "enemy" then --or whatever. TODO. could also make this logic safer
       local unit = v.cell.contents
@@ -84,10 +89,8 @@ function drawBattleCellContents()
       -- setColor(unit.color) --DEBUG
       -- love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10, 10, 10)
       love.graphics.draw(IMG[v.cell.contents.graphic], (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10)--, 10, 10)
-      white()
       love.graphics.print(unit.stats.hp, (v.x-1) * cellSize + BATTLE.grid.offsetX + 10, (v.y-1) * cellSize + BATTLE.grid.offsetY + 30)
     elseif v.cell.contents.class == "hero" then
-      white()
       love.graphics.rectangle("fill", (v.x-1) * cellSize + BATTLE.grid.offsetX + 10 + v.cell.contents.xOffset, (v.y-1) * cellSize + BATTLE.grid.offsetY + 10 + v.cell.contents.yOffset, 25, 25)
     end
   end

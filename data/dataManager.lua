@@ -63,8 +63,8 @@ end
 DATA = {}
 
 DATA.enemy = { --AI scripts will make this large... except you should probably encapsulate those in another data set :)
-  SCHEMA = {name = 1, graphic = 2, stats = {maxHP = 3, ps = 4, pr = 5, es = 6, er = 7, weight = 8, initiative = 9}, attributes = {10, 11, 12}, skillset = 13}, 
-  ditto = "Ditto ditto    9999 3 3 3 3  9 1    101 100 100    ditto",
+  SCHEMA = {name = 1, graphic = 2, stats = {maxHP = 3, ps = 4, pr = 5, es = 6, er = 7, weight = 8, initiative = 9}, attributes = {10, 11, 12, locked = 13}, skillset = 14}, 
+  ditto = "Ditto ditto    9999 3 3 3 3  9 1    amorph blank blank 1   ditto",
   --{"a big string with values for all of the above keys... except variable-size arrays like skills don't make sense here :/"},
   meow = {},
 }
@@ -111,12 +111,34 @@ DATA.statusFX = { --effect name + a FUNCTION for actual effect/behavior + metada
   debug1 = {},
 }
 
-DATA.attributes = { --? not sure about this one. used for items, units, cards, skills... but not sure if necessary
+DATA.passiveEffects = { --for gear, grids, key items, and other things. i GUESS this is different from status effects?? honestly not sure
   debug1 = {},
 }
 
-DATA.passiveEffects = { --for gear, grids, key items, and other things. i GUESS this is different from status effects?? honestly not sure
-  debug1 = {},
+
+
+DATA.enemyAttributes = {
+  SCHEMA = {name = 1, abbreviation = 2, debugColor = {3, 4, 5, 6}}, --TODO graphics
+  blank = "None _   .2 .2 .2 .2", --TODO in your graphical font, make "_" into another space, i guess? :)
+  amorph = "Amorphous AMO   .9 .5 .7 1",
+}
+
+DATA.cardAttributes = {
+  SCHEMA = {name = 1, abbreviation = 2, debugColor = {3, 4, 5, 6}}, --TODO graphics
+  blank = "None _   .2 .2 .2 .2",
+  d = "Destruction DES   .95 .1 .1 1",
+}
+
+DATA.gearAttributes = {
+  SCHEMA = {name = 1, abbreviation = 2, debugColor = {3, 4, 5, 6}}, --TODO graphics
+  blank = "None _   .2 .2 .2 .2",
+  metal = "Metal MET   .8 .8 .8 1",
+}
+
+DATA.skillAttributes = {
+  SCHEMA = {name = 1, abbreviation = 2, debugColor = {3, 4, 5, 6}}, --TODO graphics
+  blank = "None _   .2 .2 .2 .2",
+  d = "Destruction DES   .95 .1 .1 1",
 }
 
 
@@ -168,7 +190,11 @@ DATA.particles = {
   debug1 = {},
 }
 
-DATA.quests = { --these are actually (probably) big enough that they'll need one file each
+DATA.storyQuests = { --these are actually (probably) big enough that they'll need one file each
+  debug1 = {},
+}
+
+DATA.genericQuests = { --ditto
   debug1 = {},
 }
 
