@@ -66,3 +66,41 @@ function df_attack(p) --basically 100% DEBUG because i don't know what i'm doing
   
   return damage
 end
+
+
+
+function df_fireball(p) --basically 100% DEBUG because i don't know what i'm doing yet!
+  local damage = 0
+  local critMultiplier = 1
+  local randomizationMultiplier = 1
+  
+  --basic damage calculation
+  -- if p.potency and p.user and p.user.ps and p.target and p.target.pr then --TODO try pcall() instead
+  --   damage = p.potency * p.user.ps / p.target.pr
+  --   print(damage)
+  -- end
+  --
+  local success, error = pcall(function ()
+    damage = p.user.stats.es * p.potency / p.target.stats.er
+  end)
+  print(error)
+  --well, it works, but it ain't elegant. maybe abstract to a try() function? TODO
+  
+  --is it a critical hit?
+  if p.user and p.user.critRate and math.random() < p.user.critRate then
+    critMultiplier = 2
+    print("crit!")
+    --TODO flip a flag or something that changes the animation... or something
+  end
+  
+  --randomize damage a bit TODO abstract this for sure, maybe bundled with the rollRound part
+  randomizationMultiplier = 1 - math.random() / 9
+  print("rando "..randomizationMultiplier)
+  
+  --the final math
+  damage = rollRound(damage * critMultiplier * randomizationMultiplier)
+  print("final damage "..damage)
+  
+  return damage
+end
+

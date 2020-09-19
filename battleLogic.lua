@@ -30,6 +30,12 @@ function initBattleSystem()
   mainCommandsGrids[1][3][1] = {contents = "END TURN (debug)", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEndTurn"}
   mainCommandsGrids[1][3][3] = {contents = "RUN AWAY", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEscape"}
   
+  --can i load a skill based on data? 
+  --all very DEBUG obviously... skills will mainly go in separate mind grids, and faves will be managed another different way
+  local skill = HERO.skills[1]
+  mainCommandsGrids[1][3][2] = {contents = skill.name, bgColor = {r = 0.8, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroUseSkill", commandParams = 1} 
+  --DEBUG DEBUG DEBUG
+  
   -- tablePrint(mainCommandsGrids)
   
   --graphical gradients. TODO maybe put these somewhere else? outside of draw() is good, though...
@@ -59,7 +65,7 @@ function battleClick(mx, my, button)
   
   --is this a battlefield cell?
   if 1 <= mCellX and mCellX <= 3 and 1 <= mCellY and mCellY <= 3 then --TODO abstract somehow
-    setOrRemoveBattleTargetCell(mCellX, mCellY) --TODO should only happen in a logic branch if 1. it's your turn and 2. (? lol, unfinished thought)
+    setOrRemoveBattleTargetedCell(mCellX, mCellY) --TODO should only happen in a logic branch if 1. it's your turn and 2. (? lol, unfinished thought)
   end
   
   --is this a battle command grid cell?
@@ -82,28 +88,28 @@ function battleClick(mx, my, button)
 end
 
 --sets the target if it doesn't exist or needs to be moved; otherwise deletes it
-function setOrRemoveBattleTargetCell(mx, my)
+function setOrRemoveBattleTargetedCell(mx, my)
   if BATTLE.targetedCell then
     if BATTLE.targetedCell.y == my and BATTLE.targetedCell.x == mx then --TODO *could* simplify this if higher caller is safe, but maybe leave as is
       BATTLE.targetedCell = nil
     else
-      setBattleTargetCell(mx, my)
+      setBattleTargetedCell(mx, my)
     end
   else
-    setBattleTargetCell(mx, my)
+    setBattleTargetedCell(mx, my)
   end
   
   -- tablePrint(BATTLE.targetedCell)
 end
 
-function setBattleTargetCell(mx, my)
+function setBattleTargetedCell(mx, my) --TODO ooh, you're bad. why is this x-y instead of y-x?
   if BATTLE.grid[my] and BATTLE.grid[my][mx] then
     BATTLE.targetedCell = {y = my, x = mx}
   end
 end
 
 --TODO rename these? "target" vs "targeted"... meh?
-function getBattleTargetCell()
+function getBattleTargetedCell()
   return BATTLE.grid[BATTLE.targetedCell.y][BATTLE.targetedCell.x]
 end
 

@@ -66,7 +66,9 @@ function initHERO()
 
   --starting card/skill/gear/etc inventories
   HERO.cards = {}
-  HERO.skill = {}
+  HERO.skills = {
+    loadSkill("fireball")
+  }
   HERO.gear = {
     newGear(1),
     newGear(2),

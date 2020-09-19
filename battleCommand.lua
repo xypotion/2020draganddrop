@@ -26,6 +26,8 @@ function battleCommand(cmd, params)
   return success, error --probably not necessary, but what the heck
 end
 
+-----------------------------------------------------------------------------------------------------------
+
 --when Attack is clicked
 function battleCommand_heroAttack()
   print("heroAttack time!")
@@ -115,4 +117,78 @@ function moveBattleUnitAtYX(y, x, dy, dx, max)
     })
 
   -- processNow()
+end
+
+
+-----------------------------------------------------------------------------------------------------------
+
+function battleCommand_heroUseSkill(id)
+  local s = HERO.skills[id]
+  
+  -- tablePrint(s)
+  
+  if not BATTLE.targetedCell then
+    autoTarget(s.autoTargetSelector)
+  end
+
+  local ty, tx = BATTLE.targetedCell.y, BATTLE.targetedCell.x
+  local tc = BATTLE.grid[ty][tx]
+  
+  --call the thing
+  local method = "skill_"..s.method
+  local success, error = pcall(_G[method], {user = HERO, target = tc.contents, skill = s})
+  
+  if error and not success then
+    print("tried to run "..method..", but this happened:\n"..error)
+    
+    if error == "attempt to call a nil value" then 
+      print("("..method.." probably isn't defined, dummy)") 
+    end
+  end
+  
+  -- if success then
+    --apply effects now?
+end
+
+function autoTarget(type) --TODO DEBUG ETC this is not final
+  --find an enemy to target. DEBUG doesn't matter which :P
+  print("AUTO TARGETING")
+  
+  for k, v in pairs(allCellsInGrid(BATTLE.grid)) do
+    if v.cell.contents and v.cell.contents.class == "enemy" then
+      setBattleTargetedCell(v.x, v.y)
+    end
+  end
+end
+
+function skill_fireball(params)
+  --[[
+  what actually happens at this point for a typical skill?
+  1. determine variant, if applicable; some 
+  2. determine targets (there might be multiple); this might even be empty tiles, not combatants!
+  3. tally total scaling factor
+  4. check targets' attributes to see if there's any special logic, e.g. an auto-crit
+  5. determine effects via (usually?) external formulae: damage, status changes, field effects... calculations will often include the scale factor
+  6. queue events to resolve effects, including: sound, animations, damage numbers, movement, unit death, ...
+  
+  the holy grail here is to use these same functions for when enemies use these skills (rather than making separate versions for each skill)
+  ]]
+    
+    -- tablePrint(fb)
+    
+    local ty, tx = BATTLE.targetedCell.y, BATTLE.targetedCell.x --find a better way. TODO (actually yeah, this totally doesn't work when enemies use skill)
+    local tc = BATTLE.grid[ty][tx]
+    params.potency = 500
+    local damage = damageFormula("fireball", params)
+    
+    --queue events: damage, animation; hp actuation
+    queueSet({
+      battleEvent({
+        user = HERO, 
+        target = tc.contents, 
+        damage = damage, 
+        apCost = 1
+      }),
+      particleEvent(ty * cellSize * overworldZoom + HALFCELLSIZE, tx * cellSize * overworldZoom + HALFCELLSIZE, "fireball"),
+    })
 end

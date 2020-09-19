@@ -28,6 +28,12 @@ end
 ---------------------------------------------------------------------------------------------------
 
 
+--TODO floating damage numbers will probably be a kind of particle effect (? i guess), but allow for DELAYS in spawning, so they can appear at certain points during animations!
+
+
+---------------------------------------------------------------------------------------------------
+
+
 --TODO i guess move this elsewhere. it shouldn't go in an event file, probably
 --TODO ...and more importantly, there are going to be a ton of different particle types. gotta make data files for that or something. so basically all of this will be scrapped eventually, lol
 function newParticle(y, x, name)
@@ -42,9 +48,19 @@ function newParticle(y, x, name)
     p.ax = 0 - p.dx
     -- p.dy = p.dy * 4
     -- p.dx = p.dx * 4
+  elseif name == "fireball" then
+    -- TODO filename for graphic or something
+    
+    p.dy = (math.random() - 0.5) * 300
+    p.dx = (math.random() - 0.5) * 300
+    p.ay = 0 - p.dy
+    p.ax = 0 - p.dx
+    -- p.dy = p.dy * 4
+    -- p.dx = p.dx * 4
+    p.color = {r = math.random() + 0.5, g = math.random() - 0.5, b = 0}
   else
     print("that's not a real particle type, dude. giving you \"bash\"")
-    return newParticle("bash")
+    return newParticle(y, x, "bash")
   end
   
   return p

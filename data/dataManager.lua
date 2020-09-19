@@ -18,6 +18,11 @@ function loadGraphics()
   --TODO: these might be preferable for sprite sheets; investigate: https://love2d.org/wiki/love.graphics.newArrayImage ...it's almost like the art of game design has evolved since the 90s! :o
 end
 
+
+
+
+
+
 function loadEnemy(member, noVariance)
   local e = loadData("enemy", member)
   
@@ -25,6 +30,15 @@ function loadEnemy(member, noVariance)
   
   --TODO stat variance, unless noVariance = true (for whatever reason. boss fight, bestiary...)
   
+  -- tablePrint(e)
+  
+  return e
+end
+
+function loadSkill(member)
+  local e = loadData("skill", member)
+  
+  --?
   -- tablePrint(e)
   
   return e
@@ -149,8 +163,14 @@ DATA.gear = {
   debug3 = {},--interesting accessory
 }
 
-DATA.skills = {
-  debug1 = {}, --fireball, what else? make a fire field effect, too
+DATA.skill = { --skills as bought from the skill shop, i.e. the skill's default/germane data. randomization (e.g. of enemy skills when extracted) or variation will be added programatically later
+  SEPARATOR = ",",
+  SCHEMA = {
+    name = 1, graphic = 2, descriptionStrings = {short = 3, medium = 4, long = 5}, 
+    attributes = {6, 7, 8, locked = 9}, shopCost = 10, shopMinima = 11,
+    animation = 12, method = 13, apCost = 14, cooldown = 15, warmup = 16, range = 17, autoTargetSelector = 18},
+    
+  fireball = "Fireball calcifer fireballS fireballM fireballL   d blank blank 1 100 d9   fireball fireball 2 2 0 ranged enemy",
   debug2 = {}, --maybe a heal or buff
   debug3 = {}, --teleport
 }
