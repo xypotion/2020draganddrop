@@ -99,6 +99,7 @@ function process_battleEvent(e) --TODO i think ultimately rename this. it's too 
   t.stats.hp = t.stats.hp - e.params.damage --DEBUG... but only a little :)
   
   u.stats.ap = u.stats.ap - e.params.apCost --DEBUG... ditto :)
+  --TODO i'm thinking these should all be separate, single ways of using the event, similar to "gridOps". one "op" at a time
   
   --change scalars, e.g. apply damage to actual HP
   -- for scalar, value in pairs(e.scalarEffects) do

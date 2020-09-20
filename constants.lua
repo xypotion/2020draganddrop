@@ -17,6 +17,9 @@ PI = math.pi
 TAU = PI * 2
 
 
+eventFrameLength = 0.0125
+
+
 
 maxFramesForHeroMove = 6
 

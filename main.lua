@@ -132,6 +132,54 @@ function love.load()
   -- currentIsland[2][2][4][4].danger = 7
   
   -- loadData("enemy", "ditto")
+  
+  
+  --DEBUG PARTICLESYSTEM stuff
+  -- PS = love.graphics.newParticleSystem(overworldCanvas, 20)
+  -- -- PS = love.graphics.newParticleSystem(IMG.noidea, 20)
+  -- PS:setEmissionRate(5)
+  -- PS:setParticleLifetime(2,2)
+  -- -- PS:setEmitterLifetime(3)
+  -- PS:setInsertMode("bottom")
+  --
+  -- PS:setSizes(0, 0.5, 0.25)
+  -- -- PS:setSizeVariation(0.001, 1) --honestly can't tell what this does
+  -- PS:setEmissionArea("normal", 10, 10, 1, true)
+  --
+  -- PS:setColors(1,1,1,0.25, 1,1,1,1, 1,0,0,0)
+  --
+  -- PS:setDirection(1)
+  -- PS:setSpeed(10, 100)
+  -- PS:setSpread(10)
+  -- -- PS:setLinearAcceleration(10, 10, 100, 100)
+  -- -- PS:setRadialAcceleration(100, 1000)
+  -- PS:setLinearDamping(0.2, 0.5)
+  -- PS:setTangentialAcceleration(200)
+  --
+  -- PS:setRotation(-1,-1)
+  -- PS:setRelativeRotation(true)
+  -- -- PS:setSpin(-10)
+  -- -- PS:setSpinVariation(1)
+  --
+  -- PS:setQuads(
+  --   love.graphics.newQuad(0, 0, 50, 50, 77, 128),
+  --   love.graphics.newQuad(0, 50, 50, 50, 77, 128),
+  --   love.graphics.newQuad(0, 0, 50, 50, 77, 128),
+  --   love.graphics.newQuad(0, 50, 50, 50, 77, 128),
+  --   love.graphics.newQuad(0, 0, 50, 50, 77, 128),
+  --   love.graphics.newQuad(0, 50, 50, 50, 77, 128),
+  --   love.graphics.newQuad(0, 0, 50, 50, 77, 128),
+  --   love.graphics.newQuad(0, 50, 50, 50, 77, 128)
+  -- )
+  --
+  -- PS:emit(10)
+  --
+  -- print(PS, NULL)
+  -- print(NULL == nil) --weird. this is true
+  
+  -- PS:pause()
+  
+  initParticleSystemSystem()
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -219,6 +267,9 @@ function love.update(dt)
     end
   end
   
+  
+  
+  
   --process particles: make them move, etc
   for i, p in pairs(particles) do
     if p.ttl <= 0 then
@@ -239,6 +290,23 @@ function love.update(dt)
       p.ttl = p.ttl - dt
     end
   end
+  
+  
+  
+  
+  --DEBUG PARTICLESYSTEM stuff
+  -- -- print(PS)
+  --
+  -- PS:update(dt)
+  -- -- PS:setEmissionRate(oscillatorCounter)
+  -- -- PS:setEmissionRate(love.mouse.getPosition())
+  -- if PS:getCount() == 0 then
+  --   PS:release()
+  --   print(PS)
+  --   if not PS then print("not PS!") else print("PS?") end
+  -- end
+  
+  updateAllParticleSystems(dt)
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -341,9 +409,9 @@ end
 function love.keypressed(key)
   if key == "escape" then love.event.quit() end
 
-  if key == "p" then
-    tablePrint(currentEvents)
-  end
+  -- if key == "p" then
+  --   tablePrint(currentEvents)
+  -- end
 
   if key == "s" then
     for i = 1, 27 do
@@ -391,6 +459,9 @@ function love.keypressed(key)
   
   if key == "h" then
     tablePrint(findHeroLocationInGrid(BATTLE.grid))
+  end
+  
+  if key == "p" then
   end
 end
 

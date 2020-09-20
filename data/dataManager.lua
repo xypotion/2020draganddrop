@@ -13,6 +13,9 @@ function loadGraphics()
   
   IMG.ditto = love.graphics.newImage("img/ditto.png")
   IMG.meow = love.graphics.newImage("img/meow_knife.png")
+  IMG.noidea = love.graphics.newImage("img/no_idea.png")
+  IMG.dot = love.graphics.newImage("img/dot.png")
+  
   
   --TODO: https://love2d.org/wiki/love.filesystem.getDirectoryItems - the omni-file-opener practically writes itself. more info at https://love2d.org/wiki/love.filesystem
   --TODO: these might be preferable for sprite sheets; investigate: https://love2d.org/wiki/love.graphics.newArrayImage ...it's almost like the art of game design has evolved since the 90s! :o

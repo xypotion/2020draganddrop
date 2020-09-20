@@ -18,7 +18,7 @@ function initEventQueueSystem()
 	eventSetQueue = {}
 	
 	eventFrame = 0
-	eventFrameLength = 0.0125 --this is the animation speed for the whole game. could be configurable or at least more formalized somewhere... TODO
+	-- eventFrameLength = 0.0125 --this is the animation speed for the whole game. could be configurable or at least more formalized somewhere... TODO
 	
 	currentEvents = {}
 end

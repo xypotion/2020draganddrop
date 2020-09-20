@@ -173,22 +173,20 @@ function skill_fireball(params)
   
   the holy grail here is to use these same functions for when enemies use these skills (rather than making separate versions for each skill)
   ]]
-    
-    -- tablePrint(fb)
-    
-    local ty, tx = BATTLE.targetedCell.y, BATTLE.targetedCell.x --find a better way. TODO (actually yeah, this totally doesn't work when enemies use skill)
-    local tc = BATTLE.grid[ty][tx]
-    params.potency = 500
-    local damage = damageFormula("fireball", params)
-    
-    --queue events: damage, animation; hp actuation
-    queueSet({
-      battleEvent({
-        user = HERO, 
-        target = tc.contents, 
-        damage = damage, 
-        apCost = 1
-      }),
-      particleEvent(ty * cellSize * overworldZoom + HALFCELLSIZE, tx * cellSize * overworldZoom + HALFCELLSIZE, "fireball"),
-    })
+        
+  local ty, tx = BATTLE.targetedCell.y, BATTLE.targetedCell.x --find a better way. TODO (actually yeah, this totally doesn't work when enemies use skill)
+  local tc = BATTLE.grid[ty][tx]
+  params.potency = 500
+  local damage = damageFormula("fireball", params)
+  
+  --queue events: damage, animation; hp actuation
+  queueSet({
+    battleEvent({
+      user = HERO, 
+      target = tc.contents, 
+      damage = damage, 
+      apCost = 2
+    }),
+    particleEvent(ty * cellSize * overworldZoom + HALFCELLSIZE, tx * cellSize * overworldZoom + HALFCELLSIZE, "fireball"),
+  })
 end

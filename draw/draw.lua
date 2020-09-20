@@ -53,10 +53,25 @@ function love.draw()
   -- love.graphics.polygon("line", {10, 50, 50, 0, 90, 50, 0, 20, 100, 20}) --linear stars work fine, fwiw
 
   --draw all particles on top of everything else TODO probably move this
-  for i, p in pairs(particles) do
-    setColor(p.color)
-    love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
+  -- for i, p in pairs(particles) do
+  --   setColor(p.color)
+  --   love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
+  -- end
+  
+  
+  --DEBUG PARTICLESYSTEM stuff
+  -- love.graphics.draw(PS, 100, 100)
+  -- love.graphics.print("live particles: "..PS:getCount(), 10, 10)
+  
+  white()
+  
+  for i, ps in pairs(PARTICLESYSTEMS) do
+    -- setColor(p.color)
+    -- love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
+    love.graphics.draw(ps, 0, 0)
   end
+  
+  
 end
 
 -----------------------------------------------------------------------------------------------------------
