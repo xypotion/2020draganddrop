@@ -106,7 +106,7 @@ function newParticleFoo(y, x, name)
   
   -- return p
   
-  table.insert(PARTICLESYSTEMS, ps)
+  table.insert(BATTLE.particleSystems, ps)
 end
 
 --TODO in your brain: think of different color-change modes, e.g. fading away, cooling off, etc... it might be best to make verbal shortcuts for these things than numerically define dr, dg, db, da for every particle type
@@ -114,6 +114,38 @@ end
 --TODO math.random for dy and dx is not great. better: choose a random direction and use trigonometry to set dx and dy! that way things will at least spread circularly. I'M A GENIUS (lol no)
 
 
+--[[
+things defined by the PARTICLE TYPE: graphics & quads, colors, sizes, emission area, particle lifetime, spread, direction, speed, accel, damping, rotation, spin, tangential accel, relative rotation, offset, spin & size variations
+
+things defined in the PARTICLE SHAPE: 
+- *the particle*
+- the *style* of particle system...
+  - constant: for weather, field effects, and some status effects
+  - timedBursts... just a list of y:x:amount:seconds
+  - randomTimedBursts... just amount:seconds; locations are random (within some bounds)
+  - movement?
+    * funny: "fireball" is not actually a skill you've put in the game. are you sure you need arcing particle emitters? haha
+  - bigLine: for quake, tremor, other linear attacks; ideally just define angle + center, then the line will just cut through it at that angle across the whole screen
+  - lineFromUserToTarget
+  - lineFromUserPastTarget
+  - burstAllCellsAtOnce
+  - burstAllCellsInRandomOrderFast/Slow
+  - directionalBurst: overwrites the particle's normal direction to do a burst
+    - could also just do burstLeft, burstRight, etc
+  - ...and more!
+- position, emitter lifetime & emission rate, emit() bursts and timing, buffer size?
+
+...and so maybe SKILL ANIMATIONS are just sets of type:shape pairs?
+
+for directional math, maybe pre-define N E W S NE NW SE SW? because calculating radians is annoying and confusing
+
+consider using milliseconds for timings. or centiseconds? heh
+]]
+
+
+--TODO a frustrating thing here is that you still need damage numbers & effects! ideally as particles, but that doesn't work 9_9 (i even checked the forums). it's ok, making your own shouldn't be hard....
+--for flying text, consider: position & movement, colors incl. changing/flashing/fading out, size variation, expiration/removing, lots displaying at once in different places
+--i think DON'T draw text in the battle canvas, kinda just in general. readability is important (it turns out)
 
 
 function newTravelingParticleSystem()
@@ -122,13 +154,15 @@ end
 
 
 
+--
+-- function initParticleSystemSystem()
+--   PARTICLESYSTEMS = {}
+-- end--
+--
+-- function updateAllParticleSystems(dt)
+--   for k, ps in ipairs(PARTICLESYSTEMS) do
+--     ps:update(dt)
+--   end
+-- end
 
-function initParticleSystemSystem()
-  PARTICLESYSTEMS = {}
-end
 
-function updateAllParticleSystems(dt)
-  for k, ps in ipairs(PARTICLESYSTEMS) do
-    ps:update(dt)
-  end
-end

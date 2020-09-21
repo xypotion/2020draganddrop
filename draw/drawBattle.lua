@@ -33,6 +33,10 @@ function drawBattlefield()
   white()
   love.graphics.draw(BATTLE.canvas, 0, 0, 0, overworldZoom, overworldZoom)
   
+  drawBattleParticleSystems()
+  
+  drawBattleEffectText()
+  
   drawBattleDebugInfo() --DEBUG, obviously
 end
 
@@ -44,7 +48,7 @@ function drawBattlefieldGrid()
   drawBattleCellOverlays()
   
   --draw targeting ring if a cell is targeted
-  if BATTLE.targetedCell then -- AND it's your turn & there's no animation playing TODO
+  if BATTLE.targetedCell then -- AND it's your turn AND there's no animation playing TODO
     white()
     local targetY = (BATTLE.targetedCell.y + 0.5) * cellSize
     local targetX = (BATTLE.targetedCell.x + 0.5) * cellSize
@@ -62,6 +66,21 @@ function drawBattlefieldGrid()
   --drawBattleAnimations() --tough one. so many possibilities here.
   
   --drawBattleNumbers() --ditto
+end
+
+function drawBattleEffectText()
+  for k, t in ipairs(BATTLE.effectTexts) do
+    setColor(t.color)
+    love.graphics.printf(t.text, t.x - cellSize * 0.5, t.y, cellSize * 1, "center", 0, 2, 2)
+  end
+end
+
+function drawBattleParticleSystems()
+  for i, ps in ipairs(BATTLE.particleSystems) do
+    -- setColor(p.color)
+    -- love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
+    love.graphics.draw(ps, 0, 0)
+  end
 end
 
 function drawBattleCellBackgrounds()

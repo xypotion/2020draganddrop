@@ -13,6 +13,10 @@ function initBattleSystem()
   
   BATTLE.targetedCell = nil
   
+  BATTLE.effectTexts = {}
+  
+  BATTLE.particleSystems = {}
+  
   
   --TODO this'll probably need to be made, saved, etc elsewhere
   --TODO remember that this is actually multiple grids! up to 3, i think
@@ -56,6 +60,32 @@ function initBattleGrid()
 end
 
 -----------------------------------------------------------------------------------------------------------
+
+function updateBattleLogic(dt)  
+  updateBattleEffectText(dt)
+  
+  updateBattleParticleSystems(dt)
+end
+
+function updateBattleEffectText(dt)
+  for k, t in ipairs(BATTLE.effectTexts) do
+    if t.timer > 2 then
+      table.remove(BATTLE.effectTexts, k)
+    else
+      t.timer = t.timer + dt
+      t.y = t.y - dt * 10
+      t.color.a = 2 - t.timer
+      --TODO these numbers should be constants
+      --TODO make the text bigger? somehow?
+    end    
+  end
+end
+
+function updateBattleParticleSystems(dt)
+  for k, ps in ipairs(BATTLE.particleSystems) do
+    ps:update(dt)
+  end
+end
 
 --player clicked/tapped during GAMESTATE == "battle". what now?
 function battleClick(mx, my, button)

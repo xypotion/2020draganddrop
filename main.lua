@@ -61,7 +61,7 @@ function love.load()
 
 
   --DEBUG never tried image fonts before...
-  imgFont = love.graphics.newImageFont("love-wiki-imagefont.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-+/():;%&`'*#=[]\"")
+  imgFont = love.graphics.newImageFont("love-wiki-imagefont.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-+/():;%&`'*#=[]\"")--, -1) TODO consider this kind of thing!
   love.graphics.setFont(imgFont, 200)
   imgFont:setFilter("linear", "nearest")
   -- imgFont:setLineHeight(1.25)
@@ -179,7 +179,7 @@ function love.load()
   
   -- PS:pause()
   
-  initParticleSystemSystem()
+  -- initParticleSystemSystem()
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -291,7 +291,10 @@ function love.update(dt)
     end
   end
   
+  updateBattleLogic(dt)
   
+  
+  -- updateBattleEffectText(dt)
   
   
   --DEBUG PARTICLESYSTEM stuff
@@ -306,7 +309,7 @@ function love.update(dt)
   --   if not PS then print("not PS!") else print("PS?") end
   -- end
   
-  updateAllParticleSystems(dt)
+  -- updateAllParticleSystems(dt)
 end
 
 -----------------------------------------------------------------------------------------------------------

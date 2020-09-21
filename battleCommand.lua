@@ -51,7 +51,9 @@ function battleCommand_heroAttack()
       user = HERO, 
       target = tc.contents, 
       damage = damage, 
-      apCost = 1
+      apCost = 1,
+      ty = ty,
+      tx = tx
     }),
     particleEvent(ty * cellSize * overworldZoom + HALFCELLSIZE, tx * cellSize * overworldZoom + HALFCELLSIZE, "bash"),
     --TODO sound effect!
@@ -185,7 +187,9 @@ function skill_fireball(params)
       user = HERO, 
       target = tc.contents, 
       damage = damage, 
-      apCost = 2
+      apCost = 2,
+      ty = ty,
+      tx = tx
     }),
     particleEvent(ty * cellSize * overworldZoom + HALFCELLSIZE, tx * cellSize * overworldZoom + HALFCELLSIZE, "fireball"),
   })

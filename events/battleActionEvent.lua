@@ -114,6 +114,13 @@ function process_battleEvent(e) --TODO i think ultimately rename this. it's too 
   --special: run anonymous functions? use pcall()!
   
   --POSSIBILITY (TODO consider): little floating damage numbers could be spawned (as particles, basically) HERE. will you ever actually want them separated?
+  table.insert(BATTLE.effectTexts, {
+    text = e.params.damage, 
+    y = (e.params.ty + 0.5) * cellSize * overworldZoom + math.random(9) - 5, 
+    x = e.params.tx * cellSize * overworldZoom + math.random(9) - 5, 
+    timer = 0, 
+    color = {r=1,g=2/3,b=2/3,a=1}
+  })
   
   e.finished = true
 end

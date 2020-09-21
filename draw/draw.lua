@@ -65,11 +65,11 @@ function love.draw()
   
   white()
   
-  for i, ps in pairs(PARTICLESYSTEMS) do
-    -- setColor(p.color)
-    -- love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
-    love.graphics.draw(ps, 0, 0)
-  end
+  -- for i, ps in pairs(PARTICLESYSTEMS) do
+  --   -- setColor(p.color)
+  --   -- love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
+  --   love.graphics.draw(ps, 0, 0)
+  -- end
   
   
 end
