@@ -31,7 +31,7 @@ function loadEnemy(member, noVariance)
   
   e.stats.hp = e.stats.maxHP
   
-  --TODO stat variance, unless noVariance = true (for whatever reason. boss fight, bestiary...)
+  --TODO stat variance, unless noVariance = true (for whatever reason. boss fight, bestiary...), maybe bosses don't get variance, but common enemies do?
   
   -- tablePrint(e)
   
@@ -124,7 +124,7 @@ DATA.pets = { --AI scripts will make this large... except you should probably en
   debug1 = {},
 }
 
-DATA.statusFX = { --effect name + a FUNCTION for actual effect/behavior + metadata like description, category, when it should be invoked, icon, animation?, class (buff or debuff, etc)
+DATA.statusEffects = { --effect name + a FUNCTION for actual effect/behavior + metadata like description, category, when it should be invoked, icon, animation?, class (buff or debuff, etc)
   debug1 = {},
 }
 
@@ -200,6 +200,14 @@ DATA.recipes = {
 
 
 
+DATA.particleType = {
+  debug1 = {},
+}
+
+DATA.particleShape = {
+  debug1 = {},
+}
+
 DATA.unitAnimations = {
   --graphic TODO, 
   debug1 = {},
@@ -209,9 +217,7 @@ DATA.screenAnimations = {--particle, density/frequency, direction, overlay
   debug1 = {}, --rain, basically
 }
 
-DATA.particles = {
-  debug1 = {},
-}
+
 
 DATA.storyQuests = { --these are actually (probably) big enough that they'll need one file each
   debug1 = {},

@@ -2,14 +2,13 @@
 function damageFormula(name, params)
   print("calculating damage for: "..name)
 
-  if _G["df_"..name] then
-    return _G["df_"..name](params)
-  end
+  --TODO set default values for ALL params to increase chance of success (?)
+  
+  return pcallIt("df_"..name, params)
 end
 
--- _G["process_"..e.class.."Event"](e)
-
--- but wait, what is a damage formula supposed to return? just a damage amount, i guess??
+-- but wait, what is a damage formula supposed to return? just a damage amount, i guess?? 
+--TODO maybe rename whole file to "battleFormula", or just "formula", since lots of things will be calculated here, like success rates for non-damage effects
 
 -- what goes into a damage formula?
 --[[
@@ -31,24 +30,9 @@ function df_attack(p) --basically 100% DEBUG because i don't know what i'm doing
   local damage = 0
   local critMultiplier = 1
   local randomizationMultiplier = 1
-  
-  --basic damage calculation
-  -- if p.potency and p.user and p.user.ps and p.target and p.target.pr then --TODO try pcall() instead
-  --   damage = p.potency * p.user.ps / p.target.pr
-  --   print(damage)
-  -- end
-  --
-  local success, error = pcall(function ()
-    -- print("anon function??")
-      -- tablePrint(p)
-    damage = p.user.stats.ps * p.potency / p.target.stats.pr
-    -- print("base damage "..damage)
-  -- end, function()
-    -- return "something went wrong"
-    -- return
-  end)
-  print(error)
-  --well, it works, but it ain't elegant. maybe abstract to a try() function? TODO
+
+  --pcall seems a little unnecessary here...? except yeah, lots of different params for different formulae... ehhh... TODO consider more
+  damage = p.user.stats.ps * p.potency / p.target.stats.pr
   
   --is it a critical hit?
   if p.user and p.user.critRate and math.random() < p.user.critRate then
@@ -67,24 +51,12 @@ function df_attack(p) --basically 100% DEBUG because i don't know what i'm doing
   return damage
 end
 
-
-
 function df_fireball(p) --basically 100% DEBUG because i don't know what i'm doing yet!
   local damage = 0
   local critMultiplier = 1
   local randomizationMultiplier = 1
   
-  --basic damage calculation
-  -- if p.potency and p.user and p.user.ps and p.target and p.target.pr then --TODO try pcall() instead
-  --   damage = p.potency * p.user.ps / p.target.pr
-  --   print(damage)
-  -- end
-  --
-  local success, error = pcall(function ()
-    damage = p.user.stats.es * p.potency / p.target.stats.er
-  end)
-  print(error)
-  --well, it works, but it ain't elegant. maybe abstract to a try() function? TODO
+  damage = p.user.stats.es * p.potency / p.target.stats.er
   
   --is it a critical hit?
   if p.user and p.user.critRate and math.random() < p.user.critRate then

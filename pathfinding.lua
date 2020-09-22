@@ -1,5 +1,6 @@
 --need a dijkstra refresher? https://www.youtube.com/watch?v=pVfj6mxhdMwx
 
+--TODO might rather make this just "mapAllPathsFrom", then provide coordinates. also maybe a mode?
 function mapAllPathsFromHero(grid)--, start)
   local failsafe = 0
   -- print("mapAllPathsFromHero") DEBUG

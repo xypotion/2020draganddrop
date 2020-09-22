@@ -1,20 +1,12 @@
 function initOverworldSystem()
-
-
+  --TODO battle system has the BATTLE table. should there be an OVERWORLD one, too? or not necessary?
+  
+  --TODO this probably isn't who should control this canvas. genericize them somehow, like CANVASES[1], [2], etc
   overworldCanvas = love.graphics.newCanvas(cellSize * AREASIZE, cellSize * AREASIZE)
   overworldCanvas:setFilter("nearest")  
   
   currentIsland = initIsland()
-  CIA = currentIsland[currentIsland.areaNumbersReference[1].y][currentIsland.areaNumbersReference[1].x]
-
-  --this is not elegant (you're mapping twice at boot), but it's debug junk anyway. doesn't matter
-  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "block", threshold = 0.1}))
-  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "npc", threshold = 0.1}))
-  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "danger", threshold = 0.1}))
-  -- queue(gridOpEvent(GRIDS.debug, "add obstacles", {type = "item", threshold = 0.1})) --TODO document these in gridOps before deleting. lol
-  -- queue(gridOpEvent(GRIDS.debug, "remap"))
-
-  --init island and CIA "current island area"
+  CIA = currentIsland[currentIsland.areaNumbersReference[1].y][currentIsland.areaNumbersReference[1].x] --because you should always start in area 1 :)
 
   queue(gridOpEvent(CIA, "add obstacles", {type = "item", threshold = 0.1}))
   queue(gridOpEvent(CIA, "remap"))
@@ -28,9 +20,6 @@ function initOverworldSystem()
     yOffset = 0,
     xOffset = 0
   }
-
-  -- CIA = mapAllPathsFromHero(CIA) --TODO might rather make this just "mapAllPathsFrom", then provide coordinates. also maybe a mode?
-
 end
 
 function overworldClick(mx, my, button)
@@ -148,14 +137,6 @@ function moveThingAtYX(y, x, dy, dx, max)
   processNow()
 end
 
---similar to above...
---queue an areaMove event after building up its moveFrames
--- function moveAreaByDYDX(area, dy, dx, max)
---   max = max or 10 --the number of frames this movement should last
---
---   -- local moveFrames... wait. why am i doing this here, again?
--- end
-
 --dy and dx describe the way the hero is moving... we're moving to a neighboring map, but which way?
 function queueNextAreaMoveAndRemapEvents(dy, dx, heroY, heroX)
   local ciaCoords = currentIsland.areaNumbersReference[CIA.areaNumber]
@@ -187,7 +168,7 @@ end
 -- 	mouseStillDown = false
 -- 	mouseHasntMovedFar = false
 --
--- 	processNow()
+-- 	processNow() --probably not necessary? or should be done higher up
 -- end
 
 function convertMouseCoordsToOverworldCoords(mx, my)

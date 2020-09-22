@@ -12,18 +12,9 @@ battleClick actually just always passes the commandParams, which is a table cont
 ]]
 
 
+--lol, this shrank to a 1-liner. is it still needed? TODO
 function battleCommand(cmd, params)
-  local bc = "battleCommand_"..cmd
-  local success, error = pcall(_G[bc], params)
-  
-  if error and not success then
-    print("tried to run "..bc..", but this happened:\n"..error)
-    if error == "attempt to call a nil value" then 
-      print("("..bc.." probably isn't defined, dummy)") 
-    end
-  end
-  
-  return success, error --probably not necessary, but what the heck
+  return pcallIt("battleCommand_"..cmd, params)
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -55,7 +46,7 @@ function battleCommand_heroAttack()
       ty = ty,
       tx = tx
     }),
-    particleEvent(ty * cellSize * overworldZoom + HALFCELLSIZE, tx * cellSize * overworldZoom + HALFCELLSIZE, "bash"),
+    particleEvent(ty * cellSize * overworldZoom + HALFSCREENCELLSIZE, tx * cellSize * overworldZoom + HALFSCREENCELLSIZE, "bash"),
     --TODO sound effect!
   })
 end
@@ -137,19 +128,9 @@ function battleCommand_heroUseSkill(id)
   local tc = BATTLE.grid[ty][tx]
   
   --call the thing
-  local method = "skill_"..s.method
-  local success, error = pcall(_G[method], {user = HERO, target = tc.contents, skill = s})
-  
-  if error and not success then
-    print("tried to run "..method..", but this happened:\n"..error)
-    
-    if error == "attempt to call a nil value" then 
-      print("("..method.." probably isn't defined, dummy)") 
-    end
-  end
-  
-  -- if success then
-    --apply effects now?
+  local skillResult = pcallIt("skill_"..s.method, {user = HERO, target = tc.contents, skill = s})
+
+  return skillResult
 end
 
 function autoTarget(type) --TODO DEBUG ETC this is not final
@@ -191,6 +172,6 @@ function skill_fireball(params)
       ty = ty,
       tx = tx
     }),
-    particleEvent(ty * cellSize * overworldZoom + HALFCELLSIZE, tx * cellSize * overworldZoom + HALFCELLSIZE, "fireball"),
+    particleEvent(ty * cellSize * overworldZoom + HALFSCREENCELLSIZE, tx * cellSize * overworldZoom + HALFSCREENCELLSIZE, "fireball"),
   })
 end

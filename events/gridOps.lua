@@ -17,10 +17,8 @@ end
 
 function process_gridOpEvent(e)
   if e.command == "remap" then
---		GRIDS.debug = mapAllPathsFromHero(GRIDS.debug) --this is definitely wrong
-    e.g = mapAllPathsFromHero(e.g) --...ok, but it's weird that this works. sigh.
-
-  elseif e.command == "clear obstacles" then
+    e.g = mapAllPathsFromHero(e.g) --...ok, but it's weird that this works. sigh. pass-by-reference patterns are confusing sometimes
+  elseif e.command == "clear obstacles" then --DEBUG
     for y, row in ipairs(e.g) do
       for x, cell in ipairs(row) do
         if cell.contents.class ~= "hero" then
@@ -28,8 +26,8 @@ function process_gridOpEvent(e)
         end
       end
     end
-  elseif e.command == "add obstacles" then --debug junk
-    --generate some random obstacles
+  elseif e.command == "add obstacles" then --DEBUG junk
+    --generate some random obstacles; used to insert "block", "npc", "danger", and "item" randomly after every move :)
     for y, row in ipairs(e.g) do
       for x, cell in ipairs(row) do
         if cell.contents.class == "clear" and math.random() < e.params.threshold then

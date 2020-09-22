@@ -2,7 +2,7 @@ function drawOverworld()
   love.graphics.setCanvas(overworldCanvas)  
   love.graphics.clear(0,0,0,1)
 
-  --draw CIA, PIA cells' backgrounds and contents
+  --draw CIA, PIA cells' backgrounds, then contents. reminder: PIA = "previous island area", for when you're doing transitions
   drawIslandAreaBackgrounds(CIA)
 
   if PIA then
@@ -18,9 +18,10 @@ function drawOverworld()
   white()
 
   --draw path to currently hovered destination
+  --DEBUG... but a version of this will be needed in the final game
   if hoveredCell and CIA[hoveredCell.y][hoveredCell.x].pathFromHero then --TODO this second condition was not always necessary. investigate
     for i, step in pairs(CIA[hoveredCell.y][hoveredCell.x].pathFromHero) do
-      love.graphics.circle("line", (step.x-0.5)*cellSize + CIA.offsetX, (step.y-0.5)*cellSize + CIA.offsetY, cellSize*0.45)
+      love.graphics.circle("line", (step.x-0.5)*cellSize + CIA.offsetX, (step.y-0.5)*cellSize + CIA.offsetY, cellSize*0.45) --too much math! TODO simplify
     end
   end
 
@@ -64,9 +65,6 @@ function drawIslandAreaContents(ia)
       end
     end
   end
-end
-
-function drawStage()
 end
 
 function drawCellContents(obj, screenY, screenX)

@@ -97,6 +97,7 @@ function addOuterIslandBorder(island)
         for areaX, cell in ipairs(areaRow) do
           if (y == 1 and areaY == 1) or (y == 3 and areaY == 5) or (x == 1 and areaX == 1) or (x == 3 and areaX == 5) then
             cell.contents = deepClone(outerBorderBlock)
+            
             cell.contents.color[3] = 0.5 + 0.25 * math.random() --a little ~bluer~ (DEBUG)
           end
         end

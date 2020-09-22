@@ -41,8 +41,6 @@ function initHERO()
     v = 1,
     m = 1,
   }
-  -- HERO.stats = {} --this all should be derived (later, i guess) from base + affinities + other other stuff
-  HERO.stats = deepClone(HERO.baseStats) --DEBUG
 
 
   --hero grid stuff
@@ -62,24 +60,26 @@ function initHERO()
   HERO.bodies = {newBody()}
   HERO.invocations = {newInvocation()}
   HERO.pets = {newPet()}
-
+  
 
   --starting card/skill/gear/etc inventories
   HERO.cards = {}
   HERO.skills = {
-    loadSkill("fireball")
+    loadSkill("fireball") --oh, right. this works :D
   }
   HERO.gear = {
     newGear(1),
     newGear(2),
     newGear(3),
   }
+  --TODO makes me think about how customized items will need to be stored in save data. it's pretty much just the attributes, right? otherwise the data is identical & can be re-derived on load?
+  
   HERO.keyItems = {}
   HERO.stories = {}
   HERO.recipes = {}
   HERO.toys = {}
   HERO.potions = {}
-  HERO.crafting = {}
+  HERO.materials = {}
 
 
   --put stuff in grids
@@ -132,6 +132,9 @@ end
 
 --will be called often; accounts for everything! bonuses from racial skills (?), gear, grid bonuses, key items, etc
 function calculateHEROStats()
+  HERO.stats = deepClone(HERO.baseStats) --DEBUG
+  
+  
   --use HERO.baseStats to initialize
 
 

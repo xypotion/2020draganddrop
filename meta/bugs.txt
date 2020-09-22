@@ -12,3 +12,5 @@ BUGS:
 4   argh, pathing is still not perfect; see 9/12 screenshot. for some reason chose to path through 3 hazards when it could have done just 2 :/ 
     FIXED 9/12... basically... just gotta set the hazards' danger levels higher and pathing will avoid them. it feels hacky, but it works... i'm pretty sure. don't really want to work on pathing anymore right now, lol
 5   pathing quirk, see 9/15 screenshots: hero takes one path from A to B, but a different (longer) path back. not sure if this is actually a bug, though... either path is justifiable
+6   attacking an empty cell or the hero crashes the game
+7   clicking rapidly while hero walks on overworld causes odd behavior (like moving backwards 1 step after arriving)

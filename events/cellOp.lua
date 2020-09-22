@@ -1,20 +1,21 @@
-function cellOpEvent(grid, y, x, payload) --TODO rename? this is vague. actually everything here is vague...
-  local e = {
-    class = "cellOp",
-    grid = grid,
-    y = y,
-    x = x,
-    payload = payload
-  }
-
-  return e
-end
-
-function process_cellOpEvent(e)
-  e.grid[e.y][e.x].contents = e.payload
-
-  e.finished = true
-end
+-- function cellOpEvent(grid, y, x, payload) --TODO rename to cellFillEvent? "cellOp" is vague. actually everything here is vague...
+--   local e = {
+--     class = "cellOp",
+--     grid = grid,
+--     y = y,
+--     x = x,
+--     payload = payload
+--   }
+--
+--   return e
+-- end
+--
+-- function process_cellOpEvent(e)
+--   e.grid[e.y][e.x].contents = e.payload
+--
+--   e.finished = true
+-- end
+--LOL, this is never used! but it still might be sometime, so keep
 
 -----------------------------------------------------------------------------------------------------------
 

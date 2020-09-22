@@ -68,6 +68,9 @@ end
 -- function randomGridPlace(grid, item)
 --   --just call this multiple times; item will be placed somewhere random but only on "clear" cells
 -- end
+--
+--probably best (TODO implement & use this):
+--function randomClearCell(grid), return cell,y,x
 
 function empty(t)
   local e = true
@@ -218,3 +221,19 @@ end
 -- function empty()
 -- 	return {contents = clear()}
 -- end
+
+function pcallIt(func, params)
+  local success, errorOrReturnValue = pcall(_G[func], params)
+
+  if success == false then
+    print("tried to run "..func..", but this happened:\n"..errorOrReturnValue)
+    
+    if errorOrReturnValue == "attempt to call a nil value" then 
+      print("("..func.." probably isn't defined, dummy)") 
+    end
+    
+    --TODO actually LOG an error? :)
+  end
+  
+  return errorOrReturnValue
+end

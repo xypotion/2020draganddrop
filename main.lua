@@ -67,119 +67,31 @@ function love.load()
   -- imgFont:setLineHeight(1.25)
   -- love.graphics.scale(20) --seemingly does nothing unless called while drawing
   
-
---  grabbedThing = nil
-  mouseDownTimer = 0
-  mouseDownAtX, mouseDownAtY = 0, 0 --not sure if necessary
-  mouseStillDown = false
-  mouseHasntMovedFar = false
-
-  --also TODO shouldn't there be a way to not make this return things
-  -- gameMode = "debug" --TODO shouldn't be necessary! remove & simplify
   -- hoveredCell = nil
+  -- grabbedThing = nil
+  -- mouseDownTimer = 0
+  -- mouseDownAtX, mouseDownAtY = 0, 0 --not sure if necessary
+  -- mouseStillDown = false
+  -- mouseHasntMovedFar = false
+
 
   softOscillator = 1
   oscillatorCounter = 0
   
   love.graphics.setLineWidth(2)
 
-  --pretending i know how the hero object will be structured
   initHERO()
-  -- tablePrint(HERO)
   
   initOverworldSystem()
   
   initBattleSystem()
   
   GAMESTATE = "overworld"
-
-
-  particles = {} --TODO obviously move. probably a particlesystem file
-  --LOL, DID YOU KNOW THIS IS A THING LOVE CAN DO FOR YOU?
-  
   
   loadGraphics()
   
-  
-  -- CIA[2][2].danger = 5
-  -- CIA[2][3].danger = 5
-  -- CIA[2][4].danger = 5
-  -- CIA[3][2].danger = 5
-  -- CIA[3][3].danger = 7
-  -- CIA[3][4].danger = 7
-  -- CIA[4][2].danger = 7
-  -- CIA[4][3].danger = 7
-  -- CIA[4][4].danger = 5
-  
-  -- CIA[3][4].contents = {
-  --         class = "block",
-  --         color = {1, 1, 0, 1},
-  --         fadeColor = {1, 1, 1, 0.5},
-  --         yOffset = 0,
-  --         xOffset = 0
-  --       }
-  
-
-
-  -- currentIsland[2][2][2][2].danger = 5
-  -- currentIsland[2][2][2][3].danger = 5
-  -- currentIsland[2][2][2][4].danger = 6
-  -- currentIsland[2][2][3][2].danger = 8
-  -- currentIsland[2][2][3][3].danger = 8
-  -- currentIsland[2][2][3][4].danger = 9
-  -- currentIsland[2][2][4][2].danger = 2
-  -- currentIsland[2][2][4][3].danger = 1
-  -- currentIsland[2][2][4][4].danger = 7
-  
-  -- loadData("enemy", "ditto")
-  
-  
-  --DEBUG PARTICLESYSTEM stuff
-  -- PS = love.graphics.newParticleSystem(overworldCanvas, 20)
-  -- -- PS = love.graphics.newParticleSystem(IMG.noidea, 20)
-  -- PS:setEmissionRate(5)
-  -- PS:setParticleLifetime(2,2)
-  -- -- PS:setEmitterLifetime(3)
-  -- PS:setInsertMode("bottom")
-  --
-  -- PS:setSizes(0, 0.5, 0.25)
-  -- -- PS:setSizeVariation(0.001, 1) --honestly can't tell what this does
-  -- PS:setEmissionArea("normal", 10, 10, 1, true)
-  --
-  -- PS:setColors(1,1,1,0.25, 1,1,1,1, 1,0,0,0)
-  --
-  -- PS:setDirection(1)
-  -- PS:setSpeed(10, 100)
-  -- PS:setSpread(10)
-  -- -- PS:setLinearAcceleration(10, 10, 100, 100)
-  -- -- PS:setRadialAcceleration(100, 1000)
-  -- PS:setLinearDamping(0.2, 0.5)
-  -- PS:setTangentialAcceleration(200)
-  --
-  -- PS:setRotation(-1,-1)
-  -- PS:setRelativeRotation(true)
-  -- -- PS:setSpin(-10)
-  -- -- PS:setSpinVariation(1)
-  --
-  -- PS:setQuads(
-  --   love.graphics.newQuad(0, 0, 50, 50, 77, 128),
-  --   love.graphics.newQuad(0, 50, 50, 50, 77, 128),
-  --   love.graphics.newQuad(0, 0, 50, 50, 77, 128),
-  --   love.graphics.newQuad(0, 50, 50, 50, 77, 128),
-  --   love.graphics.newQuad(0, 0, 50, 50, 77, 128),
-  --   love.graphics.newQuad(0, 50, 50, 50, 77, 128),
-  --   love.graphics.newQuad(0, 0, 50, 50, 77, 128),
-  --   love.graphics.newQuad(0, 50, 50, 50, 77, 128)
-  -- )
-  --
-  -- PS:emit(10)
-  --
-  -- print(PS, NULL)
-  -- print(NULL == nil) --weird. this is true
-  
-  -- PS:pause()
-  
-  -- initParticleSystemSystem()
+  a, b, c, d, e = pcall(function() return 1, 2, 3, 4, 5 end)
+  print(a, b, c, d, e)
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -237,107 +149,66 @@ function love.update(dt)
 
   eventProcessing(dt)
 
+  --just commented out for now, but TODO probably recycle some of this when you get to real drag-and-drop interfaces
   --still maybe doing a long press?
-  if mouseHasntMovedFar and grabbedThing then
-    local dx, dy = love.mouse.getX() - mouseDownAtX, love.mouse.getY() - mouseDownAtY
-
-    if dx * dx + dy * dy > 100 then
-      mouseHasntMovedFar = false
-      mouseDownTimer = 0
-    end
-  end
-
-  --yes, so far still doing a long press
-  --TODO this block can almost definitely be consolidated with the above one
-  if mouseHasntMovedFar then
-    --keep counting the long-press timer up
-    if love.mouse.isDown(1) then
-      mouseDownTimer = mouseDownTimer + dt
-    end
-
-    --done counting! do that long press 
-    --also reset stuff so we don't repeatedly do long-press stuff
-    if mouseDownTimer >= longPressTime and not mouseStillDown then
-      longPressEventAt(love.mouse.getPosition())
-
-      mouseDownTimer = 0
-      mouseStillDown = false
-      mouseHasntMovedFar = false
-      grabbedThing = nil
-    end
-  end
-  
-  
-  
-  
-  --process particles: make them move, etc
-  for i, p in pairs(particles) do
-    if p.ttl <= 0 then
-      table.remove(particles, i)
-    else
-      p.y = p.y + p.dy * dt
-      p.x = p.x + p.dx * dt
-
-      p.dy = p.dy + p.ay * dt
-      p.dx = p.dx + p.ax * dt
-    
-      --jerk?
-    
-      --size change.
-    
-      --color change.
-      
-      p.ttl = p.ttl - dt
-    end
-  end
-  
-  updateBattleLogic(dt)
-  
-  
-  -- updateBattleEffectText(dt)
-  
-  
-  --DEBUG PARTICLESYSTEM stuff
-  -- -- print(PS)
+  -- if mouseHasntMovedFar and grabbedThing then
+  --   local dx, dy = love.mouse.getX() - mouseDownAtX, love.mouse.getY() - mouseDownAtY
   --
-  -- PS:update(dt)
-  -- -- PS:setEmissionRate(oscillatorCounter)
-  -- -- PS:setEmissionRate(love.mouse.getPosition())
-  -- if PS:getCount() == 0 then
-  --   PS:release()
-  --   print(PS)
-  --   if not PS then print("not PS!") else print("PS?") end
+  --   if dx * dx + dy * dy > 100 then
+  --     mouseHasntMovedFar = false
+  --     mouseDownTimer = 0
+  --   end
+  -- end
+  --
+  -- --yes, so far still doing a long press
+  -- --TODO this block can almost definitely be consolidated with the above one
+  -- if mouseHasntMovedFar then
+  --   --keep counting the long-press timer up
+  --   if love.mouse.isDown(1) then
+  --     mouseDownTimer = mouseDownTimer + dt
+  --   end
+  --
+  --   --done counting! do that long press
+  --   --also reset stuff so we don't repeatedly do long-press stuff
+  --   if mouseDownTimer >= longPressTime and not mouseStillDown then
+  --     longPressEventAt(love.mouse.getPosition())
+  --
+  --     mouseDownTimer = 0
+  --     mouseStillDown = false
+  --     mouseHasntMovedFar = false
+  --     grabbedThing = nil
+  --   end
   -- end
   
-  -- updateAllParticleSystems(dt)
+  if GAMESTATE == "battle" then
+    updateBattleLogic(dt)
+  end
 end
 
 -----------------------------------------------------------------------------------------------------------
 
 function love.mousepressed(mx, my, button)
+  --TODO make this more like mousereleased :)
   
-  -- local mCellX, mCellY = math.floor((mx-GRIDS.debug.offsetX+cellSize)/cellSize), math.floor((my-GRIDS.debug.offsetY+cellSize)/cellSize)
-  -- local mCellX, mCellY = math.floor((mx-CIA.offsetX+cellSize)/cellSize), math.floor((my-CIA.offsetY+cellSize)/cellSize)
-  local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
-
-  mouseDownAtX, mouseDownAtY = mx, my
-
-  --if we're clicking in the grid and there's an item there, "grab" it... TODO this sucks. clean it up
-  -- if GRIDS.debug[mCellY] and GRIDS.debug[mCellY][mCellX] and GRIDS.debug[mCellY][mCellX].contents and GRIDS.debug[mCellY][mCellX].contents.class ~= "clear" then
-  if CIA[mCellY] and CIA[mCellY][mCellX] and CIA[mCellY][mCellX].contents and CIA[mCellY][mCellX].contents.class ~= "clear" then
-    grabbedThing = {
-      -- item = GRIDS.debug[mCellY][mCellX].contents,
-      item = CIA[mCellY][mCellX].contents,
-      -- relMouseY = my - cellSize * (mCellY - 1) - GRIDS.debug.offsetY, --to prevent the graphic from jumping to a weird place near the cursor when grabbed
-      -- relMouseX = mx - cellSize * (mCellX - 1) - GRIDS.debug.offsetX,
-      relMouseY = my - cellSize * (mCellY - 1) - CIA.offsetY, --to prevent the graphic from jumping to a weird place near the cursor when grabbed
-      relMouseX = mx - cellSize * (mCellX - 1) - CIA.offsetX,
-      originY = mCellY,
-      originX = mCellX
-    }
-
-    mouseHasntMovedFar = true
-  end
+  -- local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
+  --
+  -- mouseDownAtX, mouseDownAtY = mx, my
+  -- 
+  -- if we're clicking in the grid and there's an item there, "grab" it... TODO this sucks. clean it up
+  -- if CIA[mCellY] and CIA[mCellY][mCellX] and CIA[mCellY][mCellX].contents and CIA[mCellY][mCellX].contents.class ~= "clear" then
+  --   grabbedThing = {
+  --     -- item = GRIDS.debug[mCellY][mCellX].contents,
+  --     item = CIA[mCellY][mCellX].contents,
+  --     -- relMouseY = my - cellSize * (mCellY - 1) - GRIDS.debug.offsetY, --to prevent the graphic from jumping to a weird place near the cursor when grabbed
+  --     -- relMouseX = mx - cellSize * (mCellX - 1) - GRIDS.debug.offsetX,
+  --     relMouseY = my - cellSize * (mCellY - 1) - CIA.offsetY, --to prevent the graphic from jumping to a weird place near the cursor when grabbed
+  --     relMouseX = mx - cellSize * (mCellX - 1) - CIA.offsetX,
+  --     originY = mCellY,
+  --     originX = mCellX
+  --   }
+  --
+  --  mouseHasntMovedFar = true
+  -- end
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -354,6 +225,9 @@ end
 -----------------------------------------------------------------------------------------------------------
 
 function love.mousemoved(mx,my)
+  --TODO maybe make this more like mousereleased... but it's kind of all DEBUG for now. 
+  --touchscreens won't need this except when dragging and dropping stuff
+  
   local mCellX, mCellY = convertMouseCoordsToOverworldCoords(mx, my)
 
   --are we now hovering over a grid cell?
@@ -363,7 +237,8 @@ function love.mousemoved(mx,my)
   for k, v in ipairs(allCellsInGrid(CIA)) do
     if v.y == mCellY and v.x == mCellX then
       v.cell.mouseOver = true
-      hoveredCell = {y = mCellY, x = mCellX} --wait, why is this needed? TODO
+      
+      hoveredCell = {y = mCellY, x = mCellX} --this informs the path-drawing code
     else
       v.cell.mouseOver = false
     end
@@ -373,6 +248,7 @@ end
 -----------------------------------------------------------------------------------------------------------
 
 --TODO https://love2d.org/wiki/love.lowmemory and other callbacks... probably think about implementing! :)
+
 --https://love2d.org/wiki/love.displayrotated is interesting....
 
 -----------------------------------------------------------------------------------------------------------
@@ -412,9 +288,9 @@ end
 function love.keypressed(key)
   if key == "escape" then love.event.quit() end
 
-  -- if key == "p" then
-  --   tablePrint(currentEvents)
-  -- end
+  if key == "p" then
+    tablePrint(currentEvents)
+  end
 
   if key == "s" then
     for i = 1, 27 do
@@ -429,12 +305,6 @@ function love.keypressed(key)
   if key == "i" then
     tablePrint(island)
   end
-
-  -- if key == "e" then --move screen east
-  --   queue(areaMoveEvent(currentIsland.areaNumbersReference[CIA.areaNumber], currentIsland, "east"))
-  --   tablePrint(eventSetQueue)
-  --   processNow()
-  -- end
   
   if key == "b" then 
     local heroLoc = findHeroLocationInGrid(CIA)
@@ -463,9 +333,6 @@ function love.keypressed(key)
   if key == "h" then
     tablePrint(findHeroLocationInGrid(BATTLE.grid))
   end
-  
-  if key == "p" then
-  end
 end
 
 --gives you CIA[y][x] if it exists, otherwise nil
@@ -477,29 +344,6 @@ function cellAt(y, x)
     return nil
   end
 end
-
--- function cellAt(g, y, x) --i want this one, too... how?
---ugh, it's just not worth it! g[y][x] is not harder to type than cellAt(g, y, x)!
-
---TODO decide you need this or not. not sure if it's necessary when you can just do grid[y][x]
---copied from HDBS:
--- function cellAt(y, x)
--- 	-- if stage.field[y] then
--- 	-- 	return stage.field[y][x]
--- 	if grid[y] and grid[y][x] and grid[y][x].contents then
--- 		return grid[y][x]
--- 	else
--- 		return nil
--- 	end
--- end
-
--- function itemAt(x, y)
--- 	if grid[y] and grid[y][x] and grid[y][x].contents then
--- 		return grid[y][x].contents
--- 	else
--- 		return nil
--- 	end
--- end
 
 --for use when you need to read all the cells in a 2D array and don't want to do the nested 'for' loops. kinda dumb, but worth a try.
 --GOOD for tallying stat bonuses or checking for the presence of a single thing

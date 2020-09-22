@@ -68,6 +68,7 @@ function updateBattleLogic(dt)
 end
 
 function updateBattleEffectText(dt)
+  --for flying text, consider: position & movement, colors incl. changing/flashing/fading out, size variation, expiration/removing, lots displaying at once in different places
   for k, t in ipairs(BATTLE.effectTexts) do
     if t.timer > 2 then
       table.remove(BATTLE.effectTexts, k)
@@ -104,7 +105,6 @@ function battleClick(mx, my, button)
     --TODO mainCommandsGrids[mainCommandsGrids.current] is very clumsy. abstract. abstract all of this!
     -- tablePrint(mainCommandsGrids[mainCommandsGrids.current][mCellY][mCellX])
     
-    -- local command = mainCommandsGrids[mainCommandsGrids.current][mCellY][mCellX].command
     local cell = mainCommandsGrids[mainCommandsGrids.current][mCellY][mCellX]
     if cell.command then
       battleCommand(cell.command, cell.commandParams)
@@ -138,11 +138,11 @@ function setBattleTargetedCell(mx, my) --TODO ooh, you're bad. why is this x-y i
   end
 end
 
---TODO rename these? "target" vs "targeted"... meh?
 function getBattleTargetedCell()
   return BATTLE.grid[BATTLE.targetedCell.y][BATTLE.targetedCell.x]
 end
 
+--TODO fix up, maybe combine with the overworld version?
 function convertMouseCoordsToBattleGridCoords(mx, my)
   local x = math.floor(mx / cellSize / overworldZoom)
   local y = math.floor(my / cellSize / overworldZoom)
@@ -153,43 +153,14 @@ end
 
 -----------------------------------------------------------------------------------------------------------
 
+--TODO this is apparently necessary, but you should clarify that it's just a "proxy" for the hero
+--...OR re-architect some stuff so that ALL grid units are proxies that point to external data? TODO this might be better
 function battleUnit_hero()
   local en = {
     class = "hero",
     yOffset = 0,
-    xOffset = 0
-  }
-  
-  en.color = {r = 1, g = math.random(), b = math.random()}
-  
-  -- en.stats = {
-  --   maxHP = 999,
-  --   hp = 999,
-  --   ps = 9, --physical strength
-  --   pr = 9, --physical resistance
-  --   es = 9, --elemental strength
-  --   er = 9, --elemental resistance ...these are subject to change, obvs
-  --   level = 1,
-  --   weight = 9,
-  -- }
-  
-  return en
-end
-
-function battleUnit_enemy()
-  local en = {class = "enemy"}
-  
-  en.color = {r = 1, g = math.random(), b = math.random()}
-  
-  en.stats = {
-    maxHP = 999,
-    hp = 999,
-    ps = 9, --physical strength
-    pr = 9, --physical resistance
-    es = 9, --elemental strength
-    er = 9, --elemental resistance ...these are subject to change, obvs
-    level = 1,
-    weight = 9,
+    xOffset = 0,
+    data = HERO --? or something
   }
   
   return en

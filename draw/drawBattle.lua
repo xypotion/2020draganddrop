@@ -18,7 +18,6 @@ function drawBattlefield()
   -- tablePrint(BATTLE.bgColor)
   
   setColor(BATTLE.bgColor)
-  -- white()
   love.graphics.rectangle("fill", 0, 0, cellSize * AREASIZE, cellSize * AREASIZE)
       
   --top/bottom gradients. classy!
@@ -52,9 +51,7 @@ function drawBattlefieldGrid()
     white()
     local targetY = (BATTLE.targetedCell.y + 0.5) * cellSize
     local targetX = (BATTLE.targetedCell.x + 0.5) * cellSize
-    -- love.graphics.arc("line", "open", targetX, targetY, cellSize/2, (softOscillator * 8 + 0.0) * TAU, (softOscillator * 8 + 0.25) * TAU)
-    -- love.graphics.arc("line", "open", targetX, targetY, cellSize/2, (softOscillator * 8 + 0.5) * TAU, (softOscillator * 8 + 0.75) * TAU)
-    love.graphics.arc("line", "open", targetX, targetY, cellSize/2, (oscillatorCounter * 0.25 + 0.0) * TAU, (oscillatorCounter * 0.25 + 0.125) * TAU) --TODO make this a little less hacky
+    love.graphics.arc("line", "open", targetX, targetY, cellSize/2, (oscillatorCounter * 0.25 + 0.0) * TAU, (oscillatorCounter * 0.25 + 0.125) * TAU) --TODO make this a little less hacky, like make other counters
     love.graphics.arc("line", "open", targetX, targetY, cellSize/2, (oscillatorCounter * 0.25 + 0.5) * TAU, (oscillatorCounter * 0.25 + 0.625) * TAU)
     
     --draw hero's path to that cell
@@ -71,14 +68,12 @@ end
 function drawBattleEffectText()
   for k, t in ipairs(BATTLE.effectTexts) do
     setColor(t.color)
-    love.graphics.printf(t.text, t.x - cellSize * 0.5, t.y, cellSize * 1, "center", 0, 2, 2)
+    love.graphics.printf(t.text, t.x - cellSize * 0.5, t.y, cellSize * 1, "center", 0, 2, 2) --TODO establish constants or game settings
   end
 end
 
 function drawBattleParticleSystems()
   for i, ps in ipairs(BATTLE.particleSystems) do
-    -- setColor(p.color)
-    -- love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
     love.graphics.draw(ps, 0, 0)
   end
 end
@@ -127,18 +122,16 @@ function drawBattleCommands() --i want a better name for this :'(
 end
 
 function drawBattleMainCommands()
-  for k, v in pairs(allCellsInGrid(mainCommandsGrids[mainCommandsGrids.current])) do
-    -- local offset = cellSize + mainCommandsGrids.offsetX
-    
+  for k, v in pairs(allCellsInGrid(mainCommandsGrids[mainCommandsGrids.current])) do    
     setColor(v.cell.bgColor)
-    -- setColor(1, 1, 0, 0.5)
-    -- setColor({r=1, g=1, b=0, a=0.95})
     love.graphics.rectangle("fill", (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, cellSize)
+
     setColor(v.cell.lineColor)
     love.graphics.rectangle("line", (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, cellSize)
     
     --these draw/print commands are so ugly, not to mention repetetive... find some way to abstract them or make them cleaner! TODO DRY it up
     
+    --print the name of the battle command. i guess this is DEBUG? not sure yet :P
     if v.cell.contents then
       white()
       love.graphics.printf(v.cell.contents, (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, "center")

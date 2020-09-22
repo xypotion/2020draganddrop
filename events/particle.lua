@@ -9,13 +9,8 @@ function particleEvent(y, x, params)
   return e
 end
 
-function process_particleEvent(e)
-  -- table.insert(particles, newParticle(e.y, e.x, e.params))
-  -- table.insert(particles, newParticle(e.y, e.x, e.params))
-  -- table.insert(particles, newParticle(e.y, e.x, e.params))
-  --TODO obviously actually enumerate these in e
-  
-  newParticleFoo(e.y, e.x, e.params) --TODO "params" seems inappropriate here...
+function process_particleEvent(e)  
+  newParticleType(e.y, e.x, e.params) --TODO "params" seems inappropriate here...
   
   --TODO add internal timer here? or just release & finish when count = 0? or some other threshold? ("you've emitted your last, now die")
   --timer kinda seems better, but you'd need to pass in dt. wait, why aren't you passing in dt?
@@ -33,49 +28,16 @@ end
 ---------------------------------------------------------------------------------------------------
 
 
---TODO floating damage numbers will probably be a kind of particle effect (? i guess), but allow for DELAYS in spawning, so they can appear at certain points during animations!
-
-
----------------------------------------------------------------------------------------------------
-
-
 --TODO i guess move this elsewhere. it shouldn't go in an event file, probably
 --TODO ...and more importantly, there are going to be a ton of different particle types. gotta make data files for that or something. so basically all of this will be scrapped eventually, lol
-function newParticleFoo(y, x, name)
+function newParticleType(y, x, name)
   -- local p = {y = y, x = x, w = 10, h = 10, ttl = 0.25, color = white()}
   local ps = love.graphics.newParticleSystem(IMG.dot)
   ps:setPosition(x, y)
   ps:setEmissionRate(0)
   ps:setParticleLifetime(1)
   
-  -- if name == "old bash" then
-  --   -- TODO filename for graphic or something
-  --
-  --   p.dy = (math.random() - 0.5) * 300
-  --   p.dx = (math.random() - 0.5) * 300
-  --   p.ay = 0 - p.dy
-  --   p.ax = 0 - p.dx
-  --   -- p.dy = p.dy * 4
-  --   -- p.dx = p.dx * 4
-  -- elseif name == "fireball" then
-  --   -- TODO filename for graphic or something
-  --
-  --   p.dy = (math.random() - 0.5) * 300
-  --   p.dx = (math.random() - 0.5) * 300
-  --   p.ay = 0 - p.dy
-  --   p.ax = 0 - p.dx
-  --   -- p.dy = p.dy * 4
-  --   -- p.dx = p.dx * 4
-  --   p.color = {r = math.random() + 0.5, g = math.random() - 0.5, b = 0}
   if name == "bash" then
-    -- p.dy = (math.random() - 0.5) * 300
-    -- p.dx = (math.random() - 0.5) * 300
-    -- p.ay = 0 - p.dy
-    -- p.ax = 0 - p.dx
-    -- p.dy = p.dy * 4
-    -- p.dx = p.dx * 4
-    -- p.color = {r = math.random() + 0.5, g = math.random() - 0.5, b = 0}
-    
     ps:setSpread(10)
     ps:setSizes(6, 9)
     ps:setSpeed(81, 81)
@@ -143,26 +105,6 @@ consider using milliseconds for timings. or centiseconds? heh
 ]]
 
 
---TODO a frustrating thing here is that you still need damage numbers & effects! ideally as particles, but that doesn't work 9_9 (i even checked the forums). it's ok, making your own shouldn't be hard....
---for flying text, consider: position & movement, colors incl. changing/flashing/fading out, size variation, expiration/removing, lots displaying at once in different places
---i think DON'T draw text in the battle canvas, kinda just in general. readability is important (it turns out)
-
-
 function newTravelingParticleSystem()
   --fling those fireballs
 end
-
-
-
---
--- function initParticleSystemSystem()
---   PARTICLESYSTEMS = {}
--- end--
---
--- function updateAllParticleSystems(dt)
---   for k, ps in ipairs(PARTICLESYSTEMS) do
---     ps:update(dt)
---   end
--- end
-
-
