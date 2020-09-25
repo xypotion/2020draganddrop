@@ -74,13 +74,17 @@ x example: EME for "equipment - metal"
   * what about cursed/damaged? leave room for it in case you decide to add later
 ]]
 
-function battleEvent(params)
+-- function battleEvent(op, params, delay)
+function battleUnitStatChangeEvent(op, unit, params, delay)
+  -- delay = delay or 0
+  
   local e = {
-    class = "battle",
-    params = params
+    class = "battleUnitStatChange",
+    op = op,
+    unit = unit,
+    params = params,
+    delay = delay or 0
   }
-
-  --IF this is a favorited skill, treat differently... or that will be handled at a higher level? not sure yet. obviously consider. TODO
   
   return e
 end
@@ -88,39 +92,83 @@ end
 -- so... all damage formulas and stuff happen BEFORE this event is processed? would kinda make sense & be cleaner. but where should all that happen...
 -- ...maybe ^^^ when the event is made? just call to damageFormula(x, y, z) and other things? what about multiple targets & effects? I THINK THAT'S NOT A GOOD PLACE
 
---happens instantaneously, and is only used for stat & status effect changes
+--happens instantaneously (barring delay), and is only used for stat & status effect changes
 --since other parallel events will need to know & change when various things happen (like animations for variable skills), VERY LITTLE CALCULATION should be done here
 --ideally should work for normal battle commands (like Attack), skills, and even the attacks of non-hero units
 --animations, actuations, moves all happen elsewhere
-function process_battleEvent(e) --TODO i think ultimately rename this. it's too vague
-  local t = e.params.target
-  local u = e.params.user
-    
-  t.stats.hp = t.stats.hp - e.params.damage --DEBUG... but only a little :)
+function process_battleUnitStatChangeEvent(e, dt) --TODO i think ultimately rename this. it's too vague
+  --first of all, are we counting down a delay on this event?
+  if e.delay > 0 then
+    -- print (e.delay, dt)
+    e.delay = e.delay - dt
+    return
+  end
   
-  u.stats.ap = u.stats.ap - e.params.apCost --DEBUG... ditto :)
-  --TODO i'm thinking these should all be separate, single ways of using the event, similar to "gridOps". one "op" at a time
+  --no delay? then proceed.
+  
+  local u = e.unit
+  -- local c = e.params.cell
+  local effectText = nil
+  local effectTextColor = white()
+  
+  --is this an amount something we want to display with effect text?
+  if inSet({"-hp", "+hp", "+ap", "+ip"}, e.op) then
+    effectText = e.params.amount
+  end
+  
+  --ok, and what are we actually doing? and does the effect text need a color change?
+  if e.op == "-hp" then
+    u.stats.hp = u.stats.hp - e.params.amount
+  elseif e.op == "+hp" then
+    u.stats.hp = u.stats.hp + e.params.amount
+    effectTextColor = {0, 3/4, 1, 1}
+  elseif e.op == "-ap" then
+    u.stats.ap = u.stats.ap - e.params.amount
+  elseif e.op == "+ap" then
+    u.stats.ap = u.stats.ap - e.params.amount
+  elseif e.op == "+status" then
+    -- generate by e.params.statusName, then add to unit's statuses table, i guess
+    -- effectText = ...
+    -- effectTextColor = ... (derived from status data somehow)
+  elseif e.op == "-status" then
+    -- 
+  elseif e.op == "miss" then
+    -- no-op, lol... unless TODO you put triggers in here ("on miss, _"), but i think that'd be better done elsewhere
+    effectText = "MISS"
+  elseif e.op == "kill" then
+    push(BATTLE.killList, c.contents) --for post-battle rewards, i guess? TODO consider doing in a different event
+    c.contents = nil
+    tablePrint(BATTLE.killList) --DEBUG because i still don't get pass-by-reference sometimes :/ 
+    
+    -- a = {b = {c = 99}}
+    -- d = {a}
+    -- a.b.c = nil
+    -- tablePrint(d)
+    --yeah, i think the construction above won't work how you want it to. rethink
+  else
+    print(e.op.." is not a battleEvent op. fool.")
+  end
   
   --change scalars, e.g. apply damage to actual HP
   -- for scalar, value in pairs(e.scalarEffects) do
   --   t[scalar].actual = t[scalar].actual + value
   -- end
-  
-  --add effects to target
-  -- for
-  
+  --TODO decide if you're actually doing this
+    
   --remove effects from target
   
-  --special: run anonymous functions? use pcall()!
+  --special: change a stat by name? run anonymous functions? use pcall()?
   
-  --POSSIBILITY (TODO consider): little floating damage numbers could be spawned (as particles, basically) HERE. will you ever actually want them separated?
-  table.insert(BATTLE.effectTexts, {
-    text = e.params.damage, 
-    y = (e.params.ty + 0.5) * cellSize * overworldZoom + math.random(9) - 5, 
-    x = e.params.tx * cellSize * overworldZoom + math.random(9) - 5, 
-    timer = 0, 
-    color = {r=1,g=2/3,b=2/3,a=1}
-  })
+  --make the effectText appear
+  if effectText then
+    table.insert(BATTLE.effectTexts, {
+      text = effectText, 
+      y = (e.params.ty + 0.5) * cellSize * overworldZoom + math.random(9) - 5, 
+      x = e.params.tx * cellSize * overworldZoom + math.random(9) - 5, 
+      color = effectTextColor,
+      timer = 0, 
+    })
+  end
   
   e.finished = true
 end

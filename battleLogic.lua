@@ -30,14 +30,15 @@ function initBattleSystem()
   mainCommandsGrids[1][1][1] = {contents = "ATTACK", bgColor = {r = 0.4, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroAttack"}
   mainCommandsGrids[1][1][2] = {contents = "MOVE", bgColor = {r = 0.2, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroMove", commandParams = "DEBUG"}
   mainCommandsGrids[1][1][3] = {contents = "POTION", bgColor = {r = 0.2, g = 0.4, b = 0.4}, lineColor = white(0.5), command = "heroPotion"}
-  mainCommandsGrids[1][2][3] = {contents = "DISMISS", bgColor = {r = 0.4, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroDismiss"}
+  -- mainCommandsGrids[1][2][3] = {contents = "DISMISS", bgColor = {r = 0.4, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroDismiss"}
   mainCommandsGrids[1][3][1] = {contents = "END TURN (debug)", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEndTurn"}
   mainCommandsGrids[1][3][3] = {contents = "RUN AWAY", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEscape"}
   
   --can i load a skill based on data? 
   --all very DEBUG obviously... skills will mainly go in separate mind grids, and faves will be managed another different way
   local skill = HERO.skills[1]
-  mainCommandsGrids[1][3][2] = {contents = skill.name, bgColor = {r = 0.8, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroUseSkill", commandParams = 1} 
+  mainCommandsGrids[1][3][2] = {contents = HERO.skills[1].name, bgColor = {r = 0.8, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroUseSkill", commandParams = 1} 
+  mainCommandsGrids[1][2][3] = {contents = HERO.skills[2].name, bgColor = {r = 0.4, g = 0.2, b = 0.0}, lineColor = white(0.5), command = "heroUseSkill", commandParams = 2} 
   --DEBUG DEBUG DEBUG
   
   -- tablePrint(mainCommandsGrids)

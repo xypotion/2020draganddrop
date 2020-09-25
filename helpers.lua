@@ -237,3 +237,12 @@ function pcallIt(func, params)
   
   return errorOrReturnValue
 end
+
+
+function inSet(table, item)
+  for k, v in pairs(table) do
+    if v == item then return true end
+  end
+  
+  return false
+end

@@ -90,8 +90,8 @@ function love.load()
   
   loadGraphics()
   
-  a, b, c, d, e = pcall(function() return 1, 2, 3, 4, 5 end)
-  print(a, b, c, d, e)
+  -- a, b, c, d, e = pcall(function() return 1, 2, 3, 4, 5 end)
+  -- print(a, b, c, d, e)
 end
 
 -----------------------------------------------------------------------------------------------------------

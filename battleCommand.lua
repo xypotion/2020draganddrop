@@ -29,23 +29,17 @@ function battleCommand_heroAttack()
     --TODO obviously auto-target something
   end
   
-  print("ping")
+  -- print("ping")
   
   --calculate damage
   local ty, tx = BATTLE.targetedCell.y, BATTLE.targetedCell.x
   local tc = BATTLE.grid[ty][tx]
-  local damage = damageFormula("attack", {user = HERO, target = tc.contents, potency = 100})
+  local damage = damageFormula("attack", {user = HERO, target = tc.contents, potency = 100}) --DEBUG until you implement weapons
   
   --queue events: damage, animation; hp actuation
   queueSet({
-    battleEvent({
-      user = HERO, 
-      target = tc.contents, 
-      damage = damage, 
-      apCost = 1,
-      ty = ty,
-      tx = tx
-    }),
+    battleUnitStatChangeEvent("-hp", tc.contents, {amount = damage, ty = ty, tx = tx}),
+    battleUnitStatChangeEvent("-ap", HERO, {amount = 1, ty = ty, tx = tx}), --DEBUG/TODO get tally of weapons' ap costs
     particleEvent(ty * cellSize * overworldZoom + HALFSCREENCELLSIZE, tx * cellSize * overworldZoom + HALFSCREENCELLSIZE, "bash"),
     --TODO sound effect!
   })
@@ -164,14 +158,12 @@ function skill_fireball(params)
   
   --queue events: damage, animation; hp actuation
   queueSet({
-    battleEvent({
-      user = HERO, 
-      target = tc.contents, 
-      damage = damage, 
-      apCost = 2,
-      ty = ty,
-      tx = tx
-    }),
+    battleUnitStatChangeEvent("-hp", tc.contents, {amount = damage, ty = ty, tx = tx}, 1.5),
+    battleUnitStatChangeEvent("-ap", HERO, {amount = params.skill.apCost, ty = ty, tx = tx}),
     particleEvent(ty * cellSize * overworldZoom + HALFSCREENCELLSIZE, tx * cellSize * overworldZoom + HALFSCREENCELLSIZE, "fireball"),
   })
+end
+
+function skill_quake(params)
+  --do this next, i dare ya
 end

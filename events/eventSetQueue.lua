@@ -40,19 +40,28 @@ function eventProcessing(dt)
 	if eventFrame >= eventFrameLength then
 		eventFrame = eventFrame % eventFrameLength
 
-		if peek(eventSetQueue) then 
+    --should input be blocked, i.e. are there events to process? TODO actually use inputLevel, lol
+    -- print("peek(eventSetQueue):", peek(eventSetQueue))
+    
+		if peek(currentEvents) or peek(eventSetQueue) then 
 			inputLevel = "none"
 		else
 			inputLevel = "normal"
 			return
 		end
 		
-		local numFinished = 0
+    -- local numFinished = 0
 		
 		-- local es = peek(eventSetQueue)
 		-- local numFinished = 0
 		if (not currentEvents or empty(currentEvents)) and peek(eventSetQueue) then
 			currentEvents = pop(eventSetQueue)
+      
+
+      -- print("NEW EVENT SET:")
+
+      -- tablePrint(currentEvents, 3)
+      -- print("\n\n")
 		end
 		
 		if empty(currentEvents) then print("no current events") end
@@ -62,11 +71,18 @@ function eventProcessing(dt)
 			if not e.finished then
         -- print("PROCESSING "..e.class.." EVENT") --DEBUG useful
 			
-				_G["process_"..e.class.."Event"](e)
+				_G["process_"..e.class.."Event"](e, dt)
 				
 				if e.finished then
           -- print(e.class, " FINISHED") --DEBUG useful
-					currentEvents[k] = nil
+
+          -- tablePrint(currentEvents, 3)
+          -- print("REMOVING "..k)
+          currentEvents[k] = nil
+          -- tablePrint(currentEvents, 3)
+          
+          -- print("\n\n")
+          -- table.remove(currentEvents, k)
 				end
 			end
 		end
