@@ -66,6 +66,7 @@ function drawBattlefieldGrid()
 end
 
 function drawBattleEffectText()
+  --TODO maybe a little "bounce" effect would be better? the slow float upward is a little awkward
   for k, t in ipairs(BATTLE.effectTexts) do
     setColor(t.color)
     love.graphics.printf(t.text, t.x - cellSize * 0.5, t.y, cellSize * 1, "center", 0, 2, 2) --TODO establish constants or game settings

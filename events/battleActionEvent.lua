@@ -83,7 +83,7 @@ function battleUnitStatChangeEvent(op, unit, params, delay)
     op = op,
     unit = unit,
     params = params,
-    delay = delay or 0
+    delay = delay or 0 --TODO rename, this is vague
   }
   
   return e

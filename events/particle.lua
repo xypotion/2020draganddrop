@@ -61,6 +61,21 @@ function newParticleType(y, x, name)
     
     ps:setEmitterLifetime(2)
     ps:emit(9)
+    
+  elseif name == "blizzard" then
+    ps:setDirection(1)
+    ps:setLinearAcceleration(300, 0)
+    ps:setSpread(1)
+    ps:setSizes(5)
+    ps:setSpeed(243)
+    ps:setColors(1,1,1,1, 1/2,1/2,1,1/2)
+    ps:setParticleLifetime(1.5)
+    ps:setEmissionRate(243)
+    ps:setEmissionArea("borderrectangle", 0, 400, 0)--, true)
+    ps:setPosition(-20, 0)
+    
+    ps:setEmitterLifetime(3)
+    -- ps:emit(9)
   else
     print("\""..name.."\" is not a real particle type, dude. giving you \"bash\".")
     return newParticleFoo(y, x, "bash")

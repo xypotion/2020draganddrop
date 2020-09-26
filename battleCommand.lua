@@ -116,13 +116,23 @@ function battleCommand_heroUseSkill(id)
   
   if not BATTLE.targetedCell then
     autoTarget(s.autoTargetSelector)
+    --all skills need a primary target, right? i think it's OK to do this here...
   end
 
   local ty, tx = BATTLE.targetedCell.y, BATTLE.targetedCell.x
   local tc = BATTLE.grid[ty][tx]
   
   --call the thing
-  local skillResult = pcallIt("skill_"..s.method, {user = HERO, target = tc.contents, skill = s})
+  local skillResult = pcallIt("skill_"..s.method, 
+    {
+      user = HERO, 
+      skill = s,
+      -- targetedCell = BATTLE.targetedCell,
+      ty = ty, tx = tx,
+      tc = tc,
+      -- tUnit = tc.contents,
+      target = tc.contents
+    })
 
   return skillResult
 end
@@ -138,6 +148,7 @@ function autoTarget(type) --TODO DEBUG ETC this is not final
   end
 end
 
+--DEBUG magic attack that hits one enemy
 function skill_fireball(params)
   --[[
   what actually happens at this point for a typical skill?
@@ -151,19 +162,46 @@ function skill_fireball(params)
   the holy grail here is to use these same functions for when enemies use these skills (rather than making separate versions for each skill)
   ]]
         
-  local ty, tx = BATTLE.targetedCell.y, BATTLE.targetedCell.x --find a better way. TODO (actually yeah, this totally doesn't work when enemies use skill)
-  local tc = BATTLE.grid[ty][tx]
-  params.potency = 500
+  params.potency = 300
   local damage = damageFormula("fireball", params)
   
   --queue events: damage, animation; hp actuation
   queueSet({
-    battleUnitStatChangeEvent("-hp", tc.contents, {amount = damage, ty = ty, tx = tx}, 1.5),
-    battleUnitStatChangeEvent("-ap", HERO, {amount = params.skill.apCost, ty = ty, tx = tx}),
-    particleEvent(ty * cellSize * overworldZoom + HALFSCREENCELLSIZE, tx * cellSize * overworldZoom + HALFSCREENCELLSIZE, "fireball"),
+    battleUnitStatChangeEvent("-hp", params.target, {amount = damage, ty = params.ty, tx = params.tx}, 1.5), --TODO this delay should probably be part of skill data
+    battleUnitStatChangeEvent("-ap", HERO, {amount = params.skill.apCost}),
+    particleEvent(params.ty * cellSize * overworldZoom + HALFSCREENCELLSIZE, params.tx * cellSize * overworldZoom + HALFSCREENCELLSIZE, "fireball"),
   })
 end
 
-function skill_quake(params)
-  --do this next, i dare ya
+--DEBUG magic attack that hits all enemies
+function skill_blizzard(params)
+  local ty, tx = BATTLE.targetedCell.y, BATTLE.targetedCell.x --find a better way. TODO (actually yeah, this totally doesn't work when enemies use skill)
+  local tc = BATTLE.grid[ty][tx]
+  
+  params.potency = 200 --still DEBUG
+  local damage = 0
+  
+  local es = {} --event set for queueing momentarily
+  
+  --damage for each enemy
+  for k, c in pairs(allCellsInGrid(BATTLE.grid)) do 
+    --things like this might be common, so a "allEnemiesInGrid" or allUnitsInGrid(grid, "enemy") might save space TODO
+    --you COULD even do a forAllUnitsInGrid(grid, "enemy", function() push(es, event) end) anonymous function... but that's maybe too fancy & not worth it
+    if c.cell.contents.class == "enemy" then
+      damage = damageFormula("fireball", params)
+      push(es, battleUnitStatChangeEvent("-hp", c.cell.contents, {amount = damage, ty = c.y, tx = c.x}, 2.5))
+    end
+  end
+  
+  --AP cost + animation
+  push(es, battleUnitStatChangeEvent("-ap", HERO, {amount = params.skill.apCost}))
+  push(es, particleEvent(params.ty * cellSize * overworldZoom + HALFSCREENCELLSIZE, params.tx * cellSize * overworldZoom + HALFSCREENCELLSIZE, "blizzard"))
+  
+  queueSet(es)
 end
+
+--TODO aha! you needed this after all
+function getContentsAt(grid, y, x)
+  return grid[y][x].contents
+end
+--OR DID YOU??

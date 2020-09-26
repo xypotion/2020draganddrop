@@ -66,7 +66,7 @@ function initHERO()
   HERO.cards = {}
   HERO.skills = {
     loadSkill("fireball"), --oh, right. this works :D
-    loadSkill("fireball") 
+    loadSkill("blizzard") 
   }
   HERO.gear = {
     newGear(1),
