@@ -124,20 +124,26 @@ end
 
 function drawBattleMainCommands()
   for k, v in pairs(allCellsInGrid(mainCommandsGrids[mainCommandsGrids.current])) do    
-    setColor(v.cell.bgColor)
-    love.graphics.rectangle("fill", (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, cellSize)
-
-    setColor(v.cell.lineColor)
-    love.graphics.rectangle("line", (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, cellSize)
-    
     --these draw/print commands are so ugly, not to mention repetetive... find some way to abstract them or make them cleaner! TODO DRY it up
     
     --print the name of the battle command. i guess this is DEBUG? not sure yet :P
     if v.cell.contents then
       white()
-      love.graphics.printf(v.cell.contents, (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, "center")
+      if v.cell.contents.class == "skill" then
+        love.graphics.draw(v.cell.contents.graphic, (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY)
+      elseif v.cell.contents.class == "heroCommand" then
+        --this is mostly a DEBUG mess. 
+        --TODO don't forget to remove this when it's no longer needed... it's just confusing :P
+        setColor(v.cell.contents.bgColor)
+        love.graphics.rectangle("fill", (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, cellSize)
+        white()
+        love.graphics.printf(v.cell.contents.label, (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, "center")
+      end
     end
-      
+    
+    --grid lines go on TOP
+    white(0.5)
+    love.graphics.rectangle("line", (v.x-1) * cellSize + mainCommandsGrids.offsetX, (v.y-1) * cellSize + mainCommandsGrids.offsetY, cellSize, cellSize)
   end
 end
 

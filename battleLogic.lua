@@ -27,18 +27,20 @@ function initBattleSystem()
   mainCommandsGrids.offsetY, mainCommandsGrids.offsetX = cellSize * 5, cellSize
   
   --eventually all of this will need to be loaded from data since the command grids are configurable TODO
-  mainCommandsGrids[1][1][1] = {contents = "ATTACK", bgColor = {r = 0.4, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroAttack"}
-  mainCommandsGrids[1][1][2] = {contents = "MOVE", bgColor = {r = 0.2, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroMove", commandParams = "DEBUG"}
-  mainCommandsGrids[1][1][3] = {contents = "POTION", bgColor = {r = 0.2, g = 0.4, b = 0.4}, lineColor = white(0.5), command = "heroPotion"}
-  -- mainCommandsGrids[1][2][3] = {contents = "DISMISS", bgColor = {r = 0.4, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroDismiss"}
-  mainCommandsGrids[1][3][1] = {contents = "END TURN (debug)", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEndTurn"}
-  mainCommandsGrids[1][3][3] = {contents = "RUN AWAY", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEscape"}
+  mainCommandsGrids[1][1][1] = {contents = {class = "heroCommand", method = "heroAttack", label = "ATTACK", bgColor = {r = 0.4, g = 0.2, b = 0.2}}}
+  mainCommandsGrids[1][1][2] = {contents = {class = "heroCommand", method = "heroMove", label = "MOVE", bgColor = {r = 0.2, g = 0.4, b = 0.2}}}
+  mainCommandsGrids[1][1][3] = {contents = {class = "heroCommand", method = "heroPotion", label = "POTION x9", bgColor = {r = 0.2, g = 0.2, b = 0.4}}}
+  --label and bgColor are DEBUG things; eventually replace with a plain old graphic! TODO
+
+  -- mainCommandsGrids[1][2][1] = {contents = "DISMISS", bgColor = {r = 0.4, g = 0.4, b = 0.2}, lineColor = white(0.5), command = "heroDismiss"}
+  -- mainCommandsGrids[1][3][1] = {contents = "END TURN (debug)", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEndTurn"}
+  -- mainCommandsGrids[1][3][3] = {contents = "RUN AWAY", bgColor = {r = 0.2, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroEscape"}
   
   --can i load a skill based on data? 
   --all very DEBUG obviously... skills will mainly go in separate mind grids, and faves will be managed another different way
-  local skill = HERO.skills[1]
-  mainCommandsGrids[1][3][2] = {contents = HERO.skills[1].name, bgColor = {r = 0.8, g = 0.2, b = 0.2}, lineColor = white(0.5), command = "heroUseSkill", commandParams = 1} 
-  mainCommandsGrids[1][2][3] = {contents = HERO.skills[2].name, bgColor = {r = 0.4, g = 0.2, b = 0.0}, lineColor = white(0.5), command = "heroUseSkill", commandParams = 2} 
+  -- local skill = HERO.skills[1]
+  mainCommandsGrids[1][3][2] = {contents = HERO.skills[1], lineColor = white(0.5)}
+  mainCommandsGrids[1][2][3] = {contents = HERO.skills[2], lineColor = white(0.5)}
   --DEBUG DEBUG DEBUG
   
   -- tablePrint(mainCommandsGrids)
@@ -107,8 +109,9 @@ function battleClick(mx, my, button)
     -- tablePrint(mainCommandsGrids[mainCommandsGrids.current][mCellY][mCellX])
     
     local cell = mainCommandsGrids[mainCommandsGrids.current][mCellY][mCellX]
-    if cell.command then
-      battleCommand(cell.command, cell.commandParams)
+    if cell.contents then
+      battleCommand(cell.contents)--, cell.commandParams) --TODO will commandParams ever actually be necessary?
+      --as noted in battleCommand, that logic could probably just be moved here. TODO consider, but no rush
     end
   end
   

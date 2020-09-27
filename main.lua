@@ -79,6 +79,8 @@ function love.load()
   oscillatorCounter = 0
   
   love.graphics.setLineWidth(2)
+  
+  loadGraphics()
 
   initHERO()
   
@@ -87,9 +89,7 @@ function love.load()
   initBattleSystem()
   
   GAMESTATE = "overworld"
-  
-  loadGraphics()
-  
+    
   -- a, b, c, d, e = pcall(function() return 1, 2, 3, 4, 5 end)
   -- print(a, b, c, d, e)
 end

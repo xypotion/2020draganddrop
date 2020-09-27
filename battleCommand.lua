@@ -12,9 +12,13 @@ battleClick actually just always passes the commandParams, which is a table cont
 ]]
 
 
---lol, this shrank to a 1-liner. is it still needed? TODO
-function battleCommand(cmd, params)
-  return pcallIt("battleCommand_"..cmd, params)
+-- if this is only ever called by battleClick, does it really need to be a separate function? TODO
+function battleCommand(command)--, params)
+  if command.class == "skill" then
+    heroUseSkill(command)
+  elseif command.class == "heroCommand" then
+    return pcallIt("battleCommand_"..command.method)--, params)
+  end
 end
 
 -----------------------------------------------------------------------------------------------------------
@@ -109,8 +113,8 @@ end
 
 -----------------------------------------------------------------------------------------------------------
 
-function battleCommand_heroUseSkill(id)
-  local s = HERO.skills[id]
+function heroUseSkill(s)
+  -- local s = HERO.skills[id]
   
   -- tablePrint(s)
   

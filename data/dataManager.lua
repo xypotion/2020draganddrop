@@ -3,9 +3,6 @@
 function initDataManager()
 end
 
-function loadData(thing)
-end
-
 
 --obviously DEBUG; this will go somewhere else
 function loadGraphics()
@@ -16,6 +13,7 @@ function loadGraphics()
   IMG.noidea = love.graphics.newImage("img/no_idea.png")
   IMG.dot = love.graphics.newImage("img/dot.png")
   IMG.calcifer = love.graphics.newImage("img/calcifer.png")
+  IMG.ice = love.graphics.newImage("img/ice.png")
   --TODO really, stop copying and pasting this. just write the omni-file-opener vvv
   
   
@@ -45,6 +43,7 @@ function loadSkill(member)
   
   --?
   -- tablePrint(e)
+  e.graphic = IMG[e.graphic]
   
   return e
 end
@@ -175,7 +174,7 @@ DATA.skill = { --skills as bought from the skill shop, i.e. the skill's default/
     attributes = {6, 7, 8, locked = 9}, shopCost = 10, shopMinima = 11,
     animation = 12, method = 13, apCost = 14, cooldown = 15, warmup = 16, range = 17, autoTargetSelector = 18},
   fireball = "Fireball calcifer fireballS fireballM fireballL   d blank blank 1 100 d9   fireball fireball 2 2 0 ranged enemy",
-  blizzard = "Blizzard meow blizS blizM blizL   blank blank blank 0 200 s3   blizzard blizzard 3 2 0 ranged enemy",
+  blizzard = "Blizzard ice blizS blizM blizL   blank blank blank 0 200 s3   blizzard blizzard 3 2 0 ranged enemy",
   debug2 = {}, --maybe a heal or buff
   debug3 = {}, --teleport
 }
